@@ -14,3 +14,22 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+
+
+if sys.platform == 'darwin':
+    from ._darwin import Icon
+
+elif sys.platform == 'win32':
+    from ._win32 import Icon
+
+else:
+    try:
+        from ._xorg import Icon
+    except:
+        pass
+
+
+if not Icon:
+    raise ImportError('this platform is not supported')

@@ -18,7 +18,8 @@ PACKAGE_URL = 'https://github.com/moses-palmer/pystray'
 AUTHOR_EMAIL = 'moses.palmer@gmail.com'
 
 #: The runtime requirements
-RUNTIME_PACKAGES = []
+RUNTIME_PACKAGES = [
+    'Pillow']
 
 #: Additional requirements used during setup
 SETUP_PACKAGES = []
