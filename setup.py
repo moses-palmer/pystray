@@ -22,7 +22,8 @@ RUNTIME_PACKAGES = [
     'Pillow']
 
 #: Additional requirements used during setup
-SETUP_PACKAGES = []
+SETUP_PACKAGES = RUNTIME_PACKAGES + [
+    'sphinx >=1.3.1']
 
 
 # Read globals from ._info without loading it
