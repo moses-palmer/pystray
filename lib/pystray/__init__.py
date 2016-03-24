@@ -15,18 +15,28 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import sys
 
 
+if os.environ.get('__PYSTRAY_GENERATE_DOCUMENTATION') == 'yes':
+    from ._base import Icon
+else:
+    Icon = None
+
+
 if sys.platform == 'darwin':
-    from ._darwin import Icon
+    if not Icon:
+        from ._darwin import Icon
 
 elif sys.platform == 'win32':
-    from ._win32 import Icon
+    if not Icon:
+        from ._win32 import Icon
 
 else:
     try:
-        from ._xorg import Icon
+        if not Icon:
+            from ._xorg import Icon
     except:
         pass
 
