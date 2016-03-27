@@ -86,6 +86,7 @@ setuptools.setup(
     test_suite='tests',
 
     license='LGPLv3',
+    keywords='system tray icon, systray icon',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
