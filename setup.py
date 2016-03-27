@@ -48,6 +48,11 @@ try:
             os.path.dirname(__file__),
             'README.rst')) as f:
         README = f.read()
+
+    with open(os.path.join(
+            os.path.dirname(__file__),
+            'usage.rst')) as f:
+        README += '\n\n' + f.read()
 except IOError:
     README = ''
 
@@ -86,4 +91,15 @@ setuptools.setup(
     test_suite='tests',
 
     license='LGPLv3',
-    classifiers=[])
+    keywords='system tray icon, systray icon',
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU Lesser General Public License v3 '
+        '(LGPLv3)',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows :: Windows NT/2000',
+        'Operating System :: POSIX',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4'])
