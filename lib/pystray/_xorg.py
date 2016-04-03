@@ -273,7 +273,7 @@ class Icon(_base.Icon):
             def inner(self):
                 # Just invoke the method if we are currently in the correct
                 # thread
-                if threading.current_thread() == self._thread:
+                if threading.current_thread().ident == self._thread.ident:
                     original()
                 else:
                     self._send_message(self._window, atom)
