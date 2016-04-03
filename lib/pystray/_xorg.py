@@ -106,8 +106,10 @@ class Icon(_base.Icon):
     def __del__(self):
         try:
             # Destroying the window will stop the mainloop thread
-            self._stop()
-            self._thread.join()
+            if self._running:
+                self._stop()
+                if threading.current_thread().ident != self._thread.ident:
+                    self._thread.join()
 
         finally:
             self._display.close()
