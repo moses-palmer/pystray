@@ -24,6 +24,7 @@ import types
 
 import PIL
 import Xlib.display
+import Xlib.threaded
 import Xlib.XK
 
 from six.moves import queue
