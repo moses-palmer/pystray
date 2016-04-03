@@ -142,7 +142,8 @@ class Icon(object):
             if setup:
                 setup(self)
 
-        threading.Thread(target=setup_handler).start()
+        self._setup_thread = threading.Thread(target=setup_handler)
+        self._setup_thread.start()
         self._run()
         self._running = True
 
@@ -153,6 +154,8 @@ class Icon(object):
         from a different thread.
         """
         self._stop()
+        if self._setup_thread.ident != threading.current_thread().ident:
+            self._setup_thread.join()
         self._running = False
 
     def _mark_ready(self):
