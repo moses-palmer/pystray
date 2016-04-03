@@ -55,8 +55,10 @@ class Icon(_base.Icon):
             six.reraise(*result)
 
     def __del__(self):
-        self._stop()
-        self._thread.join()
+        if self._running:
+            self._stop()
+            if self._thread.ident != threading.current_thread().ident:
+                self._thread.join()
 
     def _show(self):
         self._assert_icon_handle()
