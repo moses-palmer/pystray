@@ -58,6 +58,8 @@ class Icon(object):
 
         self.__queue = queue.Queue()
 
+        self._running = False
+
     def __del__(self):
         if self.visible:
             self._hide()
@@ -140,8 +142,10 @@ class Icon(object):
             if setup:
                 setup(self)
 
-        threading.Thread(target=setup_handler).start()
+        self._setup_thread = threading.Thread(target=setup_handler)
+        self._setup_thread.start()
         self._run()
+        self._running = True
 
     def stop(self):
         """Stops the loop handling events for the icon.
@@ -150,6 +154,9 @@ class Icon(object):
         from a different thread.
         """
         self._stop()
+        if self._setup_thread.ident != threading.current_thread().ident:
+            self._setup_thread.join()
+        self._running = False
 
     def _mark_ready(self):
         """Marks the icon as ready.

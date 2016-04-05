@@ -43,20 +43,22 @@ class Icon(_base.Icon):
             WM_STOP: self._on_stop,
             WM_NOTIFY: self._on_notify}
 
-        # Run the mainloop in a separate thread
         self._queue = queue.Queue()
-        self._thread = threading.Thread(target=self._mainloop)
-        self._thread.daemon = True
-        self._thread.start()
 
-        # Wait for the mainloop thread to initialise, and reraise any errors
-        result = self._queue.get()
-        if result is not True:
-            six.reraise(*result)
+        # Create the message loop
+        msg = wintypes.MSG()
+        lpmsg = ctypes.byref(msg)
+        PeekMessage(lpmsg, None, 0x0400, 0x0400, PM_NOREMOVE)
+
+        self._atom = self._register_class()
+        self._hwnd = self._create_window(self._atom)
+        self._HWND_TO_ICON[self._hwnd] = self
 
     def __del__(self):
-        self._stop()
-        self._thread.join()
+        if self._running:
+            self._stop()
+            if self._thread.ident != threading.current_thread().ident:
+                self._thread.join()
 
     def _show(self):
         self._assert_icon_handle()
@@ -90,8 +92,9 @@ class Icon(_base.Icon):
     def _run(self):
         self._mark_ready()
 
-        # Wait for the loop to terminate
-        self._thread.join()
+        # Run the event loop
+        self._thread = threading.current_thread()
+        self._mainloop()
 
     def _stop(self):
         PostMessage(self._hwnd, WM_STOP, 0, 0)
@@ -102,23 +105,6 @@ class Icon(_base.Icon):
         This method retrieves all events from *Windows* and makes sure to
         dispatch clicks.
         """
-        # Create the message loop
-        msg = wintypes.MSG()
-        lpmsg = ctypes.byref(msg)
-        PeekMessage(lpmsg, None, 0x0400, 0x0400, PM_NOREMOVE)
-
-        try:
-            atom = self._register_class()
-            self._hwnd = self._create_window(atom)
-            self._HWND_TO_ICON[self._hwnd] = self
-
-        except:
-            self._queue.put(sys.exc_info())
-            return
-
-        # Tell the calling thread that we are ready
-        self._queue.put(True)
-
         # Pump messages
         try:
             while True:
@@ -149,7 +135,7 @@ class Icon(_base.Icon):
                 pass
 
             DestroyWindow(self._hwnd)
-            self._unregister_class(atom)
+            self._unregister_class(self._atom)
 
     def _on_stop(self, wparam, lparam):
         """Handles ``WM_STOP``.
@@ -281,7 +267,7 @@ WM_USER = 0x400
 WM_STOP = WM_USER + 10
 WM_NOTIFY = WM_USER + 11
 
-HWND_MESSAGE = -3L
+HWND_MESSAGE = -3
 PM_NOREMOVE = 0
 
 COLOR_WINDOW = 5
@@ -325,8 +311,8 @@ PostQuitMessage = windll.user32.PostQuitMessage
 TranslateMessage = windll.user32.TranslateMessage
 
 
-WNDPROC = wintypes.WINFUNCTYPE(
-    wintypes.HRESULT,
+WNDPROC = ctypes.WINFUNCTYPE(
+    ctypes.HRESULT,
     wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
 
 

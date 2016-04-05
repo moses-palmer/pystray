@@ -24,6 +24,7 @@ import types
 
 import PIL
 import Xlib.display
+import Xlib.threaded
 import Xlib.XK
 
 from six.moves import queue
@@ -91,22 +92,36 @@ class Icon(_base.Icon):
             Xlib.X.DestroyNotify: self._on_destroy_notify,
             Xlib.X.Expose: self._on_expose}
 
-        # Run the mainloop in a separate thread
         self._queue = queue.Queue()
-        self._thread = threading.Thread(target=self._mainloop)
-        self._thread.daemon = True
-        self._thread.start()
 
-        # Wait for the mainloop thread to initialise, and reraise any errors
-        result = self._queue.get()
-        if result is not True:
-            six.reraise(*result)
+        # Connect to X
+        self._display = Xlib.display.Display()
+
+        with display_manager(self._display):
+            # Create the atoms; some of these are required when creating
+            # the window
+            self._create_atoms()
+
+            # Create the window and get a graphics context
+            self._window = self._create_window()
+            self._gc = self._window.create_gc()
+
+            # Rewrite the platform implementation methods to ensure they
+            # are executed in this thread
+            self._rewrite_implementation(
+                self._show,
+                self._hide,
+                self._update_icon,
+                self._update_title,
+                self._stop)
 
     def __del__(self):
         try:
             # Destroying the window will stop the mainloop thread
-            self._stop()
-            self._thread.join()
+            if self._running:
+                self._stop()
+                if threading.current_thread().ident != self._thread.ident:
+                    self._thread.join()
 
         finally:
             self._display.close()
@@ -154,8 +169,9 @@ class Icon(_base.Icon):
     def _run(self):
         self._mark_ready()
 
-        # Wait for the loop to terminate
-        self._thread.join()
+        # Run the event loop
+        self._thread = threading.current_thread()
+        self._mainloop()
 
     def _stop(self):
         """Stops the mainloop.
@@ -169,36 +185,6 @@ class Icon(_base.Icon):
         This method retrieves all events from *X* and makes sure to dispatch
         clicks.
         """
-        # Connect to X
-        self._display = Xlib.display.Display()
-
-        try:
-            with display_manager(self._display):
-                # Create the atoms; some of these are required when creating
-                # the window
-                self._create_atoms()
-
-                # Create the window and get a graphics context
-                self._window = self._create_window()
-                self._gc = self._window.create_gc()
-
-                # Rewrite the platform implementation methods to ensure they
-                # are executed in this thread
-                self._rewrite_implementation(
-                    self._show,
-                    self._hide,
-                    self._update_icon,
-                    self._update_title,
-                    self._stop)
-
-        except:
-            # Pass the error to the calling thread
-            self._queue.put(sys.exc_info())
-            return
-
-        # Tell the calling thread that we are ready
-        self._queue.put(True)
-
         try:
             for event in self._events():
                 # If the systray window is destroyed, the icon has been hidden
@@ -272,7 +258,7 @@ class Icon(_base.Icon):
             def inner(self):
                 # Just invoke the method if we are currently in the correct
                 # thread
-                if threading.current_thread() == self._thread:
+                if threading.current_thread().ident == self._thread.ident:
                     original()
                 else:
                     self._send_message(self._window, atom)
