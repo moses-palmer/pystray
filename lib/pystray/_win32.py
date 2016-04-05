@@ -325,8 +325,8 @@ PostQuitMessage = windll.user32.PostQuitMessage
 TranslateMessage = windll.user32.TranslateMessage
 
 
-WNDPROC = wintypes.WINFUNCTYPE(
-    wintypes.HRESULT,
+WNDPROC = ctypes.WINFUNCTYPE(
+    ctypes.HRESULT,
     wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
 
 
