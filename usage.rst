@@ -43,8 +43,3 @@ code that would follow the call to ``pystray.Icon.run()`` in it.
 
 ``pystray.Icon.run()`` will not complete until ``~pystray.Icon.stop()`` is
 called.
-
-If you do not wish to support *OSX*, the above code can be replaced with the
-following::
-
-    icon.visible = True
