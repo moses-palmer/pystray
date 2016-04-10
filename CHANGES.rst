@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v0.3.1 - No-change packaging update
+-----------------------------------
+*  Do not package an old version of ``pynput``.
+
+
 v0.3 - Proper Python 3 Support
 ------------------------------
 *  Corrected Python 3 bugs.
