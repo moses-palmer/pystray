@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v0.3.2 - Universal wheel
+------------------------
+*  Make sure to build a universal wheel for all python versions.
+
+
 v0.3.1 - No-change packaging update
 -----------------------------------
 *  Do not package an old version of ``pynput``.
