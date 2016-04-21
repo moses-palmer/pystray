@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v0.3.3 - Corrected encoding issues
+----------------------------------
+*  Make sure building works even when default encoding is not *utf-8*.
+*  Corrected issue with click selector on *OSX*.
+
+
 v0.3.2 - Universal wheel
 ------------------------
 *  Make sure to build a universal wheel for all python versions.
