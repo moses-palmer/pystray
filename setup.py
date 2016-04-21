@@ -48,13 +48,13 @@ INFO['version'] = '.'.join(str(v) for v in INFO['__version__'])
 try:
     with open(os.path.join(
             os.path.dirname(__file__),
-            'README.rst')) as f:
-        README = f.read()
+            'README.rst', 'rb')) as f:
+        README = f.read().decode('utf-8')
 
     with open(os.path.join(
             os.path.dirname(__file__),
-            'usage.rst')) as f:
-        README += '\n\n' + f.read()
+            'usage.rst'), 'rb') as f:
+        README += '\n\n' + f.read().decode('utf-8')
 except IOError:
     README = ''
 
