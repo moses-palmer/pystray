@@ -27,7 +27,7 @@ from . import _base
 
 class Icon(_base.Icon):
     #: The selector for the button action
-    _ACTION_SELECTOR = 'activate:sender'
+    _ACTION_SELECTOR = b'activate:sender'
 
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)

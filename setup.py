@@ -3,6 +3,7 @@
 
 import os
 import setuptools
+import sys
 
 
 #: The name of the package on PyPi
@@ -32,27 +33,28 @@ with open(os.path.join(
         os.path.dirname(__file__),
         'lib',
         MAIN_PACKAGE_NAME,
-        '_info.py')) as f:
-    for line in f:
-        try:
-            name, value = (i.strip() for i in line.split('='))
-            if name.startswith('__') and name.endswith('__'):
-                INFO[name[2:-2]] = eval(value)
-        except ValueError:
-            pass
+        '_info.py'), 'rb') as f:
+    data = (
+        f.read().decode('utf-8') if sys.version_info.major >= 3
+        else f.read())
+    code = compile(data, '_info.py', 'exec')
+    exec(code, {}, INFO)
+INFO['author'] = INFO['__author__']
+INFO['version'] = '.'.join(str(v) for v in INFO['__version__'])
+
 
 
 # Load the read me
 try:
     with open(os.path.join(
             os.path.dirname(__file__),
-            'README.rst')) as f:
-        README = f.read()
+            'README.rst', 'rb')) as f:
+        README = f.read().decode('utf-8')
 
     with open(os.path.join(
             os.path.dirname(__file__),
-            'usage.rst')) as f:
-        README += '\n\n' + f.read()
+            'usage.rst'), 'rb') as f:
+        README += '\n\n' + f.read().decode('utf-8')
 except IOError:
     README = ''
 
@@ -61,15 +63,15 @@ except IOError:
 try:
     with open(os.path.join(
             os.path.dirname(__file__),
-            'CHANGES.rst')) as f:
-        CHANGES = f.read()
+            'CHANGES.rst'), 'rb') as f:
+        CHANGES = f.read().decode('utf-8')
 except IOError:
     CHANGES = ''
 
 
 setuptools.setup(
     name=PYPI_PACKAGE_NAME,
-    version='.'.join(str(i) for i in INFO['version']),
+    version=INFO['version'],
     description='Provides systray integration',
     long_description=README + '\n\n' + CHANGES,
 
