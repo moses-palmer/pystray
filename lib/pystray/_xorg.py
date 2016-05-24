@@ -356,6 +356,7 @@ class Icon(_base.Icon):
         self._icon_data.paste(self._icon.resize(
             (width, height),
             PIL.Image.ANTIALIAS))
+        self._icon_data.tostring = self._icon_data.tobytes
 
     def _assert_docked(self):
         """Asserts that the icon is docked in the systray.
