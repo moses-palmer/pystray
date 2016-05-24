@@ -29,7 +29,7 @@ def git(*args):
             ' '.join(args),
             g.returncode, stderr)
     else:
-        return stdout
+        return stdout.decode('utf-8')
 
 
 def get_version():
