@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v0.3.4 - Corrected Python 3 issues on Xorg
+------------------------------------------
+*  Make sure that ``pystray`` can be used on *Python 3* on *Xorg*.
+*  Make sure the release making script runs on *Python 3*.
+
+
 v0.3.3 - Corrected encoding issues
 ----------------------------------
 *  Make sure building works even when default encoding is not *utf-8*.
