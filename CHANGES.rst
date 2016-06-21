@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+v0.3.5 - Corrected import errors
+--------------------------------
+*  Propagate import errors raised on Linux to help troubleshoot missing
+   ``Xlib`` module. Thanks to Lance Kindle!
+*  Properly declare ``six`` as a dependency.
+*  Declare ``python3-xlib`` as dependency on *Linux* for *Python 3*.
+
+
 v0.3.4 - Corrected Python 3 issues on Xorg
 ------------------------------------------
 *  Make sure that ``pystray`` can be used on *Python 3* on *Xorg*.
