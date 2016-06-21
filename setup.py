@@ -20,11 +20,17 @@ AUTHOR_EMAIL = 'moses.palmer@gmail.com'
 
 #: The runtime requirements
 RUNTIME_PACKAGES = [
-    'Pillow']
+    'Pillow',
+    'six']
 
 #: Additional requirements used during setup
 SETUP_PACKAGES = RUNTIME_PACKAGES + [
     'sphinx >=1.3.1']
+
+#: Packages requires for different environments
+EXTRA_PACKAGES = {
+    ':sys_platform == "linux" and python_version >= "3.0"': [
+        'python3-xlib']}
 
 
 # Read globals from ._info without loading it
@@ -77,6 +83,7 @@ setuptools.setup(
 
     install_requires=RUNTIME_PACKAGES,
     setup_requires=RUNTIME_PACKAGES + SETUP_PACKAGES,
+    extras_require=EXTRA_PACKAGES,
 
     author=INFO['author'],
     author_email=AUTHOR_EMAIL,
