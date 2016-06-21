@@ -37,6 +37,8 @@ else:
     try:
         if not Icon:
             from ._xorg import Icon
+    except ImportError:
+        raise
     except:
         pass
 
