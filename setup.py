@@ -20,7 +20,8 @@ AUTHOR_EMAIL = 'moses.palmer@gmail.com'
 
 #: The runtime requirements
 RUNTIME_PACKAGES = [
-    'Pillow']
+    'Pillow',
+    'six']
 
 #: Additional requirements used during setup
 SETUP_PACKAGES = RUNTIME_PACKAGES + [
