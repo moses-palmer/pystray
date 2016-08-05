@@ -59,16 +59,11 @@ def gsub(path, regex, group, replacement):
         f.write(regex.sub(sub, data))
 
 
-def assert_current_branch_is_master_and_clean():
-    """Asserts that the current branch is *master* and contains no local
-    changes.
-
-    :raises AssertionError: if the current branch is not master
+def assert_current_branch_is_clean():
+    """Asserts that the current branch contains no local changes.
 
     :raises RuntimeError: if the repository contains local changes
     """
-    assert git('rev-parse', '--abbrev-ref', 'HEAD').strip() == 'master', \
-        'The current branch is not master'
     try:
         git('diff-index', '--quiet', 'HEAD', '--')
     except RuntimeError as e:
@@ -208,7 +203,7 @@ def upload_to_pypi():
 def main():
     version = get_version()
 
-    assert_current_branch_is_master_and_clean()
+    assert_current_branch_is_clean()
     update_info(version)
     check_readme()
     check_release_notes(version)
