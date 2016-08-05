@@ -165,7 +165,8 @@ class IconTest(unittest.TestCase):
                 'Did a flashing %s icon appear?', colors)
 
     def test_activate(self):
-        """Tests that ``on_activate`` is correctly called"""
+        """Tests that ``on_activate`` is correctly called.
+        """
         q = queue.Queue()
 
         def on_activate(icon):
