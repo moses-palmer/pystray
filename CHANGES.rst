@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v0.4 - GTK+ 3 support
+---------------------
+*  Added support for *GTK+* on *Linux*.
+
+
 v0.3.5 - Corrected import errors
 --------------------------------
 *  Propagate import errors raised on Linux to help troubleshoot missing
