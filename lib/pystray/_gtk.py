@@ -107,5 +107,4 @@ class Icon(_base.Icon):
 
     @mainloop
     def _stop(self):
-        # TODO: Implement
-        pass
+        self._loop.quit()
