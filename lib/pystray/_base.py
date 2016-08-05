@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import itertools
 import threading
 
 from six.moves import queue
@@ -208,3 +209,103 @@ class Icon(object):
         This is a platform dependent implementation.
         """
         raise NotImplementedError()
+
+
+class MenuItem(object):
+    """A single menu item.
+
+    A menu item is immutable.
+
+    It has a text and an activation callback. It is callable; when called,
+    the activation callback is called.
+
+    The :attr:`visible` attribute is provided to make menu creation easier; all
+    menu items with this value set to  `False`` will be discarded when a
+    :class:`Menu` is constructed.
+    """
+    def __init__(self, visible, text, on_activated):
+        self._visible = visible
+        self._text = text
+        self._on_activated = on_activated
+
+    @property
+    def visible(self):
+        """Whether this menu item is visible.
+        """
+        return self._visible
+
+    @property
+    def text(self):
+        """The menu item text.
+        """
+        return self._text
+
+    def __call__(self, icon):
+        return self._on_activated(icon)
+
+    def __str__(self):
+        return '    %s' % self.text
+
+
+class Menu(object):
+    """A description of a menu.
+
+    A menu description is immutable.
+
+    It is created with a sequence of either :class:`Menu.Item` instances,
+    strings or tuples. If a non-:class:`Menu.Item` argument is passed, it is
+    interpreted as a tuple to pass to the menu item contructor, with ``visible``
+    set to ``True`` if it is a tuple, and a menu separator if it is the string
+    ``'----'``.
+
+    First, non-visible menu items are removed from the list, then any instances
+    of :attr:`SEPARATOR` occurring at the head or tail of the item list are
+    removed, and any consecutive separators are reduced to one.
+    """
+    #: A representation of a simple separator
+    SEPARATOR = MenuItem(True, '- - - -', None)
+
+    def __init__(self, *items):
+        def menuitem(item):
+            return (
+                item if isinstance(item, MenuItem)
+                else self.SEPARATOR if item == '----'
+                else MenuItem(True, *item))
+
+        def menuitems(items):
+            return (
+                menuitem(i)
+                for i in items)
+
+        def visible(items):
+            return (i for i in items if i.visible)
+
+        def cleaned(items):
+            was_separator = False
+            for i in items:
+                if i is self.SEPARATOR:
+                    if was_separator:
+                        continue
+                    was_separator = True
+                else:
+                    was_separator = False
+                yield i
+
+        def strip_head(items):
+            return itertools.dropwhile(lambda i: i is self.SEPARATOR, items)
+
+        def strip_tail(items):
+            return reversed(list(strip_head(reversed(list(items)))))
+
+        self._items = tuple(
+            i if isinstance(i, MenuItem) else MenuItem(*i)
+            for i in strip_tail(strip_head(cleaned(visible(menuitems(items))))))
+
+    def __getitem__(self, key):
+        return self._items[key]
+
+    def __iter__(self):
+        return iter(self._items)
+
+    def __str__(self):
+        return 'Menu:\n' + '\n'.join(str(i) for i in self)
