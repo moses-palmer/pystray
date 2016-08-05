@@ -17,19 +17,7 @@ def git(*args):
 
     :raises RuntimeError: if ``git`` returns non-zero
     """
-    g = subprocess.Popen(
-        ['git'] + list(args),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-
-    stdout, stderr = g.communicate()
-    if g.returncode != 0:
-        raise RuntimeError(
-            'Failed to call git %s (%d): %s',
-            ' '.join(args),
-            g.returncode, stderr)
-    else:
-        return stdout.decode('utf-8')
+    return command('git', *args)
 
 
 def get_version():
@@ -232,6 +220,30 @@ def main():
         raise
     push_to_origin()
     upload_to_pypi()
+
+
+def command(*args):
+    """Executes a command.
+
+    :param args: The command and arguments.
+
+    :return: stdout of the command
+
+    :raises RuntimeError: if the command returns non-zero
+    """
+    g = subprocess.Popen(
+        args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+
+    stdout, stderr = g.communicate()
+    if g.returncode != 0:
+        raise RuntimeError(
+            'Failed to execute <%s> (%d): %s',
+            ' '.join(args),
+            g.returncode, stderr)
+    else:
+        return stdout.decode('utf-8')
 
 
 if __name__ == '__main__':
