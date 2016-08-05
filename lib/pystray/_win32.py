@@ -207,7 +207,7 @@ class Icon(_base.Icon):
         fd, icon_path = tempfile.mkstemp('.ico')
         try:
             with os.fdopen(fd, 'wb') as f:
-                self._icon.save(f, format='ICO')
+                self.icon.save(f, format='ICO')
             hicon = LoadImage(
                 None,
                 wintypes.LPCWSTR(icon_path),
