@@ -59,13 +59,11 @@ class Icon(_base.Icon):
 
     @mainloop
     def _show(self):
-        # TODO: Implement
-        pass
+        self._status_icon.set_visible(True)
 
     @mainloop
     def _hide(self):
-        # TODO: Implement
-        pass
+        self._status_icon.set_visible(False)
 
     @mainloop
     def _update_icon(self):
@@ -74,8 +72,7 @@ class Icon(_base.Icon):
 
     @mainloop
     def _update_title(self):
-        # TODO: Implement
-        pass
+        self._status_icon.set_title(self.title)
 
     def _run(self):
         # TODO: Implement
