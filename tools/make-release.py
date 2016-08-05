@@ -15,42 +15,19 @@ necessary to make a full release.
 '''
 
 
-def git(*args):
-    """Executes ``git`` with the command line arguments given.
-
-    :param args: The arguments to ``git``.
-
-    :return: stdout of ``git``
-
-    :raises RuntimeError: if ``git`` returns non-zero
-    """
-    return command('git', *args)
-
-
-def gsub(path, regex, group, replacement):
-    """Runs a regular expression on the contents of a file and replaces a
-    group.
-
-    :param str path: The path to the file.
-
-    :param regex: The regular expression to use.
-
-    :param int group: The group of the regular expression to replace.
-
-    :param str replacement: The replacement string.
-    """
-    with open(path) as f:
-        data = f.read()
-
-    def sub(match):
-        full = match.group(0)
-        o = match.start(0)
-        return full[:match.start(group) - o] \
-            + replacement \
-            + full[match.end(group) - o:]
-
-    with open(path, 'w') as f:
-        f.write(regex.sub(sub, data))
+def main(version):
+    assert_current_branch_is_clean()
+    update_info(version)
+    check_readme()
+    check_release_notes(version)
+    commit_changes(version)
+    try:
+        tag_release(version)
+    except:
+        commit_changes.undo()
+        raise
+    push_to_origin()
+    upload_to_pypi()
 
 
 def assert_current_branch_is_clean():
@@ -194,19 +171,42 @@ def upload_to_pypi():
             g.returncode, stderr)
 
 
-def main(version):
-    assert_current_branch_is_clean()
-    update_info(version)
-    check_readme()
-    check_release_notes(version)
-    commit_changes(version)
-    try:
-        tag_release(version)
-    except:
-        commit_changes.undo()
-        raise
-    push_to_origin()
-    upload_to_pypi()
+def git(*args):
+    """Executes ``git`` with the command line arguments given.
+
+    :param args: The arguments to ``git``.
+
+    :return: stdout of ``git``
+
+    :raises RuntimeError: if ``git`` returns non-zero
+    """
+    return command('git', *args)
+
+
+def gsub(path, regex, group, replacement):
+    """Runs a regular expression on the contents of a file and replaces a
+    group.
+
+    :param str path: The path to the file.
+
+    :param regex: The regular expression to use.
+
+    :param int group: The group of the regular expression to replace.
+
+    :param str replacement: The replacement string.
+    """
+    with open(path) as f:
+        data = f.read()
+
+    def sub(match):
+        full = match.group(0)
+        o = match.start(0)
+        return full[:match.start(group) - o] \
+            + replacement \
+            + full[match.end(group) - o:]
+
+    with open(path, 'w') as f:
+        f.write(regex.sub(sub, data))
 
 
 def command(*args):
