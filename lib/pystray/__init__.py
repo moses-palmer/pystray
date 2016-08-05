@@ -25,23 +25,34 @@ else:
     Icon = None
 
 
-if sys.platform == 'darwin':
-    if not Icon:
-        from ._darwin import Icon
-
-elif sys.platform == 'win32':
-    if not Icon:
-        from ._win32 import Icon
-
-else:
-    try:
+error = None
+try:
+    if sys.platform == 'darwin':
         if not Icon:
-            from ._xorg import Icon
-    except ImportError:
-        raise
-    except:
-        pass
+            from ._darwin import Icon
+
+    elif sys.platform == 'win32':
+        if not Icon:
+            from ._win32 import Icon
+
+    else:
+        try:
+            if not Icon:
+                from ._gtk import Icon
+        except Exception as e:
+            error = e
+        try:
+            if not Icon:
+                from ._xorg import Icon
+        except Exception as e:
+            error = e
 
 
-if not Icon:
-    raise ImportError('this platform is not supported')
+    if not Icon:
+        if error:
+            raise error
+        else:
+            raise ImportError('this platform is not supported')
+
+finally:
+    del error
