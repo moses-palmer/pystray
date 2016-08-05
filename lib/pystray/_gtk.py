@@ -48,6 +48,15 @@ def mainloop(f):
 
 
 class Icon(_base.Icon):
+    def __init__(self, *args, **kwargs):
+        super(Icon, self).__init__(*args, **kwargs)
+
+        self._status_icon = Gtk.StatusIcon.new()
+        self._status_icon.connect('activate', lambda _: self.on_activate(self))
+
+        if self.icon:
+            self._update_icon()
+
     @mainloop
     def _show(self):
         # TODO: Implement
