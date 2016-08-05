@@ -74,7 +74,7 @@ class IconTest(unittest.TestCase):
     def test_title(self):
         """Tests that initialising with a title works.
         """
-        title = 'pytray test icon'
+        title = 'pystray test icon'
         icon, colors = self.icon(title=title)
 
         @test(icon)
@@ -87,7 +87,7 @@ class IconTest(unittest.TestCase):
     def test_title_set_hidden(self):
         """Tests that setting the title of a hidden icon works.
         """
-        title = 'pytray test icon'
+        title = 'pystray test icon'
         icon, colors = self.icon(title='this is incorrect')
 
         @test(icon)
@@ -101,7 +101,7 @@ class IconTest(unittest.TestCase):
     def test_title_set_visible(self):
         """Tests that setting the title of a visible icon works.
         """
-        title = 'pytray test icon'
+        title = 'pystray test icon'
         icon, colors = self.icon(title='this is incorrect')
 
         @test(icon)
