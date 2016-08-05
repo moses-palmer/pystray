@@ -11,13 +11,18 @@ This script will update the version number of the package and perform all steps
 necessary to make a full release.
 '''
 
+ROOT = os.path.join(
+    os.path.dirname(__file__),
+    os.pardir)
+
+LIB_DIR = os.path.join(ROOT, 'lib')
+
 PACKAGE_NAME = next(
     name
-    for name in os.listdir(os.path.join(
-        os.path.dirname(__file__),
-        os.pardir,
-        'lib'))
+    for name in os.listdir(LIB_DIR)
     if name[0] != '_')
+
+PACKAGE_DIR = os.path.join(LIB_DIR, PACKAGE_NAME)
 
 
 def main(version):
@@ -53,10 +58,7 @@ def update_info(version):
     :param tuple version: The version to set.
     """
     gsub(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.pardir,
-            'lib', PACKAGE_NAME, '_info.py'),
+        os.path.join(PACKAGE_DIR, '_info.py'),
         re.compile(r'__version__\s*=\s*(\([0-9]+(\s*,\s*[0-9]+)*\))'),
         1,
         repr(version))
@@ -74,10 +76,7 @@ def check_release_notes(version):
 
     :param tuple version: The version that is being released.
     """
-    CHANGES = os.path.join(
-        os.path.dirname(__file__),
-        os.pardir,
-        'CHANGES.rst')
+    CHANGES = os.path.join(ROOT, 'CHANGES.rst')
     header = 'v%s' % '.'.join(str(v) for v in version)
 
     # Read the release notes
@@ -158,7 +157,7 @@ def upload_to_pypi():
     print('Uploading to PyPi...')
 
     python(
-        os.path.join(os.path.dirname(__file__), os.pardir, 'setup.py'),
+        os.path.join(ROOT, 'setup.py'),
         'build_sphinx',
         'upload_docs',
         'bdist_egg',
