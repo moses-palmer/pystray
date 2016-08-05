@@ -36,8 +36,14 @@ class Icon(object):
 
     :param callable on_activate: A callback for when the system tray icon is
         activated. It is passed the icon as its sole argument.
+
+    :param menu: A menu to use as popup menu. Setting this will override
+        ``on_activate``. This can be either an instance of :class:`Menu` or a
+        tuple, which will be interpreted as arguments to the :class:`Menu`
+        constructor.
     """
-    def __init__(self, name, icon=None, title=None, on_activate=None):
+    def __init__(
+            self, name, icon=None, title=None, on_activate=None, menu=None):
         self._name = name
 
         if icon:
@@ -56,6 +62,11 @@ class Icon(object):
             self.on_activate = on_activate
         else:
             self.on_activate = lambda icon: None
+
+        if menu:
+            self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
+        else:
+            self._menu = None
 
         self.__queue = queue.Queue()
 
@@ -102,6 +113,20 @@ class Icon(object):
             self._title = value
             if self.visible:
                 self._update_title()
+
+    @property
+    def menu(self):
+        """The menu.
+
+        Setting this to a falsy value will make the icon use :attr:`on_activate`
+        instead of the menu.
+        """
+        return self._menu
+
+    @menu.setter
+    def menu(self, value):
+        self._menu = value
+        self._update_menu()
 
     @property
     def visible(self):
@@ -189,6 +214,13 @@ class Icon(object):
 
     def _update_title(self):
         """Updates the title for an already shown icon.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
+    def _update_menu(self):
+        """Updates the menu.
 
         This is a platform dependent implementation.
         """

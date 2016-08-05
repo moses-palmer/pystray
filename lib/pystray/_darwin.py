@@ -53,6 +53,10 @@ class Icon(_base.Icon):
     def _update_title(self):
         self._status_item.button().setToolTip_(self.title)
 
+    def _update_menu(self):
+        # TODO: Implement
+        pass
+
     def _run(self):
         # Make sure there is an NSApplication instance
         self._app = AppKit.NSApplication.sharedApplication()

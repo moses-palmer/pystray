@@ -90,6 +90,10 @@ class Icon(_base.Icon):
             win32.NIF_TIP,
             szTip=self.title)
 
+    def _update_menu(self):
+        # TODO: Implement
+        pass
+
     def _run(self):
         self._mark_ready()
 

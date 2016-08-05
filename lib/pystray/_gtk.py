@@ -89,6 +89,10 @@ class Icon(_base.Icon):
     def _update_title(self):
         self._status_icon.set_title(self.title)
 
+    def _update_menu(self):
+        # TODO: Implement
+        pass
+
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
         self._mark_ready()
