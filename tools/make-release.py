@@ -8,6 +8,13 @@ import sys
 PACKAGE_NAME = 'pystray'
 
 
+DESCRIPTION='''Makes a full release.
+
+This script will update the version number of the package and perform all steps
+necessary to make a full release.
+'''
+
+
 def git(*args):
     """Executes ``git`` with the command line arguments given.
 
@@ -18,19 +25,6 @@ def git(*args):
     :raises RuntimeError: if ``git`` returns non-zero
     """
     return command('git', *args)
-
-
-def get_version():
-    """Returns the version to set, read from the command line.
-
-    :return: the tuple (v1, v2,...)
-    """
-    try:
-        return tuple(int(p) for p in sys.argv[1].split('.'))
-    except IndexError:
-        raise RuntimeError('You must pass the version as the first argument')
-    except:
-        raise RuntimeError('Invalid version: %s', sys.argv[1])
 
 
 def gsub(path, regex, group, replacement):
@@ -200,9 +194,7 @@ def upload_to_pypi():
             g.returncode, stderr)
 
 
-def main():
-    version = get_version()
-
+def main(version):
     assert_current_branch_is_clean()
     update_info(version)
     check_readme()
@@ -242,8 +234,16 @@ def command(*args):
 
 
 if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+
+    parser.add_argument(
+        'version',
+        type=lambda s: tuple(int(v) for v in s.split('.')))
+
     try:
-        main()
+        main(**vars(parser.parse_args()))
     except Exception as e:
         try:
             sys.stderr.write(e.args[0] % e.args[1:] + '\n')
