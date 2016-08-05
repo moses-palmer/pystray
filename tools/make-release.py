@@ -102,6 +102,7 @@ def check_release_notes(version):
                 '  %s' % release_note
                 for release_note in release_notes) + '\n')
         sys.stdout.write('Is this correct [yes/no]? ')
+        sys.stdout.flush()
         response = sys.stdin.readline().strip()
         if response in ('yes', 'y'):
             break
