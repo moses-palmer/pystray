@@ -5,14 +5,19 @@ import re
 import subprocess
 import sys
 
-PACKAGE_NAME = 'pystray'
-
-
 DESCRIPTION='''Makes a full release.
 
 This script will update the version number of the package and perform all steps
 necessary to make a full release.
 '''
+
+PACKAGE_NAME = next(
+    name
+    for name in os.listdir(os.path.join(
+        os.path.dirname(__file__),
+        os.pardir,
+        'lib'))
+    if name[0] != '_')
 
 
 def main(version):
