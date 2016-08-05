@@ -16,6 +16,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import os
+import tempfile
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -67,8 +69,19 @@ class Icon(_base.Icon):
 
     @mainloop
     def _update_icon(self):
-        # TODO: Implement
-        pass
+        # Write the buffered image to a file and set the status icon image from
+        # the file
+        fd, icon_path = tempfile.mkstemp('.png')
+        try:
+            with os.fdopen(fd, 'wb') as f:
+                self.icon.save(f, format='PNG')
+            self._status_icon.set_from_file(icon_path)
+
+        finally:
+            try:
+                os.unlink(icon_path)
+            except:
+                pass
 
     @mainloop
     def _update_title(self):
