@@ -17,6 +17,7 @@
 
 import functools
 import os
+import signal
 import tempfile
 
 import gi
@@ -53,6 +54,7 @@ class Icon(_base.Icon):
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
+        self._loop = None
         self._status_icon = Gtk.StatusIcon.new()
         self._status_icon.connect('activate', lambda _: self.on_activate(self))
 
@@ -88,8 +90,20 @@ class Icon(_base.Icon):
         self._status_icon.set_title(self.title)
 
     def _run(self):
-        # TODO: Implement
-        pass
+        self._loop = GLib.MainLoop.new(None, False)
+        self._mark_ready()
+
+        def sigint(*args):
+            self._loop.quit()
+            previous_sigint(*args)
+
+        # Make sure that we do not inhibit ctrl+c
+        previous_sigint = signal.signal(signal.SIGINT, sigint)
+        try:
+            self._loop.run()
+        finally:
+            if signal.getsignal(signal.SIGINT) == sigint:
+                signal.signal(signal.SIGINT, previous_sigint)
 
     @mainloop
     def _stop(self):
