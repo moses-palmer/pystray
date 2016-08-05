@@ -60,8 +60,7 @@ def update_info(version):
 def check_readme():
     """Verifies that the ``README`` is *reStructuredText* compliant.
     """
-    subprocess.check_call([
-        'python', 'setup.py', 'check', '--restructuredtext', '--strict'])
+    python('setup.py', 'check', '--restructuredtext', '--strict')
 
 
 def check_release_notes(version):
@@ -153,23 +152,13 @@ def upload_to_pypi():
     """
     print('Uploading to PyPi...')
 
-    g = subprocess.Popen(
-        [
-            'python',
-            os.path.join(os.path.dirname(__file__), os.pardir, 'setup.py'),
-            'build_sphinx',
-            'upload_docs',
-            'bdist_egg',
-            'bdist_wheel',
-            'upload'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-
-    stdout, stderr = g.communicate()
-    if g.returncode != 0:
-        raise RuntimeError(
-            'Failed to upload to PyPi (%d): %s',
-            g.returncode, stderr)
+    python(
+        os.path.join(os.path.dirname(__file__), os.pardir, 'setup.py'),
+        'build_sphinx',
+        'upload_docs',
+        'bdist_egg',
+        'bdist_wheel',
+        'upload')
 
 
 def git(*args):
@@ -182,6 +171,20 @@ def git(*args):
     :raises RuntimeError: if ``git`` returns non-zero
     """
     return command('git', *args)
+
+
+def python(*args):
+    """Executes *Python* with the command line arguments given.
+
+    The *Python* used is the one executing the current script.
+
+    :param args: The arguments to *Python*.
+
+    :return: stdout of *Python*
+
+    :raises RuntimeError: if *Python* returns non-zero
+    """
+    return command(sys.executable, *args)
 
 
 def gsub(path, regex, group, replacement):
