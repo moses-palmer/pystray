@@ -75,8 +75,7 @@ class Icon(object):
         """The current icon.
 
         Setting this to a falsy value will hide the icon. Setting this to an
-        image while the icon is hidden has no effect until the icon is shown
-        using :meth:`show`.
+        image while the icon is hidden has no effect until the icon is shown.
         """
         return self._icon
 
