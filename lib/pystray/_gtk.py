@@ -56,10 +56,15 @@ class Icon(_base.Icon):
 
         self._loop = None
         self._status_icon = Gtk.StatusIcon.new()
-        self._status_icon.connect('activate', lambda _: self.on_activate(self))
+        self._status_icon.connect('activate', self._on_status_icon_activate)
+        self._status_icon.connect('popup-menu', self._on_status_icon_popup_menu)
+        self._popup_menu = None
 
         if self.icon:
             self._update_icon()
+
+        if self.menu:
+            self._update_menu()
 
     @mainloop
     def _show(self):
@@ -89,9 +94,18 @@ class Icon(_base.Icon):
     def _update_title(self):
         self._status_icon.set_title(self.title)
 
+    @mainloop
     def _update_menu(self):
-        # TODO: Implement
-        pass
+        # Just clear the menu if none is set
+        if not self.menu:
+            self._popup_menu = None
+            return
+
+        # Generate the menu
+        self._popup_menu = Gtk.Menu.new()
+        for descriptor in self.menu:
+            self._popup_menu.append(self._create_menu_item(descriptor))
+        self._popup_menu.show_all()
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
@@ -112,3 +126,50 @@ class Icon(_base.Icon):
     @mainloop
     def _stop(self):
         self._loop.quit()
+
+    def _on_status_icon_activate(self, status_icon):
+        """The handler for *activate* for the status icon.
+
+        This signal handler will invoke :attr:`on_activate`.
+        """
+        self.on_activate(self)
+
+    def _on_status_icon_popup_menu(self, status_icon, button, activate_time):
+        """The handler for *popup-menu* for the status icon.
+
+        This signal handler will display the menu if one is set.
+        """
+        if self._popup_menu:
+            self._popup_menu.popup(
+                None, None, Gtk.StatusIcon.position_menu,
+                self._status_icon, 0, Gtk.get_current_event_time())
+
+    def _handler(self, callback):
+        """Generates a signal handler.
+
+        The returned value will accept any number of arguments, but expects
+        ``callback`` to take only this icon.
+
+        :param callable callback: The actual handler.
+        """
+        @functools.wraps(callback)
+        def inner(*args):
+            callback(self)
+
+        return inner
+
+    def _create_menu_item(self, descriptor):
+        """Creates a :class:`Gtk.MenuItem` from a :class:`pystray.MenuItem`
+        instance.
+
+        :param descriptor: The menu item descriptor.
+
+        :return: a :class:`Gtk.MenuItem`
+        """
+        if descriptor is _base.Menu.SEPARATOR:
+            return Gtk.SeparatorMenuItem()
+
+        else:
+            menu_item = Gtk.MenuItem.new_with_label(descriptor.text)
+            menu_item.connect('activate', self._handler(descriptor))
+            return menu_item
