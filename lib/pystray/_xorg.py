@@ -167,8 +167,9 @@ class Icon(_base.Icon):
         self._window.set_wm_name(self.title)
 
     def _update_menu(self):
-        # TODO: Implement
-        pass
+        # We do not support menus for this platform
+        if self.menu:
+            raise NotImplementedError()
 
     def _run(self):
         self._mark_ready()
