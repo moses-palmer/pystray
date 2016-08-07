@@ -262,15 +262,21 @@ class Icon(_base.Icon):
 
 @win32.WNDPROC
 def _dispatcher(hwnd, uMsg, wParam, lParam):
+    """The function used as window procedure for the systray window.
+    """
+    # These messages are sent before Icon._HWND_TO_ICON[hwnd] has been set, so
+    # we handle them explicitly
+    if uMsg == win32.WM_NCCREATE:
+        return True
+    if uMsg == win32.WM_CREATE:
+        return 0
+
     try:
         return int(Icon._HWND_TO_ICON[hwnd]._message_handlers.get(
             uMsg, lambda w, l: 0)(wParam, lParam))
 
     except KeyError:
-        # Icon._HWND_TO_ICON[hwnd] is not yet set; this message is sent during
-        # window creation, so we assume it is WM_CREATE or WM_NCCREATE and
-        # return TRUE
-        return 1
+        return win32.DefWindowProc(hwnd, uMsg, wParam, lParam)
 
     except:
         # TODO: Report

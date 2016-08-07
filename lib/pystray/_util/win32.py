@@ -116,6 +116,11 @@ CreateWindowEx.argtypes = (
     wintypes.HMENU, wintypes.HINSTANCE, wintypes.LPVOID)
 CreateWindowEx.restype = wintypes.HWND
 
+DefWindowProc = windll.user32.DefWindowProcW
+DefWindowProc.argtypes = (
+    wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
+DefWindowProc.restype = wintypes.DWORD
+
 DestroyWindow = windll.user32.DestroyWindow
 DestroyWindow.argtypes = (
     wintypes.HWND,)
