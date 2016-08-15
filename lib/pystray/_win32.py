@@ -108,21 +108,20 @@ class Icon(_base.Icon):
         """
         # Pump messages
         try:
+            msg = wintypes.MSG()
+            lpmsg = ctypes.byref(msg)
             while True:
-                msg = wintypes.MSG()
-                lpmsg = ctypes.byref(msg)
-                while True:
-                    r = win32.GetMessage(lpmsg, None, 0, 0)
-                    if not r:
-                        break
-                    elif r == -1:
-                        break
-                    else:
-                        win32.TranslateMessage(lpmsg)
-                        win32.DispatchMessage(lpmsg)
+                r = win32.GetMessage(lpmsg, None, 0, 0)
+                if not r:
+                    break
+                elif r == -1:
+                    break
+                else:
+                    win32.TranslateMessage(lpmsg)
+                    win32.DispatchMessage(lpmsg)
 
-                # Make sure the icon is removed
-                self._hide()
+            # Make sure the icon is removed
+            self._hide()
 
         except:
             # TODO: Report errors
