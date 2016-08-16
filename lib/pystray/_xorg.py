@@ -168,8 +168,7 @@ class Icon(_base.Icon):
 
     def _update_menu(self):
         # We do not support menus for this platform
-        if self.menu:
-            raise NotImplementedError()
+        pass
 
     def _run(self):
         self._mark_ready()
