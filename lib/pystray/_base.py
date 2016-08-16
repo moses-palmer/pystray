@@ -45,32 +45,18 @@ class Icon(object):
     def __init__(
             self, name, icon=None, title=None, on_activate=None, menu=None):
         self._name = name
-
-        if icon:
-            self._icon = icon
-        else:
-            self._icon = None
-
-        if title:
-            self._title = title
-        else:
-            self._title = ''
-
+        self._icon = icon or None
+        self._title = title or ''
         self._visible = False
-
-        if on_activate:
-            self.on_activate = on_activate
-        else:
-            self.on_activate = lambda icon: None
+        self.on_activate = on_activate or (lambda icon: None)
 
         if menu:
             self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
         else:
             self._menu = None
 
-        self.__queue = queue.Queue()
-
         self._running = False
+        self.__queue = queue.Queue()
 
     def __del__(self):
         if self.visible:
