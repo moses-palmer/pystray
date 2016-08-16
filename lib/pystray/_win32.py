@@ -148,15 +148,16 @@ class Icon(_base.Icon):
             self._hide()
 
         except:
-            # TODO: Report errors
-            pass
+            self._log.error(
+                'An error occurred in the main loop', exc_info=True)
 
         finally:
             try:
                 self._hide()
                 del self._HWND_TO_ICON[self._hwnd]
             except:
-                pass
+                self._log.error(
+                    'An error occurred after the main loop', exc_info=True)
 
             win32.DestroyWindow(self._hwnd)
             win32.DestroyWindow(self._menu_hwnd)
@@ -189,6 +190,7 @@ class Icon(_base.Icon):
             # Get the cursor position to determine where to display the menu
             point = wintypes.POINT()
             if not win32.GetCursorPos(ctypes.byref(point)):
+                self._log.error('Failed to get cursor position')
                 return
 
             # Display the menu and get the menu item identifier; the identifier
@@ -203,6 +205,8 @@ class Icon(_base.Icon):
                 None)
             if identifier:
                 self.menu[identifier - 1](self)
+            else:
+                self._log.error('Unknown menu item identifier: %d' % identifier)
 
     def _create_window(self, atom):
         """Creates the system tray icon window.
@@ -297,7 +301,8 @@ class Icon(_base.Icon):
             try:
                 os.unlink(icon_path)
             except:
-                pass
+                self._log.error(
+                    'Failed to remove temporary icon', exc_info=True)
 
     def _register_class(self):
         """Registers the systray window class.
@@ -345,12 +350,15 @@ def _dispatcher(hwnd, uMsg, wParam, lParam):
         return 0
 
     try:
-        return int(Icon._HWND_TO_ICON[hwnd]._message_handlers.get(
-            uMsg, lambda w, l: 0)(wParam, lParam))
-
+        icon = Icon._HWND_TO_ICON[hwnd]
     except KeyError:
         return win32.DefWindowProc(hwnd, uMsg, wParam, lParam)
 
+    try:
+        return int(icon._message_handlers.get(
+            uMsg, lambda w, l: 0)(wParam, lParam))
+
     except:
-        # TODO: Report
+        icon._log.error(
+            'An error occurred when calling message handler', exc_info=True)
         return 0
