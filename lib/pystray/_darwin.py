@@ -29,6 +29,9 @@ class Icon(_base.Icon):
     #: The selector for the button action
     _ACTION_SELECTOR = b'activate:sender'
 
+    #: The selector for the menu item actions
+    _MENU_ITEM_SELECTOR = b'activateMenuItem:sender'
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
@@ -54,8 +57,16 @@ class Icon(_base.Icon):
         self._status_item.button().setToolTip_(self.title)
 
     def _update_menu(self):
-        # TODO: Implement
-        pass
+        # Just clear the menu if none is set
+        if not self.menu:
+            self._status_item.setMenu_(None)
+            return
+
+        # Generate the menu
+        menu = AppKit.NSMenu.alloc().initWithTitle_(self.name)
+        for descriptor in self.menu:
+            menu.addItem_(self._create_menu_item(descriptor))
+        self._status_item.setMenu_(menu)
 
     def _run(self):
         # Make sure there is an NSApplication instance
@@ -72,6 +83,8 @@ class Icon(_base.Icon):
         self._status_item.button().setTarget_(self._delegate)
         self._status_item.button().setAction_(self._ACTION_SELECTOR)
         self._status_item.button().setHidden_(True)
+
+        self._update_menu()
 
         # Notify the setup callback
         self._mark_ready()
@@ -134,8 +147,32 @@ class Icon(_base.Icon):
         self._icon_image = AppKit.NSImage.alloc().initWithData_(data)
         self._status_item.button().setImage_(self._icon_image)
 
+    def _create_menu_item(self, descriptor):
+        """Creates a :class:`AppKit.NSMenuItem` from a :class:`pystray.MenuItem`
+        instance.
+
+        :param descriptor: The menu item descriptor.
+
+        :return: a :class:`AppKit.NSMenuItem`
+        """
+        if descriptor is _base.Menu.SEPARATOR:
+            return AppKit.NSMenuItem.separatorItem()
+
+        else:
+            menu_item = AppKit.NSMenuItem.alloc() \
+                .initWithTitle_action_keyEquivalent_(
+                    descriptor.text, self._MENU_ITEM_SELECTOR, '')
+            menu_item.setAction_(self._MENU_ITEM_SELECTOR)
+            menu_item.setTarget_(self._delegate)
+            return menu_item
+
 
 class IconDelegate(Foundation.NSObject):
     @objc.namedSelector(Icon._ACTION_SELECTOR)
     def activate(self, sender):
         self.icon.on_activate(self.icon)
+
+    @objc.namedSelector(Icon._MENU_ITEM_SELECTOR)
+    def activate_menu_item(self, sender):
+        self.icon.menu[self.icon._status_item.menu().indexOfItem_(sender)](
+            self.icon)
