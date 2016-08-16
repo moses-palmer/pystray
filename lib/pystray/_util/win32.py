@@ -23,6 +23,7 @@ from ctypes import windll, wintypes
 WM_CREATE = 0x0001
 WM_NCCREATE = 0x0081
 WM_LBUTTONDOWN = 0x0201
+WM_RBUTTONDOWN = 0x0204
 WM_USER = 0x400
 
 WM_STOP = WM_USER + 10
@@ -31,6 +32,36 @@ WM_NOTIFY = WM_USER + 11
 
 LR_DEFAULTSIZE = 0x00000040
 LR_LOADFROMFILE = 0x00000010
+
+
+MFS_CHECKED = 0x00000008
+MFS_DEFAULT = 0x00001000
+MFS_DISABLED = 0x00000003
+MFS_ENABLED = 0x00000000
+MFS_GRAYED = 0x00000003
+MFS_HILITE = 0x00000080
+MFS_UNCHECKED = 0x00000000
+MFS_UNHILITE = 0x00000000
+
+MFT_BITMAP = 0x00000004
+MFT_MENUBARBREAK = 0x00000020
+MFT_MENUBREAK = 0x00000040
+MFT_OWNERDRAW = 0x00000100
+MFT_RADIOCHECK = 0x00000200
+MFT_RIGHTJUSTIFY = 0x00004000
+MFT_RIGHTORDER = 0x00002000
+MFT_SEPARATOR = 0x00000800
+MFT_STRING = 0x00000000
+
+MIIM_BITMAP = 0x00000080
+MIIM_CHECKMARKS = 0x00000008
+MIIM_DATA = 0x00000020
+MIIM_FTYPE = 0x00000100
+MIIM_ID = 0x00000002
+MIIM_STATE = 0x00000001
+MIIM_STRING = 0x00000040
+MIIM_SUBMENU = 0x00000004
+MIIM_TYPE = 0x00000010
 
 
 NIF_MESSAGE = 0x00000001
@@ -49,6 +80,25 @@ NIM_SETFOCUS = 0x00000003
 NIM_SETVERSION = 0x00000004
 
 
+TPM_CENTERALIGN = 0x0004
+TPM_LEFTALIGN = 0x0000
+TPM_RIGHTALIGN = 0x0008
+TPM_BOTTOMALIGN = 0x0020
+TPM_TOPALIGN = 0x0000
+TPM_VCENTERALIGN = 0x0010
+TPM_NONOTIFY = 0x0080
+TPM_RETURNCMD = 0x0100
+TPM_LEFTBUTTON = 0x0000
+TPM_RIGHTBUTTON = 0x0002
+TPM_HORNEGANIMATION = 0x0800
+TPM_HORPOSANIMATION = 0x0400
+TPM_NOANIMATION = 0x4000
+TPM_VERNEGANIMATION = 0x2000
+TPM_VERPOSANIMATION = 0x1000
+TPM_HORIZONTAL = 0x0000
+TPM_VERTICAL = 0x0040
+
+
 PM_NOREMOVE = 0
 COLOR_WINDOW = 5
 HWND_MESSAGE = -3
@@ -57,9 +107,29 @@ IMAGE_ICON = 1
 
 LPMSG = ctypes.POINTER(wintypes.MSG)
 
+LPPOINT = ctypes.POINTER(wintypes.POINT)
+
 WNDPROC = ctypes.WINFUNCTYPE(
     ctypes.HRESULT,
     wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
+
+
+class MENUITEMINFO(ctypes.Structure):
+    _fields_ = [
+        ('cbSize', wintypes.UINT),
+        ('fMask', wintypes.UINT),
+        ('fType', wintypes.UINT),
+        ('fState', wintypes.UINT),
+        ('wID', wintypes.UINT),
+        ('hSubMenu', wintypes.HMENU),
+        ('hbmpChecked', wintypes.HBITMAP),
+        ('hbmpUnchecked', wintypes.HBITMAP),
+        ('dwItemData', wintypes.LPVOID),
+        ('dwTypeData', wintypes.LPCWSTR),
+        ('cch', wintypes.UINT),
+        ('hbmpItem', wintypes.HBITMAP)]
+
+LPMENUITEMINFO = ctypes.POINTER(MENUITEMINFO)
 
 
 class NOTIFYICONDATA(ctypes.Structure):
@@ -91,6 +161,14 @@ class NOTIFYICONDATA(ctypes.Structure):
 LPNOTIFYICONDATA = ctypes.POINTER(NOTIFYICONDATA)
 
 
+class TPMPARAMS(ctypes.Structure):
+    _fields_ = [
+        ('cbSize', wintypes.UINT),
+        ('rcExclude', wintypes.RECT)]
+
+LPTPMPARAMS = ctypes.POINTER(TPMPARAMS)
+
+
 class WNDCLASSEX(ctypes.Structure):
     _fields_ = [
         ('cbSize', wintypes.UINT),
@@ -109,6 +187,11 @@ class WNDCLASSEX(ctypes.Structure):
 LPWNDCLASSEX = ctypes.POINTER(WNDCLASSEX)
 
 
+CreatePopupMenu = windll.user32.CreatePopupMenu
+CreatePopupMenu.argtypes = ()
+CreatePopupMenu.restype = wintypes.HMENU
+
+
 CreateWindowEx = windll.user32.CreateWindowExW
 CreateWindowEx.argtypes = (
     wintypes.DWORD, wintypes.ATOM, wintypes.LPCWSTR, wintypes.DWORD,
@@ -121,6 +204,11 @@ DefWindowProc.argtypes = (
     wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
 DefWindowProc.restype = wintypes.DWORD
 
+DestroyMenu = windll.user32.DestroyMenu
+DestroyMenu.argtypes = (
+    wintypes.HMENU,)
+DestroyMenu.restype = wintypes.BOOL
+
 DestroyWindow = windll.user32.DestroyWindow
 DestroyWindow.argtypes = (
     wintypes.HWND,)
@@ -131,6 +219,11 @@ DispatchMessage.argtypes = (
     LPMSG,)
 DispatchMessage.restype = wintypes.DWORD
 
+GetCursorPos = windll.user32.GetCursorPos
+GetCursorPos.argtypes = (
+    LPPOINT,)
+GetCursorPos.restype = wintypes.BOOL
+
 GetMessage = windll.user32.GetMessageW
 GetMessage.argtypes = (
     LPMSG, wintypes.HWND, wintypes.UINT, wintypes.UINT)
@@ -140,6 +233,11 @@ GetModuleHandle = windll.kernel32.GetModuleHandleW
 GetModuleHandle.argtypes = (
     wintypes.LPCWSTR,)
 GetModuleHandle.restype = wintypes.HMODULE
+
+InsertMenuItem = windll.user32.InsertMenuItemW
+InsertMenuItem.argtypes = (
+    wintypes.HMENU, wintypes.UINT, wintypes.BOOL, LPMENUITEMINFO)
+InsertMenuItem.restype = wintypes.BOOL
 
 LoadImage = windll.user32.LoadImageW
 LoadImage.argtypes = (
@@ -166,6 +264,11 @@ RegisterClassEx.argtypes = (
     LPWNDCLASSEX,)
 RegisterClassEx.restype = wintypes.ATOM
 
+SetForegroundWindow = windll.user32.SetForegroundWindow
+SetForegroundWindow.argtypes = (
+    wintypes.HWND,)
+SetForegroundWindow.restype = wintypes.BOOL
+
 Shell_NotifyIcon = windll.shell32.Shell_NotifyIconW
 Shell_NotifyIcon.argtypes = (
     wintypes.DWORD, LPNOTIFYICONDATA)
@@ -175,6 +278,11 @@ TranslateMessage = windll.user32.TranslateMessage
 TranslateMessage.argtypes = (
     LPMSG,)
 TranslateMessage.restype = wintypes.BOOL
+
+TrackPopupMenuEx = windll.user32.TrackPopupMenuEx
+TrackPopupMenuEx.argtypes = (
+    wintypes.HMENU, wintypes.UINT, wintypes.INT, wintypes.INT, wintypes.HWND,
+    LPTPMPARAMS)
 
 UnregisterClass = windll.user32.UnregisterClassW
 UnregisterClass.argtypes = (

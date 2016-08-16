@@ -37,6 +37,8 @@ class Icon(_base.Icon):
 
         self._icon_handle = None
         self._hwnd = None
+        self._menu_hwnd = None
+        self._hmenu = None
 
         # This is a mapping from win32 event codes to handlers used by the
         # mainloop
@@ -54,7 +56,12 @@ class Icon(_base.Icon):
 
         self._atom = self._register_class()
         self._hwnd = self._create_window(self._atom)
+        self._menu_hwnd = self._create_window(self._atom)
+        self._hmenu = win32.CreatePopupMenu()
         self._HWND_TO_ICON[self._hwnd] = self
+
+        if self.menu:
+            self._update_menu()
 
     def __del__(self):
         if self._running:
@@ -89,6 +96,23 @@ class Icon(_base.Icon):
             win32.NIM_MODIFY,
             win32.NIF_TIP,
             szTip=self.title)
+
+    def _update_menu(self):
+        # Just clear the menu if none is set
+        win32.DestroyMenu(self._hmenu)
+        self._hmenu = win32.CreatePopupMenu()
+        if not self.menu:
+            return
+
+        # Generate the menu
+        for i, descriptor in enumerate(self.menu):
+            # Use the index plus one as menu item identifier; we cannot use the
+            # index directly, since TrackPopupMenuEx will return 0 if no item
+            # was selected
+            menu_item = self._create_menu_item(descriptor, i + 1)
+            if not win32.InsertMenuItem(
+                    self._hmenu, i, True, ctypes.byref(menu_item)):
+                raise ctypes.WinError(wintypes.get_last_error())
 
     def _run(self):
         self._mark_ready()
@@ -135,6 +159,8 @@ class Icon(_base.Icon):
                 pass
 
             win32.DestroyWindow(self._hwnd)
+            win32.DestroyWindow(self._menu_hwnd)
+            win32.DestroyMenu(self._hmenu)
             self._unregister_class(self._atom)
 
     def _on_stop(self, wparam, lparam):
@@ -148,11 +174,35 @@ class Icon(_base.Icon):
     def _on_notify(self, wparam, lparam):
         """Handles ``WM_NOTIFY``.
 
-        This method calls the activate callback. It will only be called for
-        left button clicks.
+        If this is a left button click, :attr:`on_activate` will be called. If a
+        menu is registered and this is a right button click, the popup menu will
+        be displayed.
         """
         if lparam == win32.WM_LBUTTONDOWN:
             self.on_activate(self)
+
+        elif self.menu and lparam == win32.WM_RBUTTONDOWN:
+            # TrackPopupMenuEx does not behave unless our systray window is the
+            # foreground window
+            win32.SetForegroundWindow(self._hwnd)
+
+            # Get the cursor position to determine where to display the menu
+            point = wintypes.POINT()
+            if not win32.GetCursorPos(ctypes.byref(point)):
+                return
+
+            # Display the menu and get the menu item identifier; the identifier
+            # is the menu item index plus one
+            identifier = win32.TrackPopupMenuEx(
+                self._hmenu,
+                win32.TPM_RIGHTALIGN | win32.TPM_BOTTOMALIGN
+                | win32.TPM_RETURNCMD,
+                point.x,
+                point.y,
+                self._menu_hwnd,
+                None)
+            if identifier:
+                self.menu[identifier - 1](self)
 
     def _create_window(self, atom):
         """Creates the system tray icon window.
@@ -175,6 +225,29 @@ class Icon(_base.Icon):
             raise ctypes.WinError(wintypes.get_last_error())
         else:
             return hwnd
+
+    def _create_menu_item(self, descriptor, identifier):
+        """Creates a :class:`pystray._util.win32.MENUITEMINFO` from a
+        :class:`pystray.MenuItem` instance.
+
+        :param descriptor: The menu item descriptor.
+
+        :param int identifier: The menu item identifier
+
+        :return: a :class:`pystray._util.win32.MENUITEMINFO`
+        """
+        if descriptor is _base.Menu.SEPARATOR:
+            return win32.MENUITEMINFO(
+                cbSize=ctypes.sizeof(win32.MENUITEMINFO),
+                fMask=win32.MIIM_FTYPE,
+                fType=win32.MFT_SEPARATOR)
+
+        else:
+            return win32.MENUITEMINFO(
+                cbSize=ctypes.sizeof(win32.MENUITEMINFO),
+                fMask=win32.MIIM_STRING | win32.MIIM_ID,
+                wID=identifier,
+                dwTypeData=descriptor.text)
 
     def _message(self, code, flags, **kwargs):
         """Sends a message the the systray icon.

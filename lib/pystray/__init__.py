@@ -56,3 +56,6 @@ try:
 
 finally:
     del error
+
+
+from ._base import Menu, MenuItem

@@ -181,6 +181,42 @@ class IconTest(unittest.TestCase):
             print('Click the icon')
             q.get(timeout=5)
 
+    def test_menu_construct(self):
+        """Tests that the menu is constructed.
+        """
+        menu = (
+            ('Item 1', lambda _: None),
+            ('Item 2', lambda _: None))
+        icon, colors = self.icon(menu=menu)
+
+        @test(icon)
+        def _():
+            icon.visible = True
+
+            print('Expand the popup menu')
+            self.confirm(
+                'Was it <%s>?' % str(pystray.Menu(*menu)))
+
+    def test_menu_activate(self):
+        """Tests that the menu can be activated.
+        """
+        q = queue.Queue()
+
+        def on_activate(icon):
+            q.put(True)
+
+        menu = (
+            ('Item 1', on_activate),
+            ('Item 2', lambda _: None))
+        icon, colors = self.icon(menu=menu)
+
+        @test(icon)
+        def _():
+            icon.visible = True
+
+            print('Click Item 1')
+            q.get(timeout=5)
+
     def icon(self, **kwargs):
         """Generates a systray icon with the specified colours.
 
