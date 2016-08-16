@@ -119,6 +119,9 @@ class Icon(_base.Icon):
         previous_sigint = signal.signal(signal.SIGINT, sigint)
         try:
             self._loop.run()
+        except:
+            self._log.error(
+                'An error occurred in the main loop', exc_info=True)
         finally:
             if signal.getsignal(signal.SIGINT) == sigint:
                 signal.signal(signal.SIGINT, previous_sigint)

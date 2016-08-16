@@ -133,9 +133,10 @@ class Icon(_base.Icon):
         try:
             self._assert_docked()
         except AssertionError:
-            # There is no systray selection owner, so we cannot dock;
-            # ignore and dock later
-            pass
+            # There is no systray selection owner, so we cannot dock; ignore and
+            # dock later
+            self._log.error(
+                'Failed to dock icon', exc_info=True)
 
     def _hide(self):
         """The implementation of :meth:`_hide`, executed in the mainloop
@@ -152,6 +153,8 @@ class Icon(_base.Icon):
             self._assert_docked()
         except AssertionError:
             # If we are not docked, we cannot update the icon
+            self._log.error(
+                'Failed to dock icon', exc_info=True)
             return
 
         # Setting _icon_data to None will force regeneration of the icon
@@ -199,8 +202,8 @@ class Icon(_base.Icon):
                 self._message_handlers.get(event.type, lambda e: None)(event)
 
         except:
-            # TODO: Report errors
-            pass
+            self._log.error(
+                'An error occurred in the main loop', exc_info=True)
 
     def _on_button_press(self, event):
         """Handles ``Xlib.X.ButtonPress``.
@@ -227,7 +230,8 @@ class Icon(_base.Icon):
             self._assert_docked()
         except AssertionError:
             # There is no new selection owner; we must retry later
-            pass
+            self._log.error(
+                'Failed to dock icon', exc_info=True)
 
     def _on_expose(self, event):
         """Handles ``Xlib.X.ConfigureNotify`` and ``Xlib.X.Expose``.
@@ -403,7 +407,8 @@ class Icon(_base.Icon):
                 event_mask=Xlib.X.NoEventMask)
         except XError:
             # The systray manager may have been destroyed
-            pass
+            self._log.error(
+                'Failed to stop notifications', exc_info=True)
 
         self._window.unmap()
         self._window.reparent(self._display.screen().root, 0, 0)
