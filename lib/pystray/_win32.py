@@ -174,12 +174,12 @@ class Icon(_base.Icon):
     def _on_notify(self, wparam, lparam):
         """Handles ``WM_NOTIFY``.
 
-        If this is a left button click, :attr:`on_activate` will be called. If a
-        menu is registered and this is a right button click, the popup menu will
-        be displayed.
+        If this is a left button click, this icon will be activated. If a menu
+        is registered and this is a right button click, the popup menu will be
+        displayed.
         """
         if lparam == win32.WM_LBUTTONDOWN:
-            self.on_activate(self)
+            self()
 
         elif self.menu and lparam == win32.WM_RBUTTONDOWN:
             # TrackPopupMenuEx does not behave unless our systray window is the

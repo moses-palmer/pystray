@@ -55,6 +55,22 @@ class MenuDescriptorTests(unittest.TestCase):
             '----',
             '----')))
 
+    def test_menu_default_invalid(self):
+        """Tests that an invalid number of default menu items fails.
+        """
+        with self.assertRaises(ValueError):
+            menu(
+                item('one', callback, default=True),
+                item('two', callback, default=True))
+
+    def test_menu_default_callable(self):
+        """Tests that the default menu item is activated when calling the menu.
+        """
+        self.assertEqual(
+            'test result',
+            menu(
+                item('one', lambda _: 'test result', default=True))(None))
+
 
 def menu(*args, **kwargs):
     """A wrapper around the :class:`pystray.Menu` constructor.

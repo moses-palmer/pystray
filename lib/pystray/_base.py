@@ -37,44 +37,42 @@ class Icon(object):
     :param callable on_activate: A callback for when the system tray icon is
         activated. It is passed the icon as its sole argument.
 
-    :param menu: A menu to use as popup menu. Setting this will override
-        ``on_activate``. This can be either an instance of :class:`Menu` or a
-        tuple, which will be interpreted as arguments to the :class:`Menu`
-        constructor.
+        This must not be passed if ``menu`` is set.
+
+    :param menu: A menu to use as popup menu. This can be either an instance of
+        :class:`Menu` or a tuple, which will be interpreted as arguments to the
+        :class:`Menu` constructor. If ``on_activate`` is not passed, the default
+        menu item of this menu is used instead.
+
+        This must not be passed if ``on_activate`` is set.
     """
     def __init__(
             self, name, icon=None, title=None, on_activate=None, menu=None):
+        if on_activate and menu:
+            raise ValueError()
         self._name = name
-
-        if icon:
-            self._icon = icon
-        else:
-            self._icon = None
-
-        if title:
-            self._title = title
-        else:
-            self._title = ''
-
+        self._icon = icon or None
+        self._title = title or ''
         self._visible = False
-
-        if on_activate:
-            self.on_activate = on_activate
-        else:
-            self.on_activate = lambda icon: None
 
         if menu:
             self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
+        elif on_activate:
+            self._menu = Menu(
+                MenuItem(False, '', on_activate, default=True))
         else:
             self._menu = None
 
-        self.__queue = queue.Queue()
-
         self._running = False
+        self.__queue = queue.Queue()
 
     def __del__(self):
         if self.visible:
             self._hide()
+
+    def __call__(self):
+        if self._menu is not None:
+            self._menu(self)
 
     @property
     def name(self):
@@ -118,8 +116,7 @@ class Icon(object):
     def menu(self):
         """The menu.
 
-        Setting this to a falsy value will make the icon use :attr:`on_activate`
-        instead of the menu.
+        Setting this to a falsy value will disable the menu.
         """
         return self._menu
 
@@ -174,9 +171,6 @@ class Icon(object):
 
     def stop(self):
         """Stops the loop handling events for the icon.
-
-        This method can be called either from the ``on_activate`` callback or
-        from a different thread.
         """
         self._stop()
         if self._setup_thread.ident != threading.current_thread().ident:
@@ -255,10 +249,12 @@ class MenuItem(object):
     menu items with this value set to  `False`` will be discarded when a
     :class:`Menu` is constructed.
     """
-    def __init__(self, visible, text, on_activated):
+    def __init__(self, visible, text, on_activated, default=False):
         self._visible = visible
         self._text = text
+        self.__name__ = text
         self._on_activated = on_activated
+        self._default = default
 
     @property
     def visible(self):
@@ -271,6 +267,12 @@ class MenuItem(object):
         """The menu item text.
         """
         return self._text
+
+    @property
+    def default(self):
+        """Whether this is the default menu item.
+        """
+        return self._default
 
     def __call__(self, icon):
         return self._on_activated(icon)
@@ -298,23 +300,12 @@ class Menu(object):
     SEPARATOR = MenuItem(True, '- - - -', None)
 
     def __init__(self, *items):
-        def menuitem(item):
-            return (
-                item if isinstance(item, MenuItem)
-                else self.SEPARATOR if item == '----'
-                else MenuItem(True, *item))
-
-        def menuitems(items):
-            return (
-                menuitem(i)
-                for i in items)
-
-        def visible(items):
-            return (i for i in items if i.visible)
-
         def cleaned(items):
             was_separator = False
             for i in items:
+                if not i.visible:
+                    continue
+
                 if i is self.SEPARATOR:
                     if was_separator:
                         continue
@@ -329,15 +320,39 @@ class Menu(object):
         def strip_tail(items):
             return reversed(list(strip_head(reversed(list(items)))))
 
+        all_menuitems = [
+            (
+                i if isinstance(i, MenuItem)
+                else self.SEPARATOR if i == '----'
+                else MenuItem(True, *i))
+            for i in items]
+        default_menuitems = [
+            menuitem
+            for menuitem in all_menuitems
+            if menuitem.default]
+        if len(default_menuitems) > 1:
+            raise ValueError()
+
+        self._activate = (
+            default_menuitems[0]
+            if len(default_menuitems) == 1
+            else lambda _: None)
+
         self._items = tuple(
             i if isinstance(i, MenuItem) else MenuItem(*i)
-            for i in strip_tail(strip_head(cleaned(visible(menuitems(items))))))
+            for i in strip_tail(strip_head(cleaned(all_menuitems))))
+
+    def __call__(self, icon):
+        return self._activate(icon)
 
     def __getitem__(self, key):
         return self._items[key]
 
     def __iter__(self):
         return iter(self._items)
+
+    def __len__(self):
+        return len(self._items)
 
     def __str__(self):
         return 'Menu:\n' + '\n'.join(str(i) for i in self)

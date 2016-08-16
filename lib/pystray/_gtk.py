@@ -130,9 +130,9 @@ class Icon(_base.Icon):
     def _on_status_icon_activate(self, status_icon):
         """The handler for *activate* for the status icon.
 
-        This signal handler will invoke :attr:`on_activate`.
+        This signal handler will activate the icon.
         """
-        self.on_activate(self)
+        self()
 
     def _on_status_icon_popup_menu(self, status_icon, button, activate_time):
         """The handler for *popup-menu* for the status icon.

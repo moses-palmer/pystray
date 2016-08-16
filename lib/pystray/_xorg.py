@@ -168,8 +168,7 @@ class Icon(_base.Icon):
 
     def _update_menu(self):
         # We do not support menus for this platform
-        if self.menu:
-            raise NotImplementedError()
+        pass
 
     def _run(self):
         self._mark_ready()
@@ -210,7 +209,7 @@ class Icon(_base.Icon):
         left button clicks.
         """
         if event.detail == 1:
-            self.on_activate(self)
+            self()
 
     def _on_destroy_notify(self, event):
         """Handles ``Xlib.X.DestroyNotify``.
