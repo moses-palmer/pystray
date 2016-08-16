@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import itertools
+import logging
 import threading
 
 from six.moves import queue
@@ -54,6 +55,7 @@ class Icon(object):
         self._icon = icon or None
         self._title = title or ''
         self._visible = False
+        self._log = logging.getLogger(__name__)
 
         if menu:
             self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
