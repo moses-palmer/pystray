@@ -284,23 +284,12 @@ class Menu(object):
     SEPARATOR = MenuItem(True, '- - - -', None)
 
     def __init__(self, *items):
-        def menuitem(item):
-            return (
-                item if isinstance(item, MenuItem)
-                else self.SEPARATOR if item == '----'
-                else MenuItem(True, *item))
-
-        def menuitems(items):
-            return (
-                menuitem(i)
-                for i in items)
-
-        def visible(items):
-            return (i for i in items if i.visible)
-
         def cleaned(items):
             was_separator = False
             for i in items:
+                if not i.visible:
+                    continue
+
                 if i is self.SEPARATOR:
                     if was_separator:
                         continue
@@ -315,9 +304,16 @@ class Menu(object):
         def strip_tail(items):
             return reversed(list(strip_head(reversed(list(items)))))
 
+        all_menuitems = [
+            (
+                i if isinstance(i, MenuItem)
+                else self.SEPARATOR if i == '----'
+                else MenuItem(True, *i))
+            for i in items]
+
         self._items = tuple(
             i if isinstance(i, MenuItem) else MenuItem(*i)
-            for i in strip_tail(strip_head(cleaned(visible(menuitems(items))))))
+            for i in strip_tail(strip_head(cleaned(all_menuitems))))
 
     def __getitem__(self, key):
         return self._items[key]
