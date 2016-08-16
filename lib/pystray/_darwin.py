@@ -91,6 +91,9 @@ class Icon(_base.Icon):
 
         try:
             self._app.run()
+        except:
+            self._log.error(
+                'An error occurred in the main loop', exc_info=True)
         finally:
             self._status_bar.removeStatusItem_(self._status_item)
 
