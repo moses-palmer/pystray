@@ -241,10 +241,11 @@ class MenuItem(object):
     menu items with this value set to  `False`` will be discarded when a
     :class:`Menu` is constructed.
     """
-    def __init__(self, visible, text, on_activated):
+    def __init__(self, visible, text, on_activated, default=False):
         self._visible = visible
         self._text = text
         self._on_activated = on_activated
+        self._default = default
 
     @property
     def visible(self):
@@ -257,6 +258,12 @@ class MenuItem(object):
         """The menu item text.
         """
         return self._text
+
+    @property
+    def default(self):
+        """Whether this is the default menu item.
+        """
+        return self._default
 
     def __call__(self, icon):
         return self._on_activated(icon)
