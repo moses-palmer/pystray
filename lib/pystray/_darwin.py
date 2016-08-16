@@ -170,7 +170,7 @@ class Icon(_base.Icon):
 class IconDelegate(Foundation.NSObject):
     @objc.namedSelector(Icon._ACTION_SELECTOR)
     def activate(self, sender):
-        self.icon.on_activate(self.icon)
+        self.icon()
 
     @objc.namedSelector(Icon._MENU_ITEM_SELECTOR)
     def activate_menu_item(self, sender):

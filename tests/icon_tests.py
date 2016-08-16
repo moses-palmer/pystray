@@ -181,6 +181,25 @@ class IconTest(unittest.TestCase):
             print('Click the icon')
             q.get(timeout=5)
 
+    def test_activate_with_default(self):
+        """Tests that the default menu item is activated when activating icon.
+        """
+        q = queue.Queue()
+
+        def on_activate(icon):
+            q.put(True)
+
+        icon, colors = self.icon(menu=(
+            ('Item 1', lambda _: None),
+            ('Default', on_activate, True)))
+
+        @test(icon)
+        def _():
+            icon.visible = True
+
+            print('Click the icon or select the default menu item')
+            q.get(timeout=5)
+
     def test_menu_construct(self):
         """Tests that the menu is constructed.
         """

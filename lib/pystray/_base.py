@@ -37,10 +37,10 @@ class Icon(object):
     :param callable on_activate: A callback for when the system tray icon is
         activated. It is passed the icon as its sole argument.
 
-    :param menu: A menu to use as popup menu. Setting this will override
-        ``on_activate``. This can be either an instance of :class:`Menu` or a
-        tuple, which will be interpreted as arguments to the :class:`Menu`
-        constructor.
+    :param menu: A menu to use as popup menu. This can be either an instance of
+        :class:`Menu` or a tuple, which will be interpreted as arguments to the
+        :class:`Menu` constructor. If ``on_activate`` is not passed, the default
+        menu item of this menu is used instead.
     """
     def __init__(
             self, name, icon=None, title=None, on_activate=None, menu=None):
@@ -48,7 +48,7 @@ class Icon(object):
         self._icon = icon or None
         self._title = title or ''
         self._visible = False
-        self.on_activate = on_activate or (lambda icon: None)
+        self._on_activate = on_activate
 
         if menu:
             self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
@@ -61,6 +61,12 @@ class Icon(object):
     def __del__(self):
         if self.visible:
             self._hide()
+
+    def __call__(self):
+        if self._on_activate:
+            self._on_activate(self)
+        elif self._menu is not None:
+            self._menu(self)
 
     @property
     def name(self):
@@ -104,8 +110,7 @@ class Icon(object):
     def menu(self):
         """The menu.
 
-        Setting this to a falsy value will make the icon use :attr:`on_activate`
-        instead of the menu.
+        Setting this to a falsy value will disable the menu.
         """
         return self._menu
 
@@ -244,6 +249,7 @@ class MenuItem(object):
     def __init__(self, visible, text, on_activated, default=False):
         self._visible = visible
         self._text = text
+        self.__name__ = text
         self._on_activated = on_activated
         self._default = default
 

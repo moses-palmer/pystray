@@ -209,7 +209,7 @@ class Icon(_base.Icon):
         left button clicks.
         """
         if event.detail == 1:
-            self.on_activate(self)
+            self()
 
     def _on_destroy_notify(self, event):
         """Handles ``Xlib.X.DestroyNotify``.
