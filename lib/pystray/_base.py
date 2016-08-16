@@ -37,21 +37,29 @@ class Icon(object):
     :param callable on_activate: A callback for when the system tray icon is
         activated. It is passed the icon as its sole argument.
 
+        This must not be passed if ``menu`` is set.
+
     :param menu: A menu to use as popup menu. This can be either an instance of
         :class:`Menu` or a tuple, which will be interpreted as arguments to the
         :class:`Menu` constructor. If ``on_activate`` is not passed, the default
         menu item of this menu is used instead.
+
+        This must not be passed if ``on_activate`` is set.
     """
     def __init__(
             self, name, icon=None, title=None, on_activate=None, menu=None):
+        if on_activate and menu:
+            raise ValueError()
         self._name = name
         self._icon = icon or None
         self._title = title or ''
         self._visible = False
-        self._on_activate = on_activate
 
         if menu:
             self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
+        elif on_activate:
+            self._menu = Menu(
+                MenuItem(False, '', on_activate, default=True))
         else:
             self._menu = None
 
@@ -63,9 +71,7 @@ class Icon(object):
             self._hide()
 
     def __call__(self):
-        if self._on_activate:
-            self._on_activate(self)
-        elif self._menu is not None:
+        if self._menu is not None:
             self._menu(self)
 
     @property
@@ -165,9 +171,6 @@ class Icon(object):
 
     def stop(self):
         """Stops the loop handling events for the icon.
-
-        This method can be called either from the ``on_activate`` callback or
-        from a different thread.
         """
         self._stop()
         if self._setup_thread.ident != threading.current_thread().ident:
