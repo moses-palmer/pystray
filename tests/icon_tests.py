@@ -236,6 +236,28 @@ class IconTest(unittest.TestCase):
             print('Click Item 1')
             q.get(timeout=5)
 
+    def test_menu_invisble(self):
+        """Tests that a menu consisting of only empty items does not show.
+        """
+        q = queue.Queue()
+
+        def on_activate(icon):
+            q.put(True)
+
+        menu = (
+            ('Item 1', on_activate),
+            ('Item 2', lambda _: None))
+        icon, colors = self.icon(menu=(
+            pystray.MenuItem(False, 'Item1', lambda _: None),
+            pystray.MenuItem(False, 'Item1', on_activate, default=True)))
+
+        @test(icon)
+        def _():
+            icon.visible = True
+
+            print('Ensure that the menu does not show and then click the icon')
+            q.get(timeout=5)
+
     def icon(self, **kwargs):
         """Generates a systray icon with the specified colours.
 
