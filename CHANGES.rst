@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v0.5 - Menu support
+-------------------
+*  Added support for popup menus.
+*  Corrected bug which prevented stopping the icon on *Windows*.
+*  Corrected documentation.
+
+
 v0.4 - GTK+ 3 support
 ---------------------
 *  Added support for *GTK+* on *Linux*.
