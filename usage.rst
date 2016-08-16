@@ -41,5 +41,31 @@ The code in ``setup()`` will be run in a separate thread once the *system tray
 icon* is ready. The icon does not wait for it to complete, so you may put any
 code that would follow the call to ``pystray.Icon.run()`` in it.
 
-``pystray.Icon.run()`` will not complete until ``~pystray.Icon.stop()`` is
-called.
+The call to ``pystray.Icon.run()`` will not complete until ``stop()`` is called.
+
+
+Getting input from the *system tray icon*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to receive notifications about user interaction with the icon, two
+constructor arguments are available:
+
+
+*on_activate*
+    This should be a callable taking one argument---the icon instance.
+
+    It will be called when the icon is *activated*, which generally means that
+    the icon has been clicked.
+
+    This is supported on all platforms, except *OSX* when a menu has been
+    specified.
+
+
+*menu*
+    This should be an instance of ``pystray.Menu``, or a tuple that can be
+    passed to the ``pystray.Menu`` constructor. Please see the reference for
+    more information about the format.
+
+    It will be displayed when the right-hand button has been pressed on the icon
+    on *Windows* and *GTK+*, and when the icon has been clicked on *OSX*. Menus
+    are not supported on *X*.
