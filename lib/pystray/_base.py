@@ -317,10 +317,24 @@ class Menu(object):
                 else self.SEPARATOR if i == '----'
                 else MenuItem(True, *i))
             for i in items]
+        default_menuitems = [
+            menuitem
+            for menuitem in all_menuitems
+            if menuitem.default]
+        if len(default_menuitems) > 1:
+            raise ValueError()
+
+        self._activate = (
+            default_menuitems[0]
+            if len(default_menuitems) == 1
+            else lambda _: None)
 
         self._items = tuple(
             i if isinstance(i, MenuItem) else MenuItem(*i)
             for i in strip_tail(strip_head(cleaned(all_menuitems))))
+
+    def __call__(self, icon):
+        return self._activate(icon)
 
     def __getitem__(self, key):
         return self._items[key]
