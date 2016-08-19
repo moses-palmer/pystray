@@ -328,17 +328,13 @@ class Menu(object):
                 else self.SEPARATOR if i == '----'
                 else MenuItem(True, *i))
             for i in items]
-        default_menuitems = [
-            menuitem
-            for menuitem in all_menuitems
-            if menuitem.default]
-        if len(default_menuitems) > 1:
-            raise ValueError()
-
-        self._activate = (
-            default_menuitems[0]
-            if len(default_menuitems) == 1
-            else lambda _: None)
+        try:
+            self._activate = next(
+                menuitem
+                for menuitem in all_menuitems
+                if menuitem.default)
+        except StopIteration:
+            self._activate = lambda _: None
 
         self._items = tuple(
             i if isinstance(i, MenuItem) else MenuItem(*i)
