@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v0.6 - Simplified API
+---------------------
+*  Removed explicit default action parameter ``on_activate``.
+*  Allow terminating the application with *ctrl+c* on *OSX*.
+*  Added basic logging.
+
+
 v0.5 - Menu support
 -------------------
 *  Added support for popup menus.
