@@ -47,25 +47,18 @@ The call to ``pystray.Icon.run()`` will not complete until ``stop()`` is called.
 Getting input from the *system tray icon*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to receive notifications about user interaction with the icon, two
-constructor arguments are available:
+In order to receive notifications about user interaction with the icon, a
+popup menu can be added with the ``menu`` constructor argument.
 
+This should be an instance of ``pystray.Menu``, or a tuple that can be passed to
+the ``pystray.Menu`` constructor. Please see the reference for more information
+about the format.
 
-*on_activate*
-    This should be a callable taking one argument---the icon instance.
+It will be displayed when the right-hand button has been pressed on the icon on
+*Windows* and *GTK+*, and when the icon has been clicked on *OSX*. Menus are not
+supported on *X*.
 
-    It will be called when the icon is *activated*, which generally means that
-    the icon has been clicked.
-
-    This is supported on all platforms, except *OSX* when a menu has been
-    specified.
-
-
-*menu*
-    This should be an instance of ``pystray.Menu``, or a tuple that can be
-    passed to the ``pystray.Menu`` constructor. Please see the reference for
-    more information about the format.
-
-    It will be displayed when the right-hand button has been pressed on the icon
-    on *Windows* and *GTK+*, and when the icon has been clicked on *OSX*. Menus
-    are not supported on *X*.
+Menus also support a default item. On *Windows*, *GTK+* and *X*, this item will
+be activated when the user clicks on the icon using the primary button. On *OSX*
+it will be activated if the menu contains no visible entries; it does not have
+to be visible.
