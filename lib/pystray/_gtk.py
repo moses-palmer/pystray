@@ -113,7 +113,8 @@ class Icon(_base.Icon):
 
         def sigint(*args):
             self._loop.quit()
-            previous_sigint(*args)
+            if previous_sigint:
+                previous_sigint(*args)
 
         # Make sure that we do not inhibit ctrl+c
         previous_sigint = signal.signal(signal.SIGINT, sigint)

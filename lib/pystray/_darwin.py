@@ -16,11 +16,13 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import io
+import signal
 
 import AppKit
 import Foundation
 import objc
 import PIL
+import  PyObjCTools.MachSignals
 
 from . import _base
 
@@ -89,12 +91,22 @@ class Icon(_base.Icon):
         # Notify the setup callback
         self._mark_ready()
 
+        def sigint(*args):
+            self._app.terminate_(None)
+            if previous_sigint:
+                previous_sigint(*args)
+
+        # Make sure that we do not inhibit ctrl+c
+        previous_sigint = PyObjCTools.MachSignals.signal(signal.SIGINT, sigint)
+
         try:
             self._app.run()
         except:
             self._log.error(
                 'An error occurred in the main loop', exc_info=True)
         finally:
+            if PyObjCTools.MachSignals.getsignal(signal.SIGINT) == sigint:
+                PyObjCTools.MachSignals.signal(signal.SIGINT, previous_sigint)
             self._status_bar.removeStatusItem_(self._status_item)
 
     def _stop(self):
