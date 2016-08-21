@@ -35,22 +35,22 @@ class Icon(object):
 
     :param str title: A short title for the icon.
 
-    :param callable on_activate: A callback for when the system tray icon is
-        activated. It is passed the icon as its sole argument.
-
-        This must not be passed if ``menu`` is set.
-
     :param menu: A menu to use as popup menu. This can be either an instance of
         :class:`Menu` or a tuple, which will be interpreted as arguments to the
-        :class:`Menu` constructor. If ``on_activate`` is not passed, the default
-        menu item of this menu is used instead.
+        :class:`Menu` constructor.
 
-        This must not be passed if ``on_activate`` is set.
+        The behaviour of the menu depends on the platform. Only one action is
+        guaranteed to be invokable: the first menu item whose
+        :attr:`~pystray.MenuItem.default` attribute is set.
+
+        Some platforms allow both menu interaction and a special way of
+        activating the default action, some platform allow only either an
+        invisible menu with a default entry as special action or a full menu
+        with no special way to activate the default item, and some platforms do
+        not support a menu at all.
     """
     def __init__(
-            self, name, icon=None, title=None, on_activate=None, menu=None):
-        if on_activate and menu:
-            raise ValueError()
+            self, name, icon=None, title=None, menu=None):
         self._name = name
         self._icon = icon or None
         self._title = title or ''
@@ -59,9 +59,6 @@ class Icon(object):
 
         if menu:
             self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
-        elif on_activate:
-            self._menu = Menu(
-                MenuItem(False, '', on_activate, default=True))
         else:
             self._menu = None
 

@@ -38,6 +38,14 @@ def test(icon):
     return inner
 
 
+def action(on_activate):
+    """A convenience function to create a hidden default menu item.
+
+    :param callable on_activate: The activation callback.
+    """
+    return pystray.MenuItem(False, None, on_activate, default=True)
+
+
 class IconTest(unittest.TestCase):
     def test_set_icon(self):
         """Tests that updating the icon works.
@@ -172,7 +180,8 @@ class IconTest(unittest.TestCase):
         def on_activate(icon):
             q.put(True)
 
-        icon, colors = self.icon(on_activate=on_activate)
+        icon, colors = self.icon(menu=(
+            action(on_activate),))
 
         @test(icon)
         def _():
