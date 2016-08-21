@@ -55,13 +55,13 @@ class MenuDescriptorTests(unittest.TestCase):
             '----',
             '----')))
 
-    def test_menu_default_invalid(self):
+    def test_menu_default_none(self):
         """Tests that an invalid number of default menu items fails.
         """
-        with self.assertRaises(ValueError):
+        self.assertIsNone(
             menu(
-                item('one', callback, default=True),
-                item('two', callback, default=True))
+                item('one', lambda _: True, default=False),
+                item('two', lambda _: True, default=False))(None))
 
     def test_menu_default_callable(self):
         """Tests that the default menu item is activated when calling the menu.
