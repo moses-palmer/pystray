@@ -25,7 +25,7 @@ import tempfile
 from ctypes import wintypes
 from six.moves import queue
 
-from ._util import win32
+from ._util import serialized_image, win32
 from . import _base
 
 
@@ -269,24 +269,14 @@ class Icon(_base.Icon):
         if self._icon_handle:
             return
 
-        fd, icon_path = tempfile.mkstemp('.ico')
-        try:
-            with os.fdopen(fd, 'wb') as f:
-                self.icon.save(f, format='ICO')
-            hicon = win32.LoadImage(
+        with serialized_image(self.icon, 'ICO') as icon_path:
+            self._icon_handle = win32.LoadImage(
                 None,
                 icon_path,
                 win32.IMAGE_ICON,
                 0,
                 0,
                 win32.LR_DEFAULTSIZE | win32.LR_LOADFROMFILE)
-
-        finally:
-            try:
-                os.unlink(icon_path)
-            except:
-                self._log.error(
-                    'Failed to remove temporary icon', exc_info=True)
 
     def _register_class(self):
         """Registers the systray window class.
