@@ -184,12 +184,23 @@ class WNDCLASSEX(ctypes.Structure):
         ('lpszClassName', wintypes.LPCWSTR),
         ('hIconSm', wintypes.HICON)]
 
+
+def _err(result, func, arguments):
+    """A *ctypes* ``errchecker`` that ensures truthy values.
+    """
+    if not result:
+        raise ctypes.WinError()
+    else:
+        return result
+
+
 LPWNDCLASSEX = ctypes.POINTER(WNDCLASSEX)
 
 
 CreatePopupMenu = windll.user32.CreatePopupMenu
 CreatePopupMenu.argtypes = ()
 CreatePopupMenu.restype = wintypes.HMENU
+CreatePopupMenu.errcheck = _err
 
 
 CreateWindowEx = windll.user32.CreateWindowExW
@@ -198,6 +209,7 @@ CreateWindowEx.argtypes = (
     wintypes.INT, wintypes.INT, wintypes.INT, wintypes.INT, wintypes.HWND,
     wintypes.HMENU, wintypes.HINSTANCE, wintypes.LPVOID)
 CreateWindowEx.restype = wintypes.HWND
+CreateWindowEx.errcheck = _err
 
 DefWindowProc = windll.user32.DefWindowProcW
 DefWindowProc.argtypes = (
@@ -208,11 +220,13 @@ DestroyMenu = windll.user32.DestroyMenu
 DestroyMenu.argtypes = (
     wintypes.HMENU,)
 DestroyMenu.restype = wintypes.BOOL
+DestroyMenu.errcheck = _err
 
 DestroyWindow = windll.user32.DestroyWindow
 DestroyWindow.argtypes = (
     wintypes.HWND,)
 DestroyWindow.restype = wintypes.BOOL
+DestroyWindow.errcheck = _err
 
 DispatchMessage = windll.user32.DispatchMessageW
 DispatchMessage.argtypes = (
@@ -223,6 +237,7 @@ GetCursorPos = windll.user32.GetCursorPos
 GetCursorPos.argtypes = (
     LPPOINT,)
 GetCursorPos.restype = wintypes.BOOL
+GetCursorPos.errcheck = _err
 
 GetMessage = windll.user32.GetMessageW
 GetMessage.argtypes = (
@@ -233,17 +248,20 @@ GetModuleHandle = windll.kernel32.GetModuleHandleW
 GetModuleHandle.argtypes = (
     wintypes.LPCWSTR,)
 GetModuleHandle.restype = wintypes.HMODULE
+GetModuleHandle.errcheck = _err
 
 InsertMenuItem = windll.user32.InsertMenuItemW
 InsertMenuItem.argtypes = (
     wintypes.HMENU, wintypes.UINT, wintypes.BOOL, LPMENUITEMINFO)
 InsertMenuItem.restype = wintypes.BOOL
+InsertMenuItem.errcheck = _err
 
 LoadImage = windll.user32.LoadImageW
 LoadImage.argtypes = (
     wintypes.HINSTANCE, wintypes.LPCWSTR, wintypes.UINT, wintypes.INT,
     wintypes.INT, wintypes.UINT)
 LoadImage.restype = wintypes.HANDLE
+LoadImage.errcheck = _err
 
 PeekMessage = windll.user32.PeekMessageW
 PeekMessage.argtypes = (
@@ -254,6 +272,7 @@ PostMessage = windll.user32.PostMessageW
 PostMessage.argtypes = (
     wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
 PostMessage.restype = wintypes.BOOL
+PostMessage.restype = wintypes.BOOL
 
 PostQuitMessage = windll.user32.PostQuitMessage
 PostQuitMessage.argtypes = (
@@ -263,6 +282,7 @@ RegisterClassEx = windll.user32.RegisterClassExW
 RegisterClassEx.argtypes = (
     LPWNDCLASSEX,)
 RegisterClassEx.restype = wintypes.ATOM
+RegisterClassEx.errcheck = _err
 
 SetForegroundWindow = windll.user32.SetForegroundWindow
 SetForegroundWindow.argtypes = (
@@ -273,6 +293,7 @@ Shell_NotifyIcon = windll.shell32.Shell_NotifyIconW
 Shell_NotifyIcon.argtypes = (
     wintypes.DWORD, LPNOTIFYICONDATA)
 Shell_NotifyIcon.restype = wintypes.BOOL
+Shell_NotifyIcon.errcheck = _err
 
 TranslateMessage = windll.user32.TranslateMessage
 TranslateMessage.argtypes = (
@@ -288,3 +309,4 @@ UnregisterClass = windll.user32.UnregisterClassW
 UnregisterClass.argtypes = (
     wintypes.ATOM, wintypes.HINSTANCE)
 UnregisterClass.restype = wintypes.BOOL
+UnregisterClass.errcheck = _err

@@ -101,8 +101,6 @@ class Icon(_base.Icon):
         # Just clear the menu if none is set
         win32.DestroyMenu(self._hmenu)
         self._hmenu = win32.CreatePopupMenu()
-        if not self.menu:
-            return
 
         # Generate the menu
         for i, descriptor in enumerate(self.menu):
@@ -110,9 +108,7 @@ class Icon(_base.Icon):
             # index directly, since TrackPopupMenuEx will return 0 if no item
             # was selected
             menu_item = self._create_menu_item(descriptor, i + 1)
-            if not win32.InsertMenuItem(
-                    self._hmenu, i, True, ctypes.byref(menu_item)):
-                raise ctypes.WinError(wintypes.get_last_error())
+            win32.InsertMenuItem(self._hmenu, i, True, ctypes.byref(menu_item))
 
     def _run(self):
         self._mark_ready()
@@ -156,8 +152,8 @@ class Icon(_base.Icon):
                 self._hide()
                 del self._HWND_TO_ICON[self._hwnd]
             except:
-                self._log.error(
-                    'An error occurred after the main loop', exc_info=True)
+                # Ignore
+                pass
 
             win32.DestroyWindow(self._hwnd)
             win32.DestroyWindow(self._menu_hwnd)
@@ -189,9 +185,7 @@ class Icon(_base.Icon):
 
             # Get the cursor position to determine where to display the menu
             point = wintypes.POINT()
-            if not win32.GetCursorPos(ctypes.byref(point)):
-                self._log.error('Failed to get cursor position')
-                return
+            win32.GetCursorPos(ctypes.byref(point))
 
             # Display the menu and get the menu item identifier; the identifier
             # is the menu item index plus one
@@ -215,7 +209,7 @@ class Icon(_base.Icon):
 
         :return: a window
         """
-        hwnd = win32.CreateWindowEx(
+        return win32.CreateWindowEx(
             0,
             atom,
             None,
@@ -225,10 +219,6 @@ class Icon(_base.Icon):
             None,
             win32.GetModuleHandle(None),
             None)
-        if not hwnd:
-            raise ctypes.WinError(wintypes.get_last_error())
-        else:
-            return hwnd
 
     def _create_menu_item(self, descriptor, identifier):
         """Creates a :class:`pystray._util.win32.MENUITEMINFO` from a
@@ -266,14 +256,12 @@ class Icon(_base.Icon):
 
         :param kwargs: Data for the :class:`NOTIFYICONDATA` object.
         """
-        r = win32.Shell_NotifyIcon(code, win32.NOTIFYICONDATA(
+        win32.Shell_NotifyIcon(code, win32.NOTIFYICONDATA(
             cbSize=ctypes.sizeof(win32.NOTIFYICONDATA),
             hWnd=self._hwnd,
             hID=id(self),
             uFlags=flags,
             **kwargs))
-        if not r:
-            raise ctypes.WinError(wintypes.get_last_error())
 
     def _assert_icon_handle(self):
         """Asserts that the cached icon handle exists.
@@ -292,10 +280,6 @@ class Icon(_base.Icon):
                 0,
                 0,
                 win32.LR_DEFAULTSIZE | win32.LR_LOADFROMFILE)
-            if not hicon:
-                raise ctypes.WinError(wintypes.get_last_error())
-            else:
-                self._icon_handle = hicon
 
         finally:
             try:
@@ -309,7 +293,7 @@ class Icon(_base.Icon):
 
         :return: the class atom
         """
-        window_class = win32.WNDCLASSEX(
+        return win32.RegisterClassEx(win32.WNDCLASSEX(
             cbSize=ctypes.sizeof(win32.WNDCLASSEX),
             style=0,
             lpfnWndProc=_dispatcher,
@@ -321,21 +305,14 @@ class Icon(_base.Icon):
             hbrBackground=win32.COLOR_WINDOW + 1,
             lpszMenuName=None,
             lpszClassName='%s%dSystemTrayIcon' % (self.name, id(self)),
-            hIconSm=None)
-        atom = win32.RegisterClassEx(window_class)
-        if not atom:
-            raise ctypes.WinError(wintypes.get_last_error())
-        else:
-            return atom
+            hIconSm=None))
 
     def _unregister_class(self, atom):
         """Unregisters the systray window class.
 
         :param atom: The class atom returned by :meth:`_register_class`.
         """
-        r = win32.UnregisterClass(atom, win32.GetModuleHandle(None))
-        if not r:
-            raise ctypes.WinError(wintypes.get_last_error())
+        win32.UnregisterClass(atom, win32.GetModuleHandle(None))
 
 
 @win32.WNDPROC
@@ -356,7 +333,7 @@ def _dispatcher(hwnd, uMsg, wParam, lParam):
 
     try:
         return int(icon._message_handlers.get(
-            uMsg, lambda w, l: 0)(wParam, lParam))
+            uMsg, lambda w, l: 0)(wParam, lParam) or 0)
 
     except:
         icon._log.error(
