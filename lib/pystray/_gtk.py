@@ -24,6 +24,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
 
+from ._util import serialized_image
 from . import _base
 
 
@@ -78,17 +79,8 @@ class Icon(_base.Icon):
     def _update_icon(self):
         # Write the buffered image to a file and set the status icon image from
         # the file
-        fd, icon_path = tempfile.mkstemp('.png')
-        try:
-            with os.fdopen(fd, 'wb') as f:
-                self.icon.save(f, format='PNG')
+        with serialized_image(self.icon, 'PNG') as icon_path:
             self._status_icon.set_from_file(icon_path)
-
-        finally:
-            try:
-                os.unlink(icon_path)
-            except:
-                pass
 
     @mainloop
     def _update_title(self):
