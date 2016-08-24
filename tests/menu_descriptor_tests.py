@@ -12,7 +12,7 @@ class MenuDescriptorTests(unittest.TestCase):
         """
         self.assertEqual(
             'Test entry',
-            item('Test entry', callable).text)
+            item('Test entry', None).text)
 
     def test_item_call(self):
         """Tests that calling a menu item works as expected.
@@ -33,10 +33,10 @@ class MenuDescriptorTests(unittest.TestCase):
     Test entry three
     Test entry four''',
         str(menu(
-            ('Test entry one', callback),
-            ('Test entry two', callback),
-            item('Test entry three', callback),
-            item('Test entry four', callback))))
+            ('Test entry one', None),
+            ('Test entry two', None),
+            item('Test entry three', None),
+            item('Test entry four', None))))
 
     def test_menu_separator(self):
         """Tests menu construction with separators.
@@ -50,11 +50,11 @@ class MenuDescriptorTests(unittest.TestCase):
         str(menu(
             '----',
             '----',
-            item('Test entry one', callback),
+            item('Test entry one', None),
             '----',
-            hidden('Test entry hidden', callback),
+            item('Test entry hidden', None, visible=False),
             '----',
-            item('Test entry two', callback),
+            item('Test entry two', None),
             '----',
             '----')))
 
@@ -75,20 +75,7 @@ class MenuDescriptorTests(unittest.TestCase):
                 item('one', lambda _: 'test result', default=True))(None))
 
 
-def hidden(*args, **kwargs):
-    """Creates an invisible menu item.
-    """
-    kwargs['visible'] = False
-    return item(*args, **kwargs)
-
-
 def separator():
     """A wrapper around :attr:`pystray.Menu.SEPARATOR`.
     """
     return pystray.Menu.SEPARATOR
-
-
-def callback(*args, **kwargs):
-    """A dummy callback function.
-    """
-    pass
