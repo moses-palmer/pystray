@@ -60,9 +60,6 @@ class Icon(_base.Icon):
         self._hmenu = win32.CreatePopupMenu()
         self._HWND_TO_ICON[self._hwnd] = self
 
-        if self.menu:
-            self._update_menu()
-
     def __del__(self):
         if self._running:
             self._stop()
@@ -179,6 +176,8 @@ class Icon(_base.Icon):
             self()
 
         elif self.menu and lparam == win32.WM_RBUTTONDOWN:
+            self._update_menu()
+
             # TrackPopupMenuEx does not behave unless our systray window is the
             # foreground window
             win32.SetForegroundWindow(self._hwnd)
