@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+v0.7 - Dynamic menus
+--------------------
+*  Added support for dynamically generating menu item properties when a popup
+   menu is displayed.
+*  Display the default menu item distinctly.
+*  Changed the menu item API slightly.
+*  Corrected logging on Windows.
+
+
 v0.6 - Simplified API
 ---------------------
 *  Removed explicit default action parameter ``on_activate``.
