@@ -124,9 +124,6 @@ class Icon(_base.Icon):
                     win32.TranslateMessage(lpmsg)
                     win32.DispatchMessage(lpmsg)
 
-            # Make sure the icon is removed
-            self._hide()
-
         except:
             self._log.error(
                 'An error occurred in the main loop', exc_info=True)
