@@ -182,8 +182,6 @@ class Icon(_base.Icon):
                 None)
             if identifier:
                 self.menu[identifier - 1](self)
-            else:
-                self._log.error('Unknown menu item identifier: %d' % identifier)
 
     def _create_window(self, atom):
         """Creates the system tray icon window.
