@@ -2,6 +2,9 @@ import unittest
 
 import pystray
 
+from pystray import Menu as menu
+from pystray import MenuItem as item
+
 
 class MenuDescriptorTests(unittest.TestCase):
     def test_item_name(self):
@@ -72,22 +75,11 @@ class MenuDescriptorTests(unittest.TestCase):
                 item('one', lambda _: 'test result', default=True))(None))
 
 
-def menu(*args, **kwargs):
-    """A wrapper around the :class:`pystray.Menu` constructor.
-    """
-    return pystray.Menu(*args, **kwargs)
-
-
-def item(*args, **kwargs):
-    """Creates a visible menu item.
-    """
-    return pystray.MenuItem(True, *args, **kwargs)
-
-
 def hidden(*args, **kwargs):
     """Creates an invisible menu item.
     """
-    return pystray.MenuItem(False, *args, **kwargs)
+    kwargs['visible'] = False
+    return item(*args, **kwargs)
 
 
 def separator():

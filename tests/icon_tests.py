@@ -43,7 +43,7 @@ def action(on_activate):
 
     :param callable on_activate: The activation callback.
     """
-    return pystray.MenuItem(False, None, on_activate, default=True)
+    return pystray.MenuItem(None, on_activate, default=True, visible=False)
 
 
 class IconTest(unittest.TestCase):
@@ -257,8 +257,9 @@ class IconTest(unittest.TestCase):
             ('Item 1', on_activate),
             ('Item 2', None))
         icon, colors = self.icon(menu=(
-            pystray.MenuItem(False, 'Item1', None),
-            pystray.MenuItem(False, 'Item1', on_activate, default=True)))
+            pystray.MenuItem('Item1', None, visible=False),
+            pystray.MenuItem(
+                'Item1', on_activate, default=True, visible=False)))
 
         @test(icon)
         def _():

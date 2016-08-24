@@ -248,24 +248,18 @@ class MenuItem(object):
     menu items with this value set to  `False`` will be discarded when a
     :class:`Menu` is constructed.
     """
-    def __init__(self, visible, text, on_activated, default=False):
+    def __init__(self, text, on_activated, default=False, visible=True):
         self.__name__ = self._text = text or ''
         self._on_activated = on_activated or (lambda _: None)
 
-        self._visible = visible
         self._default = default
+        self._visible = visible
 
     def __call__(self, icon):
         return self._on_activated(icon)
 
     def __str__(self):
         return '    %s' % self.text
-
-    @property
-    def visible(self):
-        """Whether this menu item is visible.
-        """
-        return self._visible
 
     @property
     def text(self):
@@ -279,6 +273,12 @@ class MenuItem(object):
         """
         return self._default
 
+    @property
+    def visible(self):
+        """Whether this menu item is visible.
+        """
+        return self._visible
+
 
 class Menu(object):
     """A description of a menu.
@@ -287,16 +287,16 @@ class Menu(object):
 
     It is created with a sequence of either :class:`Menu.Item` instances,
     strings or tuples. If a non-:class:`Menu.Item` argument is passed, it is
-    interpreted as a tuple to pass to the menu item contructor, with ``visible``
-    set to ``True`` if it is a tuple, and a menu separator if it is the string
-    ``'----'``.
+    interpreted as the title and callback arguments to the constructor, with
+    ``visible`` set to ``True`` if it is a tuple, and a menu separator if it is
+    the string ``'----'``.
 
     First, non-visible menu items are removed from the list, then any instances
     of :attr:`SEPARATOR` occurring at the head or tail of the item list are
     removed, and any consecutive separators are reduced to one.
     """
     #: A representation of a simple separator
-    SEPARATOR = MenuItem(True, '- - - -', None)
+    SEPARATOR = MenuItem('- - - -', None)
 
     def __init__(self, *items):
         def cleaned(items):
@@ -323,7 +323,7 @@ class Menu(object):
             (
                 i if isinstance(i, MenuItem)
                 else self.SEPARATOR if i == '----'
-                else MenuItem(True, *i))
+                else MenuItem(*i, visible=True))
             for i in items]
         try:
             self._activate = next(
