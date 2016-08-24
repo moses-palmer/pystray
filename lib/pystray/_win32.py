@@ -160,7 +160,7 @@ class Icon(_base.Icon):
             self()
 
         elif self.menu and lparam == win32.WM_RBUTTONDOWN:
-            self._update_menu()
+            descriptors = list(self._update_menu())
 
             # TrackPopupMenuEx does not behave unless our systray window is the
             # foreground window
@@ -171,17 +171,15 @@ class Icon(_base.Icon):
             win32.GetCursorPos(ctypes.byref(point))
 
             # Display the menu and get the menu item identifier; the identifier
-            # is the menu item index plus one
-            identifier = win32.TrackPopupMenuEx(
+            # is the menu item index
+            descriptors[win32.TrackPopupMenuEx(
                 self._hmenu,
                 win32.TPM_RIGHTALIGN | win32.TPM_BOTTOMALIGN
                 | win32.TPM_RETURNCMD,
                 point.x,
                 point.y,
                 self._menu_hwnd,
-                None)
-            if identifier:
-                self.menu[identifier - 1](self)
+                None)](self)
 
     def _create_window(self, atom):
         """Creates the system tray icon window.
@@ -205,10 +203,16 @@ class Icon(_base.Icon):
         """Updates the popup menu.
 
         If no visible items are present, the menu will be disabled.
+
+        This method yields all descriptors used in such a way that the return
+        value of :func:`~pystray._util.win32.TrackPopupMenuEx` is an index into
+        the sequence.
         """
         # Just clear the menu if none is set
         win32.DestroyMenu(self._hmenu)
         self._hmenu = win32.CreatePopupMenu()
+
+        yield lambda _: None
 
         # Generate the menu
         for i, descriptor in enumerate(self.menu):
@@ -217,6 +221,8 @@ class Icon(_base.Icon):
             # was selected
             menu_item = self._create_menu_item(descriptor, i + 1)
             win32.InsertMenuItem(self._hmenu, i, True, ctypes.byref(menu_item))
+
+            yield descriptor
 
     def _create_menu_item(self, descriptor, identifier):
         """Creates a :class:`pystray._util.win32.MENUITEMINFO` from a
