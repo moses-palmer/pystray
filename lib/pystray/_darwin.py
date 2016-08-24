@@ -76,10 +76,6 @@ class Icon(_base.Icon):
         self._nsmenu.setDelegate_(self._delegate)
         self._status_item.setMenu_(self._nsmenu)
 
-        # These are used by the menu delegate to map menu item indice to
-        # descriptors
-        self._descriptors = []
-
         # Notify the setup callback
         self._mark_ready()
 
@@ -159,18 +155,15 @@ class Icon(_base.Icon):
 
         If no visible items are present, the menu will be disabled.
 
-        This method will modify :attr:`_descriptors` to make it contain only the
-        descriptors used to generate the menu, in order; thus, the index of a
-        menu item will map to its descriptor.
+        This method yields all descriptors used.
         """
         # Clear any stale menu items
         self._nsmenu.removeAllItems()
 
         # Generate the menu
-        self._descriptors = []
         for descriptor in self.menu:
             self._nsmenu.addItem_(self._create_menu_item(descriptor))
-            self._descriptors.append(descriptor)
+            yield descriptor
 
     def _create_menu_item(self, descriptor):
         """Creates a :class:`AppKit.NSMenuItem` from a :class:`pystray.MenuItem`
@@ -207,10 +200,10 @@ class IconDelegate(Foundation.NSObject):
     @objc.namedSelector(Icon._MENU_ITEM_SELECTOR)
     def activate_menu_item(self, sender):
         index = self.icon._status_item.menu().indexOfItem_(sender)
-        self.icon._descriptors[index](self.icon)
+        self.descriptors[index](self.icon)
 
     @objc.namedSelector(Icon._MENU_NEEDS_UPDATE_SELECTOR)
     def menu_needs_update(self, sender):
-        self.icon._update_menu()
+        self.descriptors = list(self.icon._update_menu())
         if not self.icon.menu:
             self.icon()
