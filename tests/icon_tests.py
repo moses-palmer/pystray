@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import itertools
 import sys
 import unittest
@@ -40,6 +42,13 @@ def test(icon):
             reraise(*result)
 
     return inner
+
+
+def say(*args, **kwargs):
+    """Prints a message, ensuring space between messages.
+    """
+    print('\n')
+    print(*args, **kwargs)
 
 
 def action(on_activate):
@@ -191,7 +200,7 @@ class IconTest(unittest.TestCase):
         def _():
             icon.visible = True
 
-            print('Click the icon')
+            say('Click the icon')
             q.get(timeout=TIMEOUT)
 
     def test_activate_with_default(self):
@@ -210,7 +219,7 @@ class IconTest(unittest.TestCase):
         def _():
             icon.visible = True
 
-            print('Click the icon or select the default menu item')
+            say('Click the icon or select the default menu item')
             q.get(timeout=TIMEOUT)
 
     def test_menu_construct(self):
@@ -225,7 +234,7 @@ class IconTest(unittest.TestCase):
         def _():
             icon.visible = True
 
-            print('Expand the popup menu')
+            say('Expand the popup menu')
             self.confirm(
                 'Was it <%s>?' % str(pystray.Menu(*menu)))
 
@@ -246,7 +255,7 @@ class IconTest(unittest.TestCase):
         def _():
             icon.visible = True
 
-            print('Click Item 1')
+            say('Click Item 1')
             q.get(timeout=TIMEOUT)
 
     def test_menu_invisble(self):
@@ -269,7 +278,7 @@ class IconTest(unittest.TestCase):
         def _():
             icon.visible = True
 
-            print('Ensure that the menu does not show and then click the icon')
+            say('Ensure that the menu does not show and then click the icon')
             q.get(timeout=TIMEOUT)
 
     def test_menu_dynamic(self):
@@ -292,10 +301,10 @@ class IconTest(unittest.TestCase):
         def _():
             icon.visible = True
 
-            print('Click Item 1')
+            say('Click Item 1')
             q.get(timeout=TIMEOUT)
 
-            print('Expand the popup menu')
+            say('Expand the popup menu')
             self.confirm(
                 'Was it <%s>?' % str(pystray.Menu(*menu)))
 
@@ -323,13 +332,13 @@ class IconTest(unittest.TestCase):
         def _():
             icon.visible = True
 
-            print('Click the icon or select the default menu item')
+            say('Click the icon or select the default menu item')
             q.get(timeout=TIMEOUT)
 
-            print('Ensure that the menu does not show and then click the icon')
+            say('Ensure that the menu does not show and then click the icon')
             q.get(timeout=TIMEOUT)
 
-            print('Expand the popup menu')
+            say('Expand the popup menu')
             self.confirm(
                 'Was it <%s>?' % str(pystray.Menu(*menu)))
 
@@ -401,7 +410,7 @@ class IconTest(unittest.TestCase):
         valid_responses = ('yes', 'y', 'no', 'n')
         accept_responses = valid_responses[:2]
 
-        message = (statement % fmt) + ' '
+        message = ('\n' + statement % fmt) + ' '
         while True:
             response = input(message)
             if response.lower() in valid_responses:
