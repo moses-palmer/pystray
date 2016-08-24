@@ -48,7 +48,6 @@ def mainloop(f):
         # Execute the callback as an idle function
         GObject.idle_add(callback, *args, **kwargs)
 
-    inner.now = f
     return inner
 
 
@@ -83,19 +82,6 @@ class Icon(_base.Icon):
     @mainloop
     def _update_title(self):
         self._status_icon.set_title(self.title)
-
-    @mainloop
-    def _update_menu(self):
-        # Just clear the menu if none is set
-        if not self.menu:
-            self._popup_menu = None
-            return
-
-        # Generate the menu
-        self._popup_menu = Gtk.Menu.new()
-        for descriptor in self.menu:
-            self._popup_menu.append(self._create_menu_item(descriptor))
-        self._popup_menu.show_all()
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
@@ -134,7 +120,7 @@ class Icon(_base.Icon):
         This signal handler will display the menu if one is set.
         """
         if self.menu:
-            self._update_menu.now(self)
+            self._update_menu()
             self._popup_menu.popup(
                 None, None, Gtk.StatusIcon.position_menu,
                 self._status_icon, 0, Gtk.get_current_event_time())
@@ -152,6 +138,22 @@ class Icon(_base.Icon):
             callback(self)
 
         return inner
+
+    def _update_menu(self):
+        """Updates the popup menu.
+
+        If no visible items are present, the menu will be disabled.
+        """
+        # Just clear the menu if none is set
+        if not self.menu:
+            self._popup_menu = None
+            return
+
+        # Generate the menu
+        self._popup_menu = Gtk.Menu.new()
+        for descriptor in self.menu:
+            self._popup_menu.append(self._create_menu_item(descriptor))
+        self._popup_menu.show_all()
 
     def _create_menu_item(self, descriptor):
         """Creates a :class:`Gtk.MenuItem` from a :class:`pystray.MenuItem`

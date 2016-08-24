@@ -58,16 +58,6 @@ class Icon(_base.Icon):
     def _update_title(self):
         self._status_item.button().setToolTip_(self.title)
 
-    def _update_menu(self):
-        # Clear any stale menu items
-        self._nsmenu.removeAllItems()
-
-        # Generate the menu
-        self._descriptors = []
-        for descriptor in self.menu:
-            self._nsmenu.addItem_(self._create_menu_item(descriptor))
-            self._descriptors.append(descriptor)
-
     def _run(self):
         # Make sure there is an NSApplication instance
         self._app = AppKit.NSApplication.sharedApplication()
@@ -163,6 +153,24 @@ class Icon(_base.Icon):
 
         self._icon_image = AppKit.NSImage.alloc().initWithData_(data)
         self._status_item.button().setImage_(self._icon_image)
+
+    def _update_menu(self):
+        """Updates the popup menu.
+
+        If no visible items are present, the menu will be disabled.
+
+        This method will modify :attr:`_descriptors` to make it contain only the
+        descriptors used to generate the menu, in order; thus, the index of a
+        menu item will map to its descriptor.
+        """
+        # Clear any stale menu items
+        self._nsmenu.removeAllItems()
+
+        # Generate the menu
+        self._descriptors = []
+        for descriptor in self.menu:
+            self._nsmenu.addItem_(self._create_menu_item(descriptor))
+            self._descriptors.append(descriptor)
 
     def _create_menu_item(self, descriptor):
         """Creates a :class:`AppKit.NSMenuItem` from a :class:`pystray.MenuItem`

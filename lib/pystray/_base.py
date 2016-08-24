@@ -122,7 +122,6 @@ class Icon(object):
     @menu.setter
     def menu(self, value):
         self._menu = value
-        self._update_menu()
 
     @property
     def visible(self):
@@ -207,13 +206,6 @@ class Icon(object):
 
     def _update_title(self):
         """Updates the title for an already shown icon.
-
-        This is a platform dependent implementation.
-        """
-        raise NotImplementedError()
-
-    def _update_menu(self):
-        """Updates the menu.
 
         This is a platform dependent implementation.
         """
