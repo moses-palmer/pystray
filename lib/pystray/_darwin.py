@@ -179,6 +179,17 @@ class Icon(_base.Icon):
                     descriptor.text, self._MENU_ITEM_SELECTOR, '')
             menu_item.setAction_(self._MENU_ITEM_SELECTOR)
             menu_item.setTarget_(self._delegate)
+            if descriptor.default:
+                menu_item.setAttributedTitle_(
+                    Foundation.NSAttributedString.alloc()
+                    .initWithString_attributes_(
+                        descriptor.text,
+                        Foundation.NSDictionary.alloc()
+                        .initWithObjectsAndKeys_(
+                            AppKit.NSFont.boldSystemFontOfSize_(
+                                AppKit.NSFont.menuFontOfSize_(0)
+                                .pointSize()),
+                            AppKit.NSFontAttributeName)))
             return menu_item
 
 
