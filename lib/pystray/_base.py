@@ -249,11 +249,12 @@ class MenuItem(object):
     :class:`Menu` is constructed.
     """
     def __init__(self, text, on_activated, default=False, visible=True):
-        self.__name__ = self._text = text or ''
-        self._on_activated = on_activated or (lambda _: None)
+        self.__name__ = str(text)
+        self._text = self._wrap(text or '')
+        self._on_activated = self._wrap(on_activated)
 
-        self._default = default
-        self._visible = visible
+        self._default = self._wrap(default)
+        self._visible = self._wrap(visible)
 
     def __call__(self, icon):
         return self._on_activated(icon)
@@ -265,19 +266,28 @@ class MenuItem(object):
     def text(self):
         """The menu item text.
         """
-        return self._text
+        return self._text(self)
 
     @property
     def default(self):
         """Whether this is the default menu item.
         """
-        return self._default
+        return self._default(self)
 
     @property
     def visible(self):
         """Whether this menu item is visible.
         """
-        return self._visible
+        return self._visible(self)
+
+    def _wrap(self, value):
+        """Wraps a value in a callable.
+
+        If the value already is a callable, it is returned unmodified
+
+        :param value: The value or callable to wrap.
+        """
+        return value if callable(value) else lambda _: value
 
 
 class Menu(object):
