@@ -329,35 +329,35 @@ class Menu(object):
         def strip_tail(items):
             return reversed(list(strip_head(reversed(list(items)))))
 
-        all_menuitems = [
+        self._items = [
             (
-                i if isinstance(i, MenuItem)
-                else self.SEPARATOR if i == '----'
-                else MenuItem(*i, visible=True))
-            for i in items]
+                item if isinstance(item, MenuItem)
+                else self.SEPARATOR if item == '----'
+                else MenuItem(*item, visible=True))
+            for item in items]
         try:
             self._activate = next(
                 menuitem
-                for menuitem in all_menuitems
+                for menuitem in self._items
                 if menuitem.default)
         except StopIteration:
             self._activate = lambda _: None
 
-        self._items = tuple(
-            i if isinstance(i, MenuItem) else MenuItem(*i)
-            for i in strip_tail(strip_head(cleaned(all_menuitems))))
+        self._menu_items = tuple(
+            item
+            for item in strip_tail(strip_head(cleaned(self._items))))
 
     def __call__(self, icon):
         return self._activate(icon)
 
     def __getitem__(self, key):
-        return self._items[key]
+        return self._menu_items[key]
 
     def __iter__(self):
-        return iter(self._items)
+        return iter(self._menu_items)
 
     def __len__(self):
-        return len(self._items)
+        return len(self._menu_items)
 
     def __str__(self):
         return 'Menu:\n' + '\n'.join(str(i) for i in self)
