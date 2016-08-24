@@ -10,6 +10,10 @@ from six import reraise
 from time import sleep
 
 
+#: The number of seconds to wait for interactive commands
+TIMEOUT = 10
+
+
 def test(icon):
     """A decorator to mark an inner function as the actual test code.
 
@@ -188,7 +192,7 @@ class IconTest(unittest.TestCase):
             icon.visible = True
 
             print('Click the icon')
-            q.get(timeout=5)
+            q.get(timeout=TIMEOUT)
 
     def test_activate_with_default(self):
         """Tests that the default menu item is activated when activating icon.
@@ -207,7 +211,7 @@ class IconTest(unittest.TestCase):
             icon.visible = True
 
             print('Click the icon or select the default menu item')
-            q.get(timeout=5)
+            q.get(timeout=TIMEOUT)
 
     def test_menu_construct(self):
         """Tests that the menu is constructed.
@@ -243,7 +247,7 @@ class IconTest(unittest.TestCase):
             icon.visible = True
 
             print('Click Item 1')
-            q.get(timeout=5)
+            q.get(timeout=TIMEOUT)
 
     def test_menu_invisble(self):
         """Tests that a menu consisting of only empty items does not show.
@@ -266,7 +270,7 @@ class IconTest(unittest.TestCase):
             icon.visible = True
 
             print('Ensure that the menu does not show and then click the icon')
-            q.get(timeout=5)
+            q.get(timeout=TIMEOUT)
 
     def icon(self, **kwargs):
         """Generates a systray icon with the specified colours.
