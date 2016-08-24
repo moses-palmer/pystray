@@ -309,6 +309,42 @@ class Menu(object):
     SEPARATOR = MenuItem('- - - -', None)
 
     def __init__(self, *items):
+        self._items = [
+            (
+                item if isinstance(item, MenuItem)
+                else self.SEPARATOR if item == '----'
+                else MenuItem(*item, visible=True))
+            for item in items]
+
+    def __call__(self, icon):
+        try:
+            return next(
+                menuitem
+                for menuitem in self._items
+                if menuitem.default)(icon)
+        except StopIteration:
+            pass
+
+    def __getitem__(self, key):
+        return self._visible_items()[key]
+
+    def __iter__(self):
+        return iter(self._visible_items())
+
+    def __len__(self):
+        return len(self._visible_items())
+
+    def __str__(self):
+        return 'Menu:\n' + '\n'.join(str(i) for i in self)
+
+    def _visible_items(self):
+        """Returns all visible menu items.
+
+        This method also filters redundant separators as is described in the
+        class documentation.
+
+        :return: a tuple containing all currently visible items
+        """
         def cleaned(items):
             was_separator = False
             for i in items:
@@ -329,35 +365,4 @@ class Menu(object):
         def strip_tail(items):
             return reversed(list(strip_head(reversed(list(items)))))
 
-        self._items = [
-            (
-                item if isinstance(item, MenuItem)
-                else self.SEPARATOR if item == '----'
-                else MenuItem(*item, visible=True))
-            for item in items]
-        try:
-            self._activate = next(
-                menuitem
-                for menuitem in self._items
-                if menuitem.default)
-        except StopIteration:
-            self._activate = lambda _: None
-
-        self._menu_items = tuple(
-            item
-            for item in strip_tail(strip_head(cleaned(self._items))))
-
-    def __call__(self, icon):
-        return self._activate(icon)
-
-    def __getitem__(self, key):
-        return self._menu_items[key]
-
-    def __iter__(self):
-        return iter(self._menu_items)
-
-    def __len__(self):
-        return len(self._menu_items)
-
-    def __str__(self):
-        return 'Menu:\n' + '\n'.join(str(i) for i in self)
+        return tuple(strip_tail(strip_head(cleaned(self._items))))
