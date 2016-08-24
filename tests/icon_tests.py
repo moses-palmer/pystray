@@ -272,6 +272,67 @@ class IconTest(unittest.TestCase):
             print('Ensure that the menu does not show and then click the icon')
             q.get(timeout=TIMEOUT)
 
+    def test_menu_dynamic(self):
+        """Tests that a dynamic menu works.
+        """
+        q = queue.Queue()
+        q.ticks = 0
+
+        def on_activate(icon):
+            q.put(True)
+            q.ticks += 1
+
+        menu = (
+            ('Item 1', on_activate),
+            ('Item 2', None),
+            (lambda _:'Item ' + str(q.ticks + 3), None))
+        icon, colors = self.icon(menu=menu)
+
+        @test(icon)
+        def _():
+            icon.visible = True
+
+            print('Click Item 1')
+            q.get(timeout=TIMEOUT)
+
+            print('Expand the popup menu')
+            self.confirm(
+                'Was it <%s>?' % str(pystray.Menu(*menu)))
+
+    def test_menu_dynamic_show_hide(self):
+        """Tests that a dynamic menu that is hidden works as expected.
+        """
+        q = queue.Queue()
+        q.ticks = 0
+
+        def on_activate(icon):
+            q.put(True)
+            q.ticks += 1
+
+        def visible(menu_item):
+            return q.ticks % 2 == 0
+
+        menu = (
+            pystray.MenuItem(
+                'Default', on_activate, default=True, visible=visible),
+            pystray.MenuItem(
+                'Item 2', None, visible=visible))
+        icon, colors = self.icon(menu=menu)
+
+        @test(icon)
+        def _():
+            icon.visible = True
+
+            print('Click the icon or select the default menu item')
+            q.get(timeout=TIMEOUT)
+
+            print('Ensure that the menu does not show and then click the icon')
+            q.get(timeout=TIMEOUT)
+
+            print('Expand the popup menu')
+            self.confirm(
+                'Was it <%s>?' % str(pystray.Menu(*menu)))
+
     def icon(self, **kwargs):
         """Generates a systray icon with the specified colours.
 
