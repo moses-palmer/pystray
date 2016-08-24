@@ -255,6 +255,12 @@ class MenuItem(object):
         self._on_activated = on_activated
         self._default = default
 
+    def __call__(self, icon):
+        return self._on_activated(icon)
+
+    def __str__(self):
+        return '    %s' % self.text
+
     @property
     def visible(self):
         """Whether this menu item is visible.
@@ -272,12 +278,6 @@ class MenuItem(object):
         """Whether this is the default menu item.
         """
         return self._default
-
-    def __call__(self, icon):
-        return self._on_activated(icon)
-
-    def __str__(self):
-        return '    %s' % self.text
 
 
 class Menu(object):
