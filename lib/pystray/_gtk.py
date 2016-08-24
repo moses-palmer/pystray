@@ -48,6 +48,7 @@ def mainloop(f):
         # Execute the callback as an idle function
         GObject.idle_add(callback, *args, **kwargs)
 
+    inner.now = f
     return inner
 
 
@@ -63,9 +64,6 @@ class Icon(_base.Icon):
 
         if self.icon:
             self._update_icon()
-
-        if self.menu:
-            self._update_menu()
 
     @mainloop
     def _show(self):
@@ -135,7 +133,8 @@ class Icon(_base.Icon):
 
         This signal handler will display the menu if one is set.
         """
-        if self._popup_menu:
+        if self.menu:
+            self._update_menu.now(self)
             self._popup_menu.popup(
                 None, None, Gtk.StatusIcon.position_menu,
                 self._status_icon, 0, Gtk.get_current_event_time())
