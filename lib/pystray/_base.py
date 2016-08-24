@@ -122,7 +122,6 @@ class Icon(object):
     @menu.setter
     def menu(self, value):
         self._menu = value
-        self._update_menu()
 
     @property
     def visible(self):
@@ -212,13 +211,6 @@ class Icon(object):
         """
         raise NotImplementedError()
 
-    def _update_menu(self):
-        """Updates the menu.
-
-        This is a platform dependent implementation.
-        """
-        raise NotImplementedError()
-
     def _run(self):
         """Runs the event loop.
 
@@ -249,11 +241,12 @@ class MenuItem(object):
     :class:`Menu` is constructed.
     """
     def __init__(self, text, on_activated, default=False, visible=True):
-        self.__name__ = self._text = text or ''
-        self._on_activated = on_activated or (lambda _: None)
+        self.__name__ = str(text)
+        self._text = self._wrap(text or '')
+        self._on_activated = self._wrap(on_activated)
 
-        self._default = default
-        self._visible = visible
+        self._default = self._wrap(default)
+        self._visible = self._wrap(visible)
 
     def __call__(self, icon):
         return self._on_activated(icon)
@@ -265,19 +258,28 @@ class MenuItem(object):
     def text(self):
         """The menu item text.
         """
-        return self._text
+        return self._text(self)
 
     @property
     def default(self):
         """Whether this is the default menu item.
         """
-        return self._default
+        return self._default(self)
 
     @property
     def visible(self):
         """Whether this menu item is visible.
         """
-        return self._visible
+        return self._visible(self)
+
+    def _wrap(self, value):
+        """Wraps a value in a callable.
+
+        If the value already is a callable, it is returned unmodified
+
+        :param value: The value or callable to wrap.
+        """
+        return value if callable(value) else lambda _: value
 
 
 class Menu(object):
@@ -299,6 +301,42 @@ class Menu(object):
     SEPARATOR = MenuItem('- - - -', None)
 
     def __init__(self, *items):
+        self._items = [
+            (
+                item if isinstance(item, MenuItem)
+                else self.SEPARATOR if item == '----'
+                else MenuItem(*item, visible=True))
+            for item in items]
+
+    def __call__(self, icon):
+        try:
+            return next(
+                menuitem
+                for menuitem in self._items
+                if menuitem.default)(icon)
+        except StopIteration:
+            pass
+
+    def __getitem__(self, key):
+        return self._visible_items()[key]
+
+    def __iter__(self):
+        return iter(self._visible_items())
+
+    def __len__(self):
+        return len(self._visible_items())
+
+    def __str__(self):
+        return 'Menu:\n' + '\n'.join(str(i) for i in self)
+
+    def _visible_items(self):
+        """Returns all visible menu items.
+
+        This method also filters redundant separators as is described in the
+        class documentation.
+
+        :return: a tuple containing all currently visible items
+        """
         def cleaned(items):
             was_separator = False
             for i in items:
@@ -319,35 +357,4 @@ class Menu(object):
         def strip_tail(items):
             return reversed(list(strip_head(reversed(list(items)))))
 
-        all_menuitems = [
-            (
-                i if isinstance(i, MenuItem)
-                else self.SEPARATOR if i == '----'
-                else MenuItem(*i, visible=True))
-            for i in items]
-        try:
-            self._activate = next(
-                menuitem
-                for menuitem in all_menuitems
-                if menuitem.default)
-        except StopIteration:
-            self._activate = lambda _: None
-
-        self._items = tuple(
-            i if isinstance(i, MenuItem) else MenuItem(*i)
-            for i in strip_tail(strip_head(cleaned(all_menuitems))))
-
-    def __call__(self, icon):
-        return self._activate(icon)
-
-    def __getitem__(self, key):
-        return self._items[key]
-
-    def __iter__(self):
-        return iter(self._items)
-
-    def __len__(self):
-        return len(self._items)
-
-    def __str__(self):
-        return 'Menu:\n' + '\n'.join(str(i) for i in self)
+        return tuple(strip_tail(strip_head(cleaned(self._items))))

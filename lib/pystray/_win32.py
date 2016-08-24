@@ -60,9 +60,6 @@ class Icon(_base.Icon):
         self._hmenu = win32.CreatePopupMenu()
         self._HWND_TO_ICON[self._hwnd] = self
 
-        if self.menu:
-            self._update_menu()
-
     def __del__(self):
         if self._running:
             self._stop()
@@ -96,19 +93,6 @@ class Icon(_base.Icon):
             win32.NIM_MODIFY,
             win32.NIF_TIP,
             szTip=self.title)
-
-    def _update_menu(self):
-        # Just clear the menu if none is set
-        win32.DestroyMenu(self._hmenu)
-        self._hmenu = win32.CreatePopupMenu()
-
-        # Generate the menu
-        for i, descriptor in enumerate(self.menu):
-            # Use the index plus one as menu item identifier; we cannot use the
-            # index directly, since TrackPopupMenuEx will return 0 if no item
-            # was selected
-            menu_item = self._create_menu_item(descriptor, i + 1)
-            win32.InsertMenuItem(self._hmenu, i, True, ctypes.byref(menu_item))
 
     def _run(self):
         self._mark_ready()
@@ -179,6 +163,8 @@ class Icon(_base.Icon):
             self()
 
         elif self.menu and lparam == win32.WM_RBUTTONDOWN:
+            self._update_menu()
+
             # TrackPopupMenuEx does not behave unless our systray window is the
             # foreground window
             win32.SetForegroundWindow(self._hwnd)
@@ -219,6 +205,23 @@ class Icon(_base.Icon):
             None,
             win32.GetModuleHandle(None),
             None)
+
+    def _update_menu(self):
+        """Updates the popup menu.
+
+        If no visible items are present, the menu will be disabled.
+        """
+        # Just clear the menu if none is set
+        win32.DestroyMenu(self._hmenu)
+        self._hmenu = win32.CreatePopupMenu()
+
+        # Generate the menu
+        for i, descriptor in enumerate(self.menu):
+            # Use the index plus one as menu item identifier; we cannot use the
+            # index directly, since TrackPopupMenuEx will return 0 if no item
+            # was selected
+            menu_item = self._create_menu_item(descriptor, i + 1)
+            win32.InsertMenuItem(self._hmenu, i, True, ctypes.byref(menu_item))
 
     def _create_menu_item(self, descriptor, identifier):
         """Creates a :class:`pystray._util.win32.MENUITEMINFO` from a

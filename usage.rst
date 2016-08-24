@@ -62,3 +62,7 @@ Menus also support a default item. On *Windows*, *GTK+* and *X*, this item will
 be activated when the user clicks on the icon using the primary button. On *OSX*
 it will be activated if the menu contains no visible entries; it does not have
 to be visible.
+
+All properties of menu items, except for the callback, can be dynamically
+calculated every time a menu is shown by supplying callables instead of values
+to the menu item constructor.
