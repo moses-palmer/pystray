@@ -249,10 +249,10 @@ class MenuItem(object):
     :class:`Menu` is constructed.
     """
     def __init__(self, visible, text, on_activated, default=False):
+        self.__name__ = self._text = text or ''
+        self._on_activated = on_activated or (lambda _: None)
+
         self._visible = visible
-        self._text = text
-        self.__name__ = text
-        self._on_activated = on_activated
         self._default = default
 
     def __call__(self, icon):

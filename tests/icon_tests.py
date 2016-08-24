@@ -199,7 +199,7 @@ class IconTest(unittest.TestCase):
             q.put(True)
 
         icon, colors = self.icon(menu=(
-            ('Item 1', lambda _: None),
+            ('Item 1', None),
             ('Default', on_activate, True)))
 
         @test(icon)
@@ -213,8 +213,8 @@ class IconTest(unittest.TestCase):
         """Tests that the menu is constructed.
         """
         menu = (
-            ('Item 1', lambda _: None),
-            ('Item 2', lambda _: None))
+            ('Item 1', None),
+            ('Item 2', None))
         icon, colors = self.icon(menu=menu)
 
         @test(icon)
@@ -235,7 +235,7 @@ class IconTest(unittest.TestCase):
 
         menu = (
             ('Item 1', on_activate),
-            ('Item 2', lambda _: None))
+            ('Item 2', None))
         icon, colors = self.icon(menu=menu)
 
         @test(icon)
@@ -255,9 +255,9 @@ class IconTest(unittest.TestCase):
 
         menu = (
             ('Item 1', on_activate),
-            ('Item 2', lambda _: None))
+            ('Item 2', None))
         icon, colors = self.icon(menu=(
-            pystray.MenuItem(False, 'Item1', lambda _: None),
+            pystray.MenuItem(False, 'Item1', None),
             pystray.MenuItem(False, 'Item1', on_activate, default=True)))
 
         @test(icon)
