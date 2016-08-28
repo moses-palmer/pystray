@@ -286,11 +286,14 @@ class MenuItem(object):
     menu items with this value set to  `False`` will be discarded when a
     :class:`Menu` is constructed.
     """
-    def __init__(self, text, on_activated, default=False, visible=True):
+    def __init__(
+            self, text, on_activated, checked=None, default=False,
+            visible=True):
         self.__name__ = str(text)
         self._text = self._wrap(text or '')
         self._on_activated = self._wrap(on_activated)
 
+        self._checked = self._assert_callable(checked, lambda _: None)
         self._default = self._wrap(default)
         self._visible = self._wrap(visible)
 
@@ -307,6 +310,12 @@ class MenuItem(object):
         return self._text(self)
 
     @property
+    def checked(self):
+        """Whether this item is checked.
+        """
+        return self._checked(self)
+
+    @property
     def default(self):
         """Whether this is the default menu item.
         """
@@ -317,6 +326,27 @@ class MenuItem(object):
         """Whether this menu item is visible.
         """
         return self._visible(self)
+
+    def _assert_callable(self, value, default):
+        """Asserts that a value is callable.
+
+        If the value is a callable, it will be returned. If the value is
+        ``None``, ``default`` will be returned, otherwise a :class:`ValueError`
+        will be raised.
+
+        :param value: The callable to check.
+
+        :param callable default: The default value to return if ``value`` is
+            ``None``
+
+        :return: a callable
+        """
+        if value is None:
+            return default
+        elif callable(value):
+            return value
+        else:
+            raise ValueError(value)
 
     def _wrap(self, value):
         """Wraps a value in a callable.
