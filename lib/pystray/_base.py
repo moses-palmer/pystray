@@ -118,6 +118,7 @@ class Icon(object):
     @menu.setter
     def menu(self, value):
         self._menu = value
+        self.update_menu()
 
     @property
     def visible(self):
@@ -171,12 +172,32 @@ class Icon(object):
             self._setup_thread.join()
         self._running = False
 
+    def update_menu(self):
+        """Updates the menu.
+
+        If the properties of the menu descriptor are dynamic, that is, any are
+        defined by callables and not constants, and the return values of these
+        callables change by actions other than the menu item activation
+        callbacks, calling this function is required to keep the menu in sync.
+
+        This is required since not all supported platforms allow the menu to be
+        generated when shown.
+
+        For simple use cases where menu changes are triggered by interaction
+        with the menu, this method is not necessary.
+        """
+        self._menu_handle = self._create_menu_handle()
+
     def _mark_ready(self):
         """Marks the icon as ready.
 
         The setup callback passed to :meth:`run` will not be called until this
         method has been invoked.
+
+        Before the setup method is scheduled to be called, :meth:`update_menu`
+        is called.
         """
+        self.update_menu()
         self.__queue.put(True)
 
     def _show(self):
@@ -202,6 +223,13 @@ class Icon(object):
 
     def _update_title(self):
         """Updates the title for an already shown icon.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
+    def _create_menu_handle(self):
+        """Creates an opaque menu handle from :attr:`menu`.
 
         This is a platform dependent implementation.
         """
