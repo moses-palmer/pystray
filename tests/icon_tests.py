@@ -11,6 +11,8 @@ from six.moves import input, queue
 from six import reraise
 from time import sleep
 
+from pystray import Menu as menu, MenuItem as item
+
 
 #: The number of seconds to wait for interactive commands
 TIMEOUT = 10
@@ -56,7 +58,7 @@ def action(on_activate):
 
     :param callable on_activate: The activation callback.
     """
-    return pystray.MenuItem(None, on_activate, default=True, visible=False)
+    return item(None, on_activate, default=True, visible=False)
 
 
 class IconTest(unittest.TestCase):
@@ -193,7 +195,7 @@ class IconTest(unittest.TestCase):
         def on_activate(icon):
             q.put(True)
 
-        icon, colors = self.icon(menu=(
+        icon, colors = self.icon(menu=menu(
             action(on_activate),))
 
         @test(icon)
@@ -211,9 +213,9 @@ class IconTest(unittest.TestCase):
         def on_activate(icon):
             q.put(True)
 
-        icon, colors = self.icon(menu=(
-            ('Item 1', None),
-            ('Default', on_activate, True)))
+        icon, colors = self.icon(menu=menu(
+            item('Item 1', None),
+            item('Default', on_activate, True)))
 
         @test(icon)
         def _():
@@ -225,10 +227,9 @@ class IconTest(unittest.TestCase):
     def test_menu_construct(self):
         """Tests that the menu is constructed.
         """
-        menu = (
-            ('Item 1', None),
-            ('Item 2', None))
-        icon, colors = self.icon(menu=menu)
+        icon, colors = self.icon(menu=menu(
+            item('Item 1', None),
+            item('Item 2', None)))
 
         @test(icon)
         def _():
@@ -236,7 +237,7 @@ class IconTest(unittest.TestCase):
 
             say('Expand the popup menu')
             self.confirm(
-                'Was it <%s>?' % str(pystray.Menu(*menu)))
+                'Was it <%s>?' % str(icon.menu))
 
     def test_menu_activate(self):
         """Tests that the menu can be activated.
@@ -246,10 +247,9 @@ class IconTest(unittest.TestCase):
         def on_activate(icon):
             q.put(True)
 
-        menu = (
-            ('Item 1', on_activate),
-            ('Item 2', None))
-        icon, colors = self.icon(menu=menu)
+        icon, colors = self.icon(menu=(
+            item('Item 1', on_activate),
+            item('Item 2', None)))
 
         @test(icon)
         def _():
@@ -266,13 +266,9 @@ class IconTest(unittest.TestCase):
         def on_activate(icon):
             q.put(True)
 
-        menu = (
-            ('Item 1', on_activate),
-            ('Item 2', None))
-        icon, colors = self.icon(menu=(
-            pystray.MenuItem('Item1', None, visible=False),
-            pystray.MenuItem(
-                'Item1', on_activate, default=True, visible=False)))
+        icon, colors = self.icon(menu=menu(
+            item('Item1', None, visible=False),
+            item('Item2', on_activate, default=True, visible=False)))
 
         @test(icon)
         def _():
@@ -291,11 +287,10 @@ class IconTest(unittest.TestCase):
             q.put(True)
             q.ticks += 1
 
-        menu = (
-            ('Item 1', on_activate),
-            ('Item 2', None),
-            (lambda _:'Item ' + str(q.ticks + 3), None))
-        icon, colors = self.icon(menu=menu)
+        icon, colors = self.icon(menu=menu(
+            item('Item 1', on_activate),
+            item('Item 2', None),
+            item(lambda _:'Item ' + str(q.ticks + 3), None)))
 
         @test(icon)
         def _():
@@ -306,7 +301,7 @@ class IconTest(unittest.TestCase):
 
             say('Expand the popup menu')
             self.confirm(
-                'Was it <%s>?' % str(pystray.Menu(*menu)))
+                'Was it <%s>?' % str(icon.menu))
 
     def test_menu_dynamic_show_hide(self):
         """Tests that a dynamic menu that is hidden works as expected.
@@ -321,12 +316,9 @@ class IconTest(unittest.TestCase):
         def visible(menu_item):
             return q.ticks % 2 == 0
 
-        menu = (
-            pystray.MenuItem(
-                'Default', on_activate, default=True, visible=visible),
-            pystray.MenuItem(
-                'Item 2', None, visible=visible))
-        icon, colors = self.icon(menu=menu)
+        icon, colors = self.icon(menu=menu(
+            item('Default', on_activate, default=True, visible=visible),
+            item('Item 2', None, visible=visible)))
 
         @test(icon)
         def _():
@@ -340,7 +332,7 @@ class IconTest(unittest.TestCase):
 
             say('Expand the popup menu')
             self.confirm(
-                'Was it <%s>?' % str(pystray.Menu(*menu)))
+                'Was it <%s>?' % str(icon.menu))
 
     def icon(self, **kwargs):
         """Generates a systray icon with the specified colours.

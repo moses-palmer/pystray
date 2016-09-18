@@ -24,7 +24,7 @@ class MenuDescriptorTests(unittest.TestCase):
             data)
 
     def test_menu_construct(self):
-        """Tests menu construction from tuples.
+        """Tests menu construction.
         """
         self.assertEqual(
             '''Menu:
@@ -33,8 +33,8 @@ class MenuDescriptorTests(unittest.TestCase):
     Test entry three
     Test entry four''',
         str(menu(
-            ('Test entry one', None),
-            ('Test entry two', None),
+            item('Test entry one', None),
+            item('Test entry two', None),
             item('Test entry three', None),
             item('Test entry four', None))))
 
@@ -48,15 +48,15 @@ class MenuDescriptorTests(unittest.TestCase):
     - - - -
     Test entry two''',
         str(menu(
-            '----',
-            '----',
+            separator(),
+            separator(),
             item('Test entry one', None),
-            '----',
+            separator(),
             item('Test entry hidden', None, visible=False),
-            '----',
+            separator(),
             item('Test entry two', None),
-            '----',
-            '----')))
+            separator(),
+            separator())))
 
     def test_menu_default_none(self):
         """Tests that an invalid number of default menu items fails.

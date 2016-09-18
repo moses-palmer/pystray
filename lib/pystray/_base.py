@@ -54,13 +54,9 @@ class Icon(object):
         self._name = name
         self._icon = icon or None
         self._title = title or ''
+        self._menu = menu
         self._visible = False
         self._log = logging.getLogger(__name__)
-
-        if menu:
-            self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
-        else:
-            self._menu = None
 
         self._running = False
         self.__queue = queue.Queue()
@@ -287,11 +283,7 @@ class Menu(object):
 
     A menu description is immutable.
 
-    It is created with a sequence of either :class:`Menu.Item` instances,
-    strings or tuples. If a non-:class:`Menu.Item` argument is passed, it is
-    interpreted as the title and callback arguments to the constructor, with
-    ``visible`` set to ``True`` if it is a tuple, and a menu separator if it is
-    the string ``'----'``.
+    It is created with a sequence of :class:`Menu.Item` instances.
 
     First, non-visible menu items are removed from the list, then any instances
     of :attr:`SEPARATOR` occurring at the head or tail of the item list are
@@ -301,12 +293,7 @@ class Menu(object):
     SEPARATOR = MenuItem('- - - -', None)
 
     def __init__(self, *items):
-        self._items = [
-            (
-                item if isinstance(item, MenuItem)
-                else self.SEPARATOR if item == '----'
-                else MenuItem(*item, visible=True))
-            for item in items]
+        self._items = tuple(items)
 
     def __call__(self, icon):
         try:
