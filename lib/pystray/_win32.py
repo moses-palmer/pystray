@@ -57,7 +57,6 @@ class Icon(_base.Icon):
         self._atom = self._register_class()
         self._hwnd = self._create_window(self._atom)
         self._menu_hwnd = self._create_window(self._atom)
-        self._hmenu = win32.CreatePopupMenu()
         self._HWND_TO_ICON[self._hwnd] = self
 
     def __del__(self):
@@ -93,6 +92,18 @@ class Icon(_base.Icon):
             win32.NIM_MODIFY,
             win32.NIF_TIP,
             szTip=self.title)
+
+    def _create_menu_handle(self):
+        try:
+            hmenu, callbacks = self._menu_handle
+            win32.DestroyMenu(hmenu)
+        except:
+            pass
+
+        callbacks = []
+        hmenu = self._create_menu(self.menu, callbacks)
+        if hmenu:
+            return (hmenu, callbacks)
 
     def _run(self):
         self._mark_ready()
@@ -138,7 +149,9 @@ class Icon(_base.Icon):
 
             win32.DestroyWindow(self._hwnd)
             win32.DestroyWindow(self._menu_hwnd)
-            win32.DestroyMenu(self._hmenu)
+            if self._menu_handle:
+                hmenu, callbacks = self._menu_handle
+                win32.DestroyMenu(hmenu)
             self._unregister_class(self._atom)
 
     def _on_stop(self, wparam, lparam):
@@ -159,9 +172,7 @@ class Icon(_base.Icon):
         if lparam == win32.WM_LBUTTONDOWN:
             self()
 
-        elif self.menu and lparam == win32.WM_RBUTTONDOWN:
-            descriptors = list(self._update_menu())
-
+        elif self._menu_handle and lparam == win32.WM_RBUTTONDOWN:
             # TrackPopupMenuEx does not behave unless our systray window is the
             # foreground window
             win32.SetForegroundWindow(self._hwnd)
@@ -172,14 +183,17 @@ class Icon(_base.Icon):
 
             # Display the menu and get the menu item identifier; the identifier
             # is the menu item index
-            descriptors[win32.TrackPopupMenuEx(
-                self._hmenu,
+            hmenu, descriptors = self._menu_handle
+            index = win32.TrackPopupMenuEx(
+                hmenu,
                 win32.TPM_RIGHTALIGN | win32.TPM_BOTTOMALIGN
                 | win32.TPM_RETURNCMD,
                 point.x,
                 point.y,
                 self._menu_hwnd,
-                None)](self)
+                None)
+            if index > 0:
+                descriptors[index - 1](self)
 
     def _create_window(self, atom):
         """Creates the system tray icon window.
@@ -199,30 +213,33 @@ class Icon(_base.Icon):
             win32.GetModuleHandle(None),
             None)
 
-    def _update_menu(self):
-        """Updates the popup menu.
+    def _create_menu(self, descriptors, callbacks):
+        """Creates a :class:`ctypes.wintypes.HMENU` from a :class:`pystray.Menu`
+        instance.
 
-        If no visible items are present, the menu will be disabled.
+        :param descriptors: The menu descriptors. If this is falsy, ``None`` is
+            returned.
 
-        This method yields all descriptors used in such a way that the return
-        value of :func:`~pystray._util.win32.TrackPopupMenuEx` is an index into
-        the sequence.
+        :param callbacks: A list to which a callback is appended for every menu
+            item created. The menu item IDs correspond to the items in this list
+            plus one.
+
+        :return: a menu
         """
-        # Just clear the menu if none is set
-        win32.DestroyMenu(self._hmenu)
-        self._hmenu = win32.CreatePopupMenu()
+        if not descriptors:
+            return None
 
-        yield lambda _: None
+        else:
+            # Generate the menu
+            hmenu = win32.CreatePopupMenu()
+            for i, descriptor in enumerate(descriptors):
+                # Append the callbacks before creating the menu items to ensure
+                # that the first item get the ID 1
+                callbacks.append(self._handler(descriptor))
+                menu_item = self._create_menu_item(descriptor, len(callbacks))
+                win32.InsertMenuItem(hmenu, i, True, ctypes.byref(menu_item))
 
-        # Generate the menu
-        for i, descriptor in enumerate(self.menu):
-            # Use the index plus one as menu item identifier; we cannot use the
-            # index directly, since TrackPopupMenuEx will return 0 if no item
-            # was selected
-            menu_item = self._create_menu_item(descriptor, i + 1)
-            win32.InsertMenuItem(self._hmenu, i, True, ctypes.byref(menu_item))
-
-            yield descriptor
+            return hmenu
 
     def _create_menu_item(self, descriptor, identifier):
         """Creates a :class:`pystray._util.win32.MENUITEMINFO` from a
@@ -230,7 +247,7 @@ class Icon(_base.Icon):
 
         :param descriptor: The menu item descriptor.
 
-        :param int identifier: The menu item identifier
+        :param int identifier: The menu item identifier.
 
         :return: a :class:`pystray._util.win32.MENUITEMINFO`
         """
