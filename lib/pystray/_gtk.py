@@ -87,21 +87,13 @@ class Icon(_base.Icon):
         self._loop = GLib.MainLoop.new(None, False)
         self._mark_ready()
 
-        def sigint(*args):
-            self._loop.quit()
-            if previous_sigint:
-                previous_sigint(*args)
-
         # Make sure that we do not inhibit ctrl+c
-        previous_sigint = signal.signal(signal.SIGINT, sigint)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
         try:
             self._loop.run()
         except:
             self._log.error(
                 'An error occurred in the main loop', exc_info=True)
-        finally:
-            if signal.getsignal(signal.SIGINT) == sigint:
-                signal.signal(signal.SIGINT, previous_sigint)
 
     @mainloop
     def _stop(self):
