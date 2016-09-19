@@ -68,6 +68,7 @@ class Icon(object):
     def __call__(self):
         if self._menu is not None:
             self._menu(self)
+            self.update_menu()
 
     @property
     def name(self):
