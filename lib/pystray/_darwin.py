@@ -28,11 +28,11 @@ from . import _base
 
 
 class Icon(_base.Icon):
+    #: The selector for the button action
+    _ACTION_SELECTOR = b'activate:sender'
+
     #: The selector for the menu item actions
     _MENU_ITEM_SELECTOR = b'activateMenuItem:sender'
-
-    #: The selector for when the menu is starting to be tracked
-    _MENU_NEEDS_UPDATE_SELECTOR = b'menuNeedsUpdate:'
 
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
@@ -58,6 +58,15 @@ class Icon(_base.Icon):
     def _update_title(self):
         self._status_item.button().setToolTip_(self.title)
 
+    def _create_menu_handle(self):
+        callbacks = []
+        nsmenu = self._create_menu(self.menu, callbacks)
+        if nsmenu:
+            self._status_item.setMenu_(nsmenu)
+            return (nsmenu, callbacks)
+        else:
+            self._status_item.setMenu_(None)
+
     def _run(self):
         # Make sure there is an NSApplication instance
         self._app = AppKit.NSApplication.sharedApplication()
@@ -71,10 +80,7 @@ class Icon(_base.Icon):
             AppKit.NSVariableStatusItemLength)
 
         self._status_item.button().setTarget_(self._delegate)
-
-        self._nsmenu = AppKit.NSMenu.alloc().initWithTitle_(self.name)
-        self._nsmenu.setDelegate_(self._delegate)
-        self._status_item.setMenu_(self._nsmenu)
+        self._status_item.button().setAction_(self._ACTION_SELECTOR)
 
         # Notify the setup callback
         self._mark_ready()
@@ -150,26 +156,41 @@ class Icon(_base.Icon):
         self._icon_image = AppKit.NSImage.alloc().initWithData_(data)
         self._status_item.button().setImage_(self._icon_image)
 
-    def _update_menu(self):
-        """Updates the popup menu.
+    def _create_menu(self, descriptors, callbacks):
+        """Creates a :class:`AppKit.NSMenu` from a :class:`pystray.Menu`
+        instance.
 
-        If no visible items are present, the menu will be disabled.
+        :param descriptors: The menu descriptors. If this is falsy, ``None`` is
+            returned.
 
-        This method yields all descriptors used.
+        :param callbacks: A list to which a callback is appended for every menu
+            item created. The menu item tags correspond to the items in this
+            list.
+
+        :return: a menu
         """
-        # Clear any stale menu items
-        self._nsmenu.removeAllItems()
+        if not descriptors:
+            return None
 
-        # Generate the menu
-        for descriptor in self.menu:
-            self._nsmenu.addItem_(self._create_menu_item(descriptor))
-            yield descriptor
+        else:
+            # Generate the menu
+            nsmenu = AppKit.NSMenu.alloc().initWithTitle_(self.name)
+            for descriptor in descriptors:
+                # Append the callback after creating the menu item to ensure
+                # that the first item gets the tag 0
+                nsmenu.addItem_(
+                    self._create_menu_item(descriptor, len(callbacks)))
+                callbacks.append(self._handler(descriptor))
 
-    def _create_menu_item(self, descriptor):
+            return nsmenu
+
+    def _create_menu_item(self, descriptor, tag):
         """Creates a :class:`AppKit.NSMenuItem` from a :class:`pystray.MenuItem`
         instance.
 
         :param descriptor: The menu item descriptor.
+
+        :param int tag: The menu item tag.
 
         :return: a :class:`AppKit.NSMenuItem`
         """
@@ -182,6 +203,7 @@ class Icon(_base.Icon):
                     descriptor.text, self._MENU_ITEM_SELECTOR, '')
             menu_item.setAction_(self._MENU_ITEM_SELECTOR)
             menu_item.setTarget_(self._delegate)
+            menu_item.setTag_(tag)
             if descriptor.default:
                 menu_item.setAttributedTitle_(
                     Foundation.NSAttributedString.alloc()
@@ -197,13 +219,11 @@ class Icon(_base.Icon):
 
 
 class IconDelegate(Foundation.NSObject):
+    @objc.namedSelector(Icon._ACTION_SELECTOR)
+    def activate_button(self, sender):
+        self.icon()
+
     @objc.namedSelector(Icon._MENU_ITEM_SELECTOR)
     def activate_menu_item(self, sender):
-        index = self.icon._status_item.menu().indexOfItem_(sender)
-        self.descriptors[index](self.icon)
-
-    @objc.namedSelector(Icon._MENU_NEEDS_UPDATE_SELECTOR)
-    def menu_needs_update(self, sender):
-        self.descriptors = list(self.icon._update_menu())
-        if not self.icon.menu:
-            self.icon()
+        nsmenu, callbacks = self.icon._menu_handle
+        callbacks[sender.tag()](self.icon)
