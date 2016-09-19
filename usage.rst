@@ -64,5 +64,10 @@ it will be activated if the menu contains no visible entries; it does not have
 to be visible.
 
 All properties of menu items, except for the callback, can be dynamically
-calculated every time a menu is shown by supplying callables instead of values
-to the menu item constructor.
+calculated by supplying callables instead of values to the menu item
+constructor. The properties are recalculated every time the icon is clicked or
+any menu item is activated.
+
+If the dynamic properties change because of an external event, you must ensure
+that ``Icon.update_menu`` is called. This is required since not all supported
+platforms allow for the menu to be generated when displayed.

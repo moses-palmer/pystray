@@ -169,6 +169,10 @@ class Icon(_base.Icon):
         # The title is the window name
         self._window.set_wm_name(self.title)
 
+    def _create_menu_handle(self):
+        # Menus are not supported on X
+        pass
+
     def _run(self):
         self._mark_ready()
 

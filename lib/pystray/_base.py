@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import functools
 import itertools
 import logging
 import threading
@@ -54,13 +55,9 @@ class Icon(object):
         self._name = name
         self._icon = icon or None
         self._title = title or ''
+        self._menu = menu
         self._visible = False
         self._log = logging.getLogger(__name__)
-
-        if menu:
-            self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
-        else:
-            self._menu = None
 
         self._running = False
         self.__queue = queue.Queue()
@@ -72,6 +69,7 @@ class Icon(object):
     def __call__(self):
         if self._menu is not None:
             self._menu(self)
+            self.update_menu()
 
     @property
     def name(self):
@@ -122,6 +120,7 @@ class Icon(object):
     @menu.setter
     def menu(self, value):
         self._menu = value
+        self.update_menu()
 
     @property
     def visible(self):
@@ -175,13 +174,53 @@ class Icon(object):
             self._setup_thread.join()
         self._running = False
 
+    def update_menu(self):
+        """Updates the menu.
+
+        If the properties of the menu descriptor are dynamic, that is, any are
+        defined by callables and not constants, and the return values of these
+        callables change by actions other than the menu item activation
+        callbacks, calling this function is required to keep the menu in sync.
+
+        This is required since not all supported platforms allow the menu to be
+        generated when shown.
+
+        For simple use cases where menu changes are triggered by interaction
+        with the menu, this method is not necessary.
+        """
+        self._menu_handle = self._create_menu_handle()
+
     def _mark_ready(self):
         """Marks the icon as ready.
 
         The setup callback passed to :meth:`run` will not be called until this
         method has been invoked.
+
+        Before the setup method is scheduled to be called, :meth:`update_menu`
+        is called.
         """
+        self.update_menu()
         self.__queue.put(True)
+
+    def _handler(self, callback):
+        """Generates a callback handler.
+
+        This method is used in platform implementations to create callback
+        handlers. It will return a function taking any parameters, which will
+        call ``callback`` with ``self`` and then call :meth:`update_menu`.
+
+        :param callable callback: The callback to wrap.
+
+        :return: a wrapped callback
+        """
+        @functools.wraps(callback)
+        def inner(*args, **kwargs):
+            try:
+                callback(self)
+            finally:
+                self.update_menu()
+
+        return inner
 
     def _show(self):
         """The implementation of the :meth:`show` method.
@@ -206,6 +245,13 @@ class Icon(object):
 
     def _update_title(self):
         """Updates the title for an already shown icon.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
+    def _create_menu_handle(self):
+        """Creates an opaque menu handle from :attr:`menu`.
 
         This is a platform dependent implementation.
         """
@@ -287,11 +333,7 @@ class Menu(object):
 
     A menu description is immutable.
 
-    It is created with a sequence of either :class:`Menu.Item` instances,
-    strings or tuples. If a non-:class:`Menu.Item` argument is passed, it is
-    interpreted as the title and callback arguments to the constructor, with
-    ``visible`` set to ``True`` if it is a tuple, and a menu separator if it is
-    the string ``'----'``.
+    It is created with a sequence of :class:`Menu.Item` instances.
 
     First, non-visible menu items are removed from the list, then any instances
     of :attr:`SEPARATOR` occurring at the head or tail of the item list are
@@ -301,12 +343,7 @@ class Menu(object):
     SEPARATOR = MenuItem('- - - -', None)
 
     def __init__(self, *items):
-        self._items = [
-            (
-                item if isinstance(item, MenuItem)
-                else self.SEPARATOR if item == '----'
-                else MenuItem(*item, visible=True))
-            for item in items]
+        self._items = tuple(items)
 
     def __call__(self, icon):
         try:
