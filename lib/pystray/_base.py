@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import functools
 import itertools
 import logging
 import threading
@@ -200,6 +201,26 @@ class Icon(object):
         """
         self.update_menu()
         self.__queue.put(True)
+
+    def _handler(self, callback):
+        """Generates a callback handler.
+
+        This method is used in platform implementations to create callback
+        handlers. It will return a function taking any parameters, which will
+        call ``callback`` with ``self`` and then call :meth:`update_menu`.
+
+        :param callable callback: The callback to wrap.
+
+        :return: a wrapped callback
+        """
+        @functools.wraps(callback)
+        def inner(*args, **kwargs):
+            try:
+                callback(self)
+            finally:
+                self.update_menu()
+
+        return inner
 
     def _show(self):
         """The implementation of the :meth:`show` method.
