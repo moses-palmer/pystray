@@ -8,7 +8,7 @@ In order to create a *system tray icon*, the class ``pystray.Icon`` is used::
     icon = pystray.Icon('test name')
 
 
-In order for the icon to be displayed, we must provide an icon. This icon must
+In order for the icon to be displayed, you must provide an icon. This icon must
 be specified as a ``PIL.Image.Image``::
 
     from PIL import Image, ImageDraw
@@ -19,7 +19,7 @@ be specified as a ``PIL.Image.Image``::
     dc.rectangle((width // 2, 0, width, height // 2), fill=color2)
     dc.rectangle((0, height // 2, width // 2, height), fill=color2)
 
-    icon.image = image
+    icon.icon = image
 
 
 To ensure that your application runs on all platforms, you must then run the
@@ -33,8 +33,8 @@ following code to show the icon::
 
 The call to ``pystray.Icon.run()`` is blocking, and it must be performed from
 the main thread of the application. The reason for this is that the *system tray
-icon* implementation for *OSX* must be run from the main thread, and it requires
-the application runloop to be running. ``pystray.Icon.run()`` will start the
+icon* implementation for *OSX* must be run from this thread, and it requires the
+application runloop to be running. ``pystray.Icon.run()`` will start the
 runloop.
 
 The code in ``setup()`` will be run in a separate thread once the *system tray
