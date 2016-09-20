@@ -8,7 +8,7 @@ In order to create a *system tray icon*, the class ``pystray.Icon`` is used::
     icon = pystray.Icon('test name')
 
 
-In order for the icon to be displayed, we must provide an icon. This icon must
+In order for the icon to be displayed, you must provide an icon. This icon must
 be specified as a ``PIL.Image.Image``::
 
     from PIL import Image, ImageDraw
