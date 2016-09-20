@@ -38,6 +38,19 @@ class MenuDescriptorTests(unittest.TestCase):
             item('Test entry three', None),
             item('Test entry four', None))))
 
+    def test_menu_construct_from_generator(self):
+        """Tests menu construction.
+        """
+        self.assertEqual(
+            '''Menu:
+    Test entry 1
+    Test entry 2
+    Test entry 3
+    Test entry 4''',
+        str(menu(lambda: (
+            item('Test entry %d' % (i + 1), None)
+            for i in range(4)))))
+
     def test_menu_separator(self):
         """Tests menu construction with separators.
         """
