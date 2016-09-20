@@ -333,7 +333,8 @@ class Menu(object):
 
     A menu description is immutable.
 
-    It is created with a sequence of :class:`Menu.Item` instances.
+    It is created with a sequence of :class:`Menu.Item` instances, or a single
+    callable which must return a generator for the menu items.
 
     First, non-visible menu items are removed from the list, then any instances
     of :attr:`SEPARATOR` occurring at the head or tail of the item list are
@@ -345,11 +346,23 @@ class Menu(object):
     def __init__(self, *items):
         self._items = tuple(items)
 
+    @property
+    def items(self):
+        """All menu items.
+        """
+        if (True
+                and len(self._items) == 1
+                and not isinstance(self._items[0], MenuItem)
+                and callable(self._items[0])):
+            return self._items[0]()
+        else:
+            return self._items
+
     def __call__(self, icon):
         try:
             return next(
                 menuitem
-                for menuitem in self._items
+                for menuitem in self.items
                 if menuitem.default)(icon)
         except StopIteration:
             pass
@@ -393,4 +406,4 @@ class Menu(object):
         def strip_tail(items):
             return reversed(list(strip_head(reversed(list(items)))))
 
-        return tuple(strip_tail(strip_head(cleaned(self._items))))
+        return tuple(strip_tail(strip_head(cleaned(self.items))))
