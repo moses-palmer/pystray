@@ -58,7 +58,7 @@ def action(on_activate):
 
     :param callable on_activate: The activation callback.
     """
-    return item(None, on_activate, default=True, visible=False)
+    return item('Default', on_activate, default=True, visible=False)
 
 
 class IconTest(unittest.TestCase):
