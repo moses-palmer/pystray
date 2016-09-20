@@ -88,6 +88,8 @@ class Icon(_base.Icon):
             self._status_icon.set_visible(False)
             self._appindicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
             self._appindicator.set_icon(self._appindicator_icon_path)
+            self._appindicator.set_menu(
+                self._menu_handle or self._create_default_menu())
 
     @mainloop
     def _hide(self):
@@ -113,7 +115,12 @@ class Icon(_base.Icon):
         self._status_icon.set_title(self.title)
 
     def _create_menu_handle(self):
-        return self._create_menu(self.menu)
+        menu = self._create_menu(self.menu)
+
+        if self._appindicator:
+            self._appindicator.set_menu(menu or self._create_default_menu())
+
+        return menu
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
@@ -212,3 +219,21 @@ class Icon(_base.Icon):
         self._appindicator_icon_path = tempfile.mktemp()
         with open(self._appindicator_icon_path, 'wb') as f:
             self.icon.save(f, 'PNG')
+
+    def _create_default_menu(self):
+        """Creates a :class:`Gtk.Menu` from the default menu entry.
+
+        :return: a :class:`Gtk.Menu`
+        """
+        menu = Gtk.Menu.new()
+        if self.menu is not None:
+            menu.append(self._create_menu_item(next(
+                menu_item
+                for menu_item in self.menu.items
+                if menu_item.default)))
+        else:
+            menu.append(self._create_menu_item(
+                _base.MenuItem(self.name, lambda _: None)))
+        menu.show_all()
+
+        return menu
