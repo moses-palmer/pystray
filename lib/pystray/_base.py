@@ -354,9 +354,6 @@ class Menu(object):
         except StopIteration:
             pass
 
-    def __getitem__(self, key):
-        return self._visible_items()[key]
-
     def __iter__(self):
         return iter(self._visible_items())
 
