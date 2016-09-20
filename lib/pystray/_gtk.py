@@ -66,6 +66,7 @@ class Icon(_base.Icon):
         self._status_icon.connect('activate', self._on_status_icon_activate)
         self._status_icon.connect('popup-menu', self._on_status_icon_popup_menu)
         self._popup_menu = None
+        self._appindicator = None
 
         if self.icon:
             self._update_icon()
@@ -74,9 +75,24 @@ class Icon(_base.Icon):
     def _show(self):
         self._status_icon.set_visible(True)
 
+        if AppIndicator:
+            self._appindicator = AppIndicator.Indicator.new(
+                self.name,
+                '',
+                AppIndicator.IndicatorCategory.APPLICATION_STATUS)
+        else:
+            self._appindicator = None
+
+        if self._appindicator:
+            self._status_icon.set_visible(False)
+            self._appindicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
+
     @mainloop
     def _hide(self):
         self._status_icon.set_visible(False)
+
+        if self._appindicator:
+            self._appindicator = None
 
     @mainloop
     def _update_icon(self):
@@ -103,6 +119,8 @@ class Icon(_base.Icon):
         except:
             self._log.error(
                 'An error occurred in the main loop', exc_info=True)
+        finally:
+            del self._appindicator
 
     @mainloop
     def _stop(self):
