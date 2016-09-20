@@ -114,6 +114,9 @@ class Icon(_base.Icon):
     def _update_title(self):
         self._status_icon.set_title(self.title)
 
+        if self._appindicator:
+            self._appindicator.set_title(self.title)
+
     def _create_menu_handle(self):
         menu = self._create_menu(self.menu)
 
