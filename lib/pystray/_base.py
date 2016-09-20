@@ -357,8 +357,10 @@ class Menu(object):
     def __iter__(self):
         return iter(self._visible_items())
 
-    def __len__(self):
-        return len(self._visible_items())
+    def __bool__(self):
+        return len(self._visible_items()) > 0
+
+    __nonzero__ = __bool__
 
     def __str__(self):
         return 'Menu:\n' + '\n'.join(str(i) for i in self)
