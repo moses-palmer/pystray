@@ -67,6 +67,7 @@ class Icon(_base.Icon):
         self._status_icon.connect('popup-menu', self._on_status_icon_popup_menu)
         self._popup_menu = None
         self._appindicator = None
+        self._appindicator_icon_path = None
 
         if self.icon:
             self._update_icon()
@@ -86,6 +87,7 @@ class Icon(_base.Icon):
         if self._appindicator:
             self._status_icon.set_visible(False)
             self._appindicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
+            self._appindicator.set_icon(self._appindicator_icon_path)
 
     @mainloop
     def _hide(self):
@@ -100,6 +102,11 @@ class Icon(_base.Icon):
         # the file
         with serialized_image(self.icon, 'PNG') as icon_path:
             self._status_icon.set_from_file(icon_path)
+
+        self._remove_appindicator_icon()
+        self._update_appindicator_icon()
+        if self._appindicator:
+            self._appindicator.set_icon(self._appindicator_icon_path)
 
     @mainloop
     def _update_title(self):
@@ -121,6 +128,7 @@ class Icon(_base.Icon):
                 'An error occurred in the main loop', exc_info=True)
         finally:
             del self._appindicator
+            self._remove_appindicator_icon()
 
     @mainloop
     def _stop(self):
@@ -180,3 +188,27 @@ class Icon(_base.Icon):
                 menu_item.get_children()[0].set_markup(
                     '<b>%s</b>' % GLib.markup_escape_text(descriptor.text))
             return menu_item
+
+    def _remove_appindicator_icon(self):
+        """Removes the temporary file used for the *AppIndicator*.
+        """
+        try:
+            if self._appindicator_icon_path:
+                os.unlink(self._appindicator_icon_path)
+                self._appindicator_icon_path = None
+        except:
+            pass
+
+    def _update_appindicator_icon(self):
+        """Updates the *AppIndicator* icon.
+
+        This method will update :attr:`_appindicator_icon_path` and create a new
+        image file.
+
+        If an *AppIndicator* icon is already set, call
+        :meth:`_remove_appindicator_icon` first to ensure that the old file is
+        removed.
+        """
+        self._appindicator_icon_path = tempfile.mktemp()
+        with open(self._appindicator_icon_path, 'wb') as f:
+            self.icon.save(f, 'PNG')
