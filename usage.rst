@@ -33,8 +33,8 @@ following code to show the icon::
 
 The call to ``pystray.Icon.run()`` is blocking, and it must be performed from
 the main thread of the application. The reason for this is that the *system tray
-icon* implementation for *OSX* must be run from the main thread, and it requires
-the application runloop to be running. ``pystray.Icon.run()`` will start the
+icon* implementation for *OSX* must be run from this thread, and it requires the
+application runloop to be running. ``pystray.Icon.run()`` will start the
 runloop.
 
 The code in ``setup()`` will be run in a separate thread once the *system tray
