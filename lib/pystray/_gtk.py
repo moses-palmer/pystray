@@ -24,6 +24,12 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
 
+try:
+    gi.require_version('AppIndicator3', '0.1')
+    from gi.repository import AppIndicator3 as AppIndicator
+except:
+    AppIndicator = None
+
 from ._util import serialized_image
 from . import _base
 
@@ -60,6 +66,8 @@ class Icon(_base.Icon):
         self._status_icon.connect('activate', self._on_status_icon_activate)
         self._status_icon.connect('popup-menu', self._on_status_icon_popup_menu)
         self._popup_menu = None
+        self._appindicator = None
+        self._appindicator_icon_path = None
 
         if self.icon:
             self._update_icon()
@@ -68,9 +76,27 @@ class Icon(_base.Icon):
     def _show(self):
         self._status_icon.set_visible(True)
 
+        if AppIndicator:
+            self._appindicator = AppIndicator.Indicator.new(
+                self.name,
+                '',
+                AppIndicator.IndicatorCategory.APPLICATION_STATUS)
+        else:
+            self._appindicator = None
+
+        if self._appindicator:
+            self._status_icon.set_visible(False)
+            self._appindicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
+            self._appindicator.set_icon(self._appindicator_icon_path)
+            self._appindicator.set_menu(
+                self._menu_handle or self._create_default_menu())
+
     @mainloop
     def _hide(self):
         self._status_icon.set_visible(False)
+
+        if self._appindicator:
+            self._appindicator = None
 
     @mainloop
     def _update_icon(self):
@@ -79,12 +105,25 @@ class Icon(_base.Icon):
         with serialized_image(self.icon, 'PNG') as icon_path:
             self._status_icon.set_from_file(icon_path)
 
+        self._remove_appindicator_icon()
+        self._update_appindicator_icon()
+        if self._appindicator:
+            self._appindicator.set_icon(self._appindicator_icon_path)
+
     @mainloop
     def _update_title(self):
         self._status_icon.set_title(self.title)
 
+        if self._appindicator:
+            self._appindicator.set_title(self.title)
+
     def _create_menu_handle(self):
-        return self._create_menu(self.menu)
+        menu = self._create_menu(self.menu)
+
+        if self._appindicator:
+            self._appindicator.set_menu(menu or self._create_default_menu())
+
+        return menu
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
@@ -97,6 +136,9 @@ class Icon(_base.Icon):
         except:
             self._log.error(
                 'An error occurred in the main loop', exc_info=True)
+        finally:
+            del self._appindicator
+            self._remove_appindicator_icon()
 
     @mainloop
     def _stop(self):
@@ -156,3 +198,45 @@ class Icon(_base.Icon):
                 menu_item.get_children()[0].set_markup(
                     '<b>%s</b>' % GLib.markup_escape_text(descriptor.text))
             return menu_item
+
+    def _remove_appindicator_icon(self):
+        """Removes the temporary file used for the *AppIndicator*.
+        """
+        try:
+            if self._appindicator_icon_path:
+                os.unlink(self._appindicator_icon_path)
+                self._appindicator_icon_path = None
+        except:
+            pass
+
+    def _update_appindicator_icon(self):
+        """Updates the *AppIndicator* icon.
+
+        This method will update :attr:`_appindicator_icon_path` and create a new
+        image file.
+
+        If an *AppIndicator* icon is already set, call
+        :meth:`_remove_appindicator_icon` first to ensure that the old file is
+        removed.
+        """
+        self._appindicator_icon_path = tempfile.mktemp()
+        with open(self._appindicator_icon_path, 'wb') as f:
+            self.icon.save(f, 'PNG')
+
+    def _create_default_menu(self):
+        """Creates a :class:`Gtk.Menu` from the default menu entry.
+
+        :return: a :class:`Gtk.Menu`
+        """
+        menu = Gtk.Menu.new()
+        if self.menu is not None:
+            menu.append(self._create_menu_item(next(
+                menu_item
+                for menu_item in self.menu.items
+                if menu_item.default)))
+        else:
+            menu.append(self._create_menu_item(
+                _base.MenuItem(self.name, lambda _: None)))
+        menu.show_all()
+
+        return menu
