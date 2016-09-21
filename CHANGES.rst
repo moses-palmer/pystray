@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+v0.8 - Platform independent API and checkable
+---------------------------------------------
+*  Added method to explicitly update menu to enable support for other platforms.
+*  Added support for *AppIndicator* backend.
+*  Re-added native clickability for *OSX*.
+*  Added support for check boxes.
+
+
 v0.7 - Dynamic menus
 --------------------
 *  Added support for dynamically generating menu item properties when a popup
