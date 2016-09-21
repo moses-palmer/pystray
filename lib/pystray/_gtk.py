@@ -192,7 +192,11 @@ class Icon(_base.Icon):
             return Gtk.SeparatorMenuItem()
 
         else:
-            menu_item = Gtk.MenuItem.new_with_label(descriptor.text)
+            if descriptor.checked is not None:
+                menu_item = Gtk.CheckMenuItem.new_with_label(descriptor.text)
+                menu_item.set_active(descriptor.checked)
+            else:
+                menu_item = Gtk.MenuItem.new_with_label(descriptor.text)
             menu_item.connect('activate', self._handler(descriptor))
             if descriptor.default:
                 menu_item.get_children()[0].set_markup(

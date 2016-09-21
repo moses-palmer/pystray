@@ -215,6 +215,10 @@ class Icon(_base.Icon):
                                 AppKit.NSFont.menuFontOfSize_(0)
                                 .pointSize()),
                             AppKit.NSFontAttributeName)))
+            if descriptor.checked is not None:
+                menu_item.setState_(
+                    AppKit.NSOnState if descriptor.checked
+                    else AppKit.NSOffState)
             return menu_item
 
 

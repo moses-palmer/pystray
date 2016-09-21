@@ -87,6 +87,24 @@ class MenuDescriptorTests(unittest.TestCase):
             menu(
                 item('one', lambda _: 'test result', default=True))(None))
 
+    def test_menu_checked_none(self):
+        """Tests that not providing a value for ``default`` works.
+        """
+        self.assertFalse(
+            item('Test', None).checked)
+
+    def test_menu_checked_non_callable(self):
+        """Tests that not providing a value for ``default`` works.
+        """
+        with self.assertRaises(ValueError):
+            item('Test', None, chcked=False)
+
+    def test_menu_checked_non_callable(self):
+        """Tests that not providing a value for ``default`` works.
+        """
+        self.assertTrue(
+            item('Test', None, checked=lambda _: True).checked)
+
 
 def separator():
     """A wrapper around :attr:`pystray.Menu.SEPARATOR`.

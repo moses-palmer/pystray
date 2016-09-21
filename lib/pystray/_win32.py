@@ -261,7 +261,9 @@ class Icon(_base.Icon):
             return win32.MENUITEMINFO(
                 cbSize=ctypes.sizeof(win32.MENUITEMINFO),
                 fMask=win32.MIIM_STRING | win32.MIIM_ID | win32.MIIM_STATE,
-                fState=win32.MFS_DEFAULT if descriptor.default else 0,
+                fState=0
+                | (win32.MFS_DEFAULT if descriptor.default else 0)
+                | (win32.MFS_CHECKED if descriptor.checked else 0),
                 wID=identifier,
                 dwTypeData=descriptor.text)
 
