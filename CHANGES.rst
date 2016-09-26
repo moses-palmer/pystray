@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v0.9 - Submenus
+---------------
+*  Added support for nested menus.
+
+
 v0.8 - Platform independent API and checkable
 ---------------------------------------------
 *  Added method to explicitly update menu to enable support for other platforms.
