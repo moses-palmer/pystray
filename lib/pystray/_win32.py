@@ -236,18 +236,20 @@ class Icon(_base.Icon):
                 # Append the callbacks before creating the menu items to ensure
                 # that the first item get the ID 1
                 callbacks.append(self._handler(descriptor))
-                menu_item = self._create_menu_item(descriptor, len(callbacks))
+                menu_item = self._create_menu_item(descriptor, callbacks)
                 win32.InsertMenuItem(hmenu, i, True, ctypes.byref(menu_item))
 
             return hmenu
 
-    def _create_menu_item(self, descriptor, identifier):
+    def _create_menu_item(self, descriptor, callbacks):
         """Creates a :class:`pystray._util.win32.MENUITEMINFO` from a
         :class:`pystray.MenuItem` instance.
 
         :param descriptor: The menu item descriptor.
 
-        :param int identifier: The menu item identifier.
+        :param callbacks: A list to which a callback is appended for every menu
+            item created. The menu item IDs correspond to the items in this list
+            plus one.
 
         :return: a :class:`pystray._util.win32.MENUITEMINFO`
         """
@@ -260,11 +262,15 @@ class Icon(_base.Icon):
         else:
             return win32.MENUITEMINFO(
                 cbSize=ctypes.sizeof(win32.MENUITEMINFO),
-                fMask=win32.MIIM_STRING | win32.MIIM_ID | win32.MIIM_STATE,
+                fMask=win32.MIIM_STRING | win32.MIIM_ID | win32.MIIM_STATE
+                | win32.MIIM_SUBMENU,
                 fState=0
                 | (win32.MFS_DEFAULT if descriptor.default else 0)
                 | (win32.MFS_CHECKED if descriptor.checked else 0),
-                wID=identifier,
+                wID=len(callbacks),
+                hSubMenu=self._create_menu(descriptor.submenu, callbacks)
+                if descriptor.submenu
+                else None,
                 dwTypeData=descriptor.text)
 
     def _message(self, code, flags, **kwargs):
