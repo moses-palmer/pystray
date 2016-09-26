@@ -15,14 +15,12 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import functools
 import os
-import signal
 import tempfile
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, GObject, Gtk
+from gi.repository import Gtk
 
 try:
     gi.require_version('AppIndicator3', '0.1')
@@ -30,20 +28,17 @@ try:
 except:
     AppIndicator = None
 
-from ._util.gtk import mainloop
+from ._util.gtk import GtkIcon, mainloop
 from ._util import serialized_image
-from . import _base
 
 
-class Icon(_base.Icon):
+class Icon(GtkIcon):
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
-        self._loop = None
         self._status_icon = Gtk.StatusIcon.new()
         self._status_icon.connect('activate', self._on_status_icon_activate)
         self._status_icon.connect('popup-menu', self._on_status_icon_popup_menu)
-        self._popup_menu = None
         self._appindicator = None
         self._appindicator_icon_path = None
 
@@ -96,31 +91,16 @@ class Icon(_base.Icon):
             self._appindicator.set_title(self.title)
 
     def _create_menu_handle(self):
-        menu = self._create_menu(self.menu)
+        menu = super(Icon, self)._create_menu_handle()
 
         if self._appindicator:
             self._appindicator.set_menu(menu or self._create_default_menu())
 
         return menu
 
-    def _run(self):
-        self._loop = GLib.MainLoop.new(None, False)
-        self._mark_ready()
-
-        # Make sure that we do not inhibit ctrl+c
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
-        try:
-            self._loop.run()
-        except:
-            self._log.error(
-                'An error occurred in the main loop', exc_info=True)
-        finally:
-            del self._appindicator
-            self._remove_appindicator_icon()
-
-    @mainloop
-    def _stop(self):
-        self._loop.quit()
+    def _finalize(self):
+        del self._appindicator
+        self._remove_appindicator_icon()
 
     def _on_status_icon_activate(self, status_icon):
         """The handler for *activate* for the status icon.
@@ -138,48 +118,6 @@ class Icon(_base.Icon):
             self._menu_handle.popup(
                 None, None, Gtk.StatusIcon.position_menu,
                 self._status_icon, 0, Gtk.get_current_event_time())
-
-    def _create_menu(self, descriptors):
-        """Creates a :class:`Gtk.Menu` from a :class:`pystray.Menu` instance.
-
-        :param descriptors: The menu descriptors. If this is falsy, ``None`` is
-            returned.
-
-        :return: a :class:`Gtk.Menu` or ``None``
-        """
-        if not descriptors:
-            return None
-
-        else:
-            menu = Gtk.Menu.new()
-            for descriptor in descriptors:
-                menu.append(self._create_menu_item(descriptor))
-            menu.show_all()
-
-            return menu
-
-    def _create_menu_item(self, descriptor):
-        """Creates a :class:`Gtk.MenuItem` from a :class:`pystray.MenuItem`
-        instance.
-
-        :param descriptor: The menu item descriptor.
-
-        :return: a :class:`Gtk.MenuItem`
-        """
-        if descriptor is _base.Menu.SEPARATOR:
-            return Gtk.SeparatorMenuItem()
-
-        else:
-            if descriptor.checked is not None:
-                menu_item = Gtk.CheckMenuItem.new_with_label(descriptor.text)
-                menu_item.set_active(descriptor.checked)
-            else:
-                menu_item = Gtk.MenuItem.new_with_label(descriptor.text)
-            menu_item.connect('activate', self._handler(descriptor))
-            if descriptor.default:
-                menu_item.get_children()[0].set_markup(
-                    '<b>%s</b>' % GLib.markup_escape_text(descriptor.text))
-            return menu_item
 
     def _remove_appindicator_icon(self):
         """Removes the temporary file used for the *AppIndicator*.
