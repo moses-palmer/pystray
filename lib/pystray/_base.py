@@ -388,6 +388,12 @@ class Menu(object):
         else:
             return self._items
 
+    @property
+    def visible(self):
+        """Whether this menu is visible.
+        """
+        return bool(self)
+
     def __call__(self, icon):
         try:
             return next(
