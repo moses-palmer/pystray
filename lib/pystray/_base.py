@@ -279,29 +279,37 @@ class MenuItem(object):
 
     A menu item is immutable.
 
-    It has a text and an activation callback. It is callable; when called,
-    the activation callback is called.
+    It has a text and an action. The action is either a callable of a menu. It
+    is callable; when called, the activation callback is called.
 
     The :attr:`visible` attribute is provided to make menu creation easier; all
     menu items with this value set to  `False`` will be discarded when a
     :class:`Menu` is constructed.
     """
     def __init__(
-            self, text, on_activated, checked=None, default=False,
+            self, text, action, checked=None, default=False,
             visible=True):
         self.__name__ = str(text)
         self._text = self._wrap(text or '')
-        self._on_activated = self._wrap(on_activated)
+
+        # Check for None to allow instantiation from Menu class body
+        self._action = action \
+            if action is not None and isinstance(action, Menu) \
+            else self._wrap(action)
 
         self._checked = self._assert_callable(checked, lambda _: None)
         self._default = self._wrap(default)
         self._visible = self._wrap(visible)
 
     def __call__(self, icon):
-        return self._on_activated(icon)
+        if not isinstance(self._action, Menu):
+            return self._action(icon)
 
     def __str__(self):
-        return '    %s' % self.text
+        if isinstance(self._action, Menu):
+            return '%s =>\n%s' % (self.text, str(self._action))
+        else:
+            return self.text
 
     @property
     def text(self):
@@ -324,8 +332,20 @@ class MenuItem(object):
     @property
     def visible(self):
         """Whether this menu item is visible.
+
+        If the action for this menu item is a menu, that also has to be visible
+        for this property to be ``True``.
         """
-        return self._visible(self)
+        if isinstance(self._action, Menu):
+            return self._visible(self) and self._action.visible
+        else:
+            return self._visible(self)
+
+    @property
+    def submenu(self):
+        """The submenu used by this menu item, or ``None``.
+        """
+        return self._action if isinstance(self._action, Menu) else None
 
     def _assert_callable(self, value, default):
         """Asserts that a value is callable.
@@ -412,7 +432,11 @@ class Menu(object):
     __nonzero__ = __bool__
 
     def __str__(self):
-        return 'Menu:\n' + '\n'.join(str(i) for i in self)
+        return '\n'.join(
+            '\n'.join(
+                '    %s' % l
+                for l in str(i).splitlines())
+            for i in self)
 
     def _visible_items(self):
         """Returns all visible menu items.

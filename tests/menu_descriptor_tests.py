@@ -27,12 +27,12 @@ class MenuDescriptorTests(unittest.TestCase):
         """Tests menu construction.
         """
         self.assertEqual(
-            '''Menu:
+            '''
     Test entry one
     Test entry two
     Test entry three
     Test entry four''',
-        str(menu(
+        '\n' + str(menu(
             item('Test entry one', None),
             item('Test entry two', None),
             item('Test entry three', None),
@@ -42,25 +42,42 @@ class MenuDescriptorTests(unittest.TestCase):
         """Tests menu construction.
         """
         self.assertEqual(
-            '''Menu:
+            '''
     Test entry 1
     Test entry 2
     Test entry 3
     Test entry 4''',
-        str(menu(lambda: (
+        '\n' + str(menu(lambda: (
             item('Test entry %d' % (i + 1), None)
             for i in range(4)))))
+
+    def test_menu_construct_with_submenu(self):
+        """Tests menu construction.
+        """
+        self.assertEqual(
+            '''
+    Test entry 1
+    Test entry 2 =>
+        Test entry 3
+        Test entry 4
+    Test entry 5''',
+        '\n' + str(menu(
+                item('Test entry 1', None),
+                item('Test entry 2', menu(
+                    item('Test entry 3', None),
+                    item('Test entry 4', None))),
+                item('Test entry 5', None))))
 
     def test_menu_separator(self):
         """Tests menu construction with separators.
         """
         # Separators at the head and tail are ignored
         self.assertEqual(
-            '''Menu:
+            '''
     Test entry one
     - - - -
     Test entry two''',
-        str(menu(
+        '\n' + str(menu(
             separator(),
             separator(),
             item('Test entry one', None),
@@ -86,6 +103,19 @@ class MenuDescriptorTests(unittest.TestCase):
             'test result',
             menu(
                 item('one', lambda _: 'test result', default=True))(None))
+
+    def test_menu_visible_submenu(self):
+        """Tests that  ``visible`` is correctly set when a submenu is set.
+        """
+        self.assertTrue(
+            item('Test', menu(
+                item('Item', None)), visible=True).visible)
+        self.assertFalse(
+            item('Test', menu(
+                item('Item', None)), visible=False).visible)
+        self.assertFalse(
+            item('Test', menu(
+                item('Item', None, visible=False)), visible=True).visible)
 
     def test_menu_checked_none(self):
         """Tests that not providing a value for ``default`` works.
