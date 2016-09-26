@@ -38,6 +38,11 @@ try:
     else:
         try:
             if not Icon:
+                from ._appindicator import Icon
+        except Exception as e:
+            error = e
+        try:
+            if not Icon:
                 from ._gtk import Icon
         except Exception as e:
             error = e
