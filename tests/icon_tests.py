@@ -258,6 +258,28 @@ class IconTest(unittest.TestCase):
             say('Click Item 1')
             q.get(timeout=TIMEOUT)
 
+
+    def test_menu_activate_submenu(self):
+        """Tests that an item in a submenu can be activated.
+        """
+        q = queue.Queue()
+
+        def on_activate(icon):
+            q.put(True)
+
+        icon, colors = self.icon(menu=(
+            item('Item 1', None),
+            item('Submenu', menu(
+                item('Item 2', None),
+                item('Item 3', on_activate)))))
+
+        @test(icon)
+        def _():
+            icon.visible = True
+
+            say('Click Item 3 in the submenu')
+            q.get(timeout=TIMEOUT)
+
     def test_menu_invisble(self):
         """Tests that a menu consisting of only empty items does not show.
         """

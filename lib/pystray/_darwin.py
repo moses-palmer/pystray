@@ -179,18 +179,20 @@ class Icon(_base.Icon):
                 # Append the callback after creating the menu item to ensure
                 # that the first item gets the tag 0
                 nsmenu.addItem_(
-                    self._create_menu_item(descriptor, len(callbacks)))
+                    self._create_menu_item(descriptor, callbacks))
                 callbacks.append(self._handler(descriptor))
 
             return nsmenu
 
-    def _create_menu_item(self, descriptor, tag):
+    def _create_menu_item(self, descriptor, callbacks):
         """Creates a :class:`AppKit.NSMenuItem` from a :class:`pystray.MenuItem`
         instance.
 
         :param descriptor: The menu item descriptor.
 
-        :param int tag: The menu item tag.
+        :param callbacks: A list to which a callback is appended for every menu
+            item created. The menu item tags correspond to the items in this
+            list.
 
         :return: a :class:`AppKit.NSMenuItem`
         """
@@ -201,9 +203,13 @@ class Icon(_base.Icon):
             menu_item = AppKit.NSMenuItem.alloc() \
                 .initWithTitle_action_keyEquivalent_(
                     descriptor.text, self._MENU_ITEM_SELECTOR, '')
-            menu_item.setAction_(self._MENU_ITEM_SELECTOR)
+            if descriptor.submenu:
+                menu_item.setSubmenu_(self._create_menu(
+                    descriptor.submenu, callbacks))
+            else:
+                menu_item.setAction_(self._MENU_ITEM_SELECTOR)
             menu_item.setTarget_(self._delegate)
-            menu_item.setTag_(tag)
+            menu_item.setTag_(len(callbacks))
             if descriptor.default:
                 menu_item.setAttributedTitle_(
                     Foundation.NSAttributedString.alloc()

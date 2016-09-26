@@ -110,7 +110,10 @@ class GtkIcon(_base.Icon):
                 menu_item.set_active(descriptor.checked)
             else:
                 menu_item = Gtk.MenuItem.new_with_label(descriptor.text)
-            menu_item.connect('activate', self._handler(descriptor))
+            if descriptor.submenu:
+                menu_item.set_submenu(self._create_menu(descriptor.submenu))
+            else:
+                menu_item.connect('activate', self._handler(descriptor))
             if descriptor.default:
                 menu_item.get_children()[0].set_markup(
                     '<b>%s</b>' % GLib.markup_escape_text(descriptor.text))
