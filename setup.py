@@ -29,7 +29,7 @@ SETUP_PACKAGES = RUNTIME_PACKAGES + [
 
 #: Packages requires for different environments
 EXTRA_PACKAGES = {
-    ':sys_platform == "linux" and python_version >= "3.0"': [
+    ':sys_platform == "linux"': [
         'python-xlib >=0.17']}
 
 
