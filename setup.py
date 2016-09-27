@@ -29,8 +29,8 @@ SETUP_PACKAGES = RUNTIME_PACKAGES + [
 
 #: Packages requires for different environments
 EXTRA_PACKAGES = {
-    ':sys_platform == "linux" and python_version >= "3.0"': [
-        'python3-xlib']}
+    ':sys_platform == "linux"': [
+        'python-xlib >=0.17']}
 
 
 # Read globals from ._info without loading it
