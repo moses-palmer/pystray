@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v0.10 - Changed Xlib backend library
+------------------------------------
+*  Changed *Xlib* library.
+*  Corrected test with incorrect parameter.
+
+
 v0.9 - Submenus
 ---------------
 *  Added support for nested menus.
