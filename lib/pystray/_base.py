@@ -54,6 +54,9 @@ class Icon(object):
     #: invoked in a special way, such as clicking on the icon.
     HAS_DEFAULT_ACTION = True
 
+    #: Whether this particular implementation supports menus.
+    HAS_MENU = True
+
     def __init__(
             self, name, icon=None, title=None, menu=None):
         self._name = name
