@@ -50,6 +50,13 @@ class Icon(object):
         with no special way to activate the default item, and some platforms do
         not support a menu at all.
     """
+    #: Whether this particular implementation has a default action that can be
+    #: invoked in a special way, such as clicking on the icon.
+    HAS_DEFAULT_ACTION = True
+
+    #: Whether this particular implementation supports menus.
+    HAS_MENU = True
+
     def __init__(
             self, name, icon=None, title=None, menu=None):
         self._name = name

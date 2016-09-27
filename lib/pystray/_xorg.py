@@ -76,6 +76,9 @@ class Icon(_base.Icon):
 
     _SYSTEM_TRAY_REQUEST_DOCK = 0
 
+    # We support only the default action
+    HAS_MENU = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 

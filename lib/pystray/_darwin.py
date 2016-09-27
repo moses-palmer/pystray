@@ -34,6 +34,9 @@ class Icon(_base.Icon):
     #: The selector for the menu item actions
     _MENU_ITEM_SELECTOR = b'activateMenuItem:sender'
 
+    # We support only a default action with an empty menu
+    HAS_DEFAULT_ACTION = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 

@@ -61,6 +61,29 @@ def action(on_activate):
     return item('Default', on_activate, default=True, visible=False)
 
 
+def for_default_action(test):
+    """Prevents a test from being run on implementations not supporting default
+    action on click.
+
+    :param test: The test.
+    """
+    if pystray.Icon.HAS_DEFAULT_ACTION:
+        return test
+    else:
+        return lambda *a: None
+
+
+def for_menu(test):
+    """Prevents a test from being run on implementations not supporting a menu.
+
+    :param test: The test.
+    """
+    if pystray.Icon.HAS_MENU:
+        return test
+    else:
+        return lambda *a: None
+
+
 class IconTest(unittest.TestCase):
     def test_set_icon(self):
         """Tests that updating the icon works.
@@ -215,7 +238,7 @@ class IconTest(unittest.TestCase):
 
         icon, colors = self.icon(menu=menu(
             item('Item 1', None),
-            item('Default', on_activate, True)))
+            item('Default', on_activate, default=True)))
 
         @test(icon)
         def _():
@@ -224,6 +247,7 @@ class IconTest(unittest.TestCase):
             say('Click the icon or select the default menu item')
             q.get(timeout=TIMEOUT)
 
+    @for_menu
     def test_menu_construct(self):
         """Tests that the menu is constructed.
         """
@@ -239,6 +263,7 @@ class IconTest(unittest.TestCase):
             self.confirm(
                 'Was it <%s>?' % str(icon.menu))
 
+    @for_menu
     def test_menu_activate(self):
         """Tests that the menu can be activated.
         """
@@ -258,7 +283,7 @@ class IconTest(unittest.TestCase):
             say('Click Item 1')
             q.get(timeout=TIMEOUT)
 
-
+    @for_menu
     def test_menu_activate_submenu(self):
         """Tests that an item in a submenu can be activated.
         """
@@ -280,6 +305,7 @@ class IconTest(unittest.TestCase):
             say('Click Item 3 in the submenu')
             q.get(timeout=TIMEOUT)
 
+    @for_default_action
     def test_menu_invisble(self):
         """Tests that a menu consisting of only empty items does not show.
         """
@@ -299,6 +325,7 @@ class IconTest(unittest.TestCase):
             say('Ensure that the menu does not show and then click the icon')
             q.get(timeout=TIMEOUT)
 
+    @for_menu
     def test_menu_dynamic(self):
         """Tests that a dynamic menu works.
         """
@@ -325,6 +352,8 @@ class IconTest(unittest.TestCase):
             self.confirm(
                 'Was it <%s>?' % str(icon.menu))
 
+    @for_default_action
+    @for_menu
     def test_menu_dynamic_show_hide(self):
         """Tests that a dynamic menu that is hidden works as expected.
         """

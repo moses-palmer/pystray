@@ -31,6 +31,10 @@ from . import _base
 
 
 class Icon(GtkIcon):
+    # We expand the menu on primary button click, and we do not even support
+    # empty menus
+    HAS_DEFAULT_ACTION = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
