@@ -215,7 +215,7 @@ class IconTest(unittest.TestCase):
 
         icon, colors = self.icon(menu=menu(
             item('Item 1', None),
-            item('Default', on_activate, True)))
+            item('Default', on_activate, default=True)))
 
         @test(icon)
         def _():
