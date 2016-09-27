@@ -61,6 +61,18 @@ def action(on_activate):
     return item('Default', on_activate, default=True, visible=False)
 
 
+def for_default_action(test):
+    """Prevents a test from being run on implementations not supporting default
+    action on click.
+
+    :param test: The test.
+    """
+    if pystray.Icon.HAS_DEFAULT_ACTION:
+        return test
+    else:
+        return lambda *a: None
+
+
 class IconTest(unittest.TestCase):
     def test_set_icon(self):
         """Tests that updating the icon works.
@@ -280,6 +292,7 @@ class IconTest(unittest.TestCase):
             say('Click Item 3 in the submenu')
             q.get(timeout=TIMEOUT)
 
+    @for_default_action
     def test_menu_invisble(self):
         """Tests that a menu consisting of only empty items does not show.
         """
@@ -325,6 +338,7 @@ class IconTest(unittest.TestCase):
             self.confirm(
                 'Was it <%s>?' % str(icon.menu))
 
+    @for_default_action
     def test_menu_dynamic_show_hide(self):
         """Tests that a dynamic menu that is hidden works as expected.
         """
