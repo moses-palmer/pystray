@@ -261,7 +261,7 @@ class IconTest(unittest.TestCase):
 
             say('Expand the popup menu')
             self.confirm(
-                'Was it <%s>?' % str(icon.menu))
+                'Was it\n%s?' % str(icon.menu))
 
     @for_menu
     def test_menu_activate(self):
@@ -350,7 +350,7 @@ class IconTest(unittest.TestCase):
 
             say('Expand the popup menu')
             self.confirm(
-                'Was it <%s>?' % str(icon.menu))
+                'Was it\n%s?' % str(icon.menu))
 
     @for_default_action
     @for_menu
@@ -383,7 +383,7 @@ class IconTest(unittest.TestCase):
 
             say('Expand the popup menu')
             self.confirm(
-                'Was it <%s>?' % str(icon.menu))
+                'Was it\n%s?' % str(icon.menu))
 
     def icon(self, **kwargs):
         """Generates a systray icon with the specified colours.
