@@ -114,3 +114,9 @@ def confirm(self, statement, *fmt):
             print(
                 'Please respond %s' % ', '.join(
                     '"%s"' % r for r in valid_responses))
+
+
+def true(*args):
+    """Returns ``True``.
+    """
+    return True

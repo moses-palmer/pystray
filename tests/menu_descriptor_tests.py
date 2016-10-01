@@ -5,7 +5,7 @@ import pystray
 from pystray import Menu as menu
 from pystray import MenuItem as item
 
-from . import separator
+from . import separator, true
 
 
 class MenuDescriptorTests(unittest.TestCase):
@@ -95,8 +95,8 @@ class MenuDescriptorTests(unittest.TestCase):
         """
         self.assertIsNone(
             menu(
-                item('one', lambda _: True, default=False),
-                item('two', lambda _: True, default=False))(None))
+                item('one', true, default=False),
+                item('two', true, default=False))(None))
 
     def test_menu_default_callable(self):
         """Tests that the default menu item is activated when calling the menu.
@@ -135,4 +135,4 @@ class MenuDescriptorTests(unittest.TestCase):
         """Tests that not providing a value for ``default`` works.
         """
         self.assertTrue(
-            item('Test', None, checked=lambda _: True).checked)
+            item('Test', None, checked=true).checked)

@@ -9,7 +9,7 @@ from time import sleep
 
 from pystray import Menu as menu, MenuItem as item
 
-from . import action, confirm, icon, image, say, separator
+from . import action, confirm, icon, image, say, separator, true
 
 
 #: The number of seconds to wait for interactive commands
