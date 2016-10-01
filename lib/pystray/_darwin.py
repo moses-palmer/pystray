@@ -37,6 +37,9 @@ class Icon(_base.Icon):
     # We support only a default action with an empty menu
     HAS_DEFAULT_ACTION = False
 
+    # Mutually exclusive menu itema are not displayed distinctly
+    HAS_MENU_RADIO = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
