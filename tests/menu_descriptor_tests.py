@@ -136,3 +136,25 @@ class MenuDescriptorTests(unittest.TestCase):
         """
         self.assertTrue(
             item('Test', None, checked=true).checked)
+
+    def test_menu_radio_uncheckable(self):
+        """Tests that not providing a value for ``checked`` for uncheckable
+        items works.
+        """
+        self.assertFalse(
+            item('Test', None).radio)
+        self.assertFalse(
+            item('Test', None, radio=False).radio)
+        self.assertFalse(
+            item('Test', None, radio=True).radio)
+
+    def test_menu_radio_checkable(self):
+        """Tests that providing a value for ``checked`` for checkable items
+        works.
+        """
+        self.assertFalse(
+            item('Test', None, checked=true).radio)
+        self.assertTrue(
+            item('Test', None, checked=true, radio=True).radio)
+        self.assertTrue(
+            item('Test', None, checked=true, radio=true).radio)
