@@ -108,6 +108,7 @@ class GtkIcon(_base.Icon):
             if descriptor.checked is not None:
                 menu_item = Gtk.CheckMenuItem.new_with_label(descriptor.text)
                 menu_item.set_active(descriptor.checked)
+                menu_item.set_draw_as_radio(descriptor.radio)
             else:
                 menu_item = Gtk.MenuItem.new_with_label(descriptor.text)
             if descriptor.submenu:
