@@ -57,6 +57,10 @@ class Icon(object):
     #: Whether this particular implementation supports menus.
     HAS_MENU = True
 
+    #: Whether this particular implementation supports displaying mutually
+    #: exclusive menu items using the :attr:`MenuItem.radio` attribute.
+    HAS_MENU_RADIO = True
+
     def __init__(
             self, name, icon=None, title=None, menu=None):
         self._name = name

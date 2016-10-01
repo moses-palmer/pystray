@@ -67,6 +67,18 @@ def for_menu(test):
         return lambda *a: None
 
 
+def for_menu_radio(test):
+    """Prevents a test from being run on implementations not supporting mutually
+    exclusive menu item groups.
+
+    :param test: The test.
+    """
+    if pystray.Icon.HAS_MENU_RADIO:
+        return test
+    else:
+        return lambda *a: None
+
+
 class IconTest(unittest.TestCase):
     def test_set_icon(self):
         """Tests that updating the icon works.
@@ -378,3 +390,20 @@ class IconTest(unittest.TestCase):
             confirm(
                 self,
                 'Was it\n%s?' % str(ico.menu))
+
+    @for_menu_radio
+    def test_menu_radio(self):
+        """Tests that mutually exclusive items are displayed separately.
+        """
+        ico, colors = icon(menu=menu(
+            item('Item 1', None, checked=true),
+            item('Item 2', None, checked=true, radio=True)))
+
+        @test(ico)
+        def _():
+            ico.visible = True
+
+            say('Expand the popup menu')
+            confirm(
+                self,
+                'Was <Item 2> displayed differently from <Item 1>?')
