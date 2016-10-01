@@ -5,6 +5,8 @@ import pystray
 from pystray import Menu as menu
 from pystray import MenuItem as item
 
+from . import separator, true
+
 
 class MenuDescriptorTests(unittest.TestCase):
     def test_item_name(self):
@@ -93,8 +95,8 @@ class MenuDescriptorTests(unittest.TestCase):
         """
         self.assertIsNone(
             menu(
-                item('one', lambda _: True, default=False),
-                item('two', lambda _: True, default=False))(None))
+                item('one', true, default=False),
+                item('two', true, default=False))(None))
 
     def test_menu_default_callable(self):
         """Tests that the default menu item is activated when calling the menu.
@@ -124,19 +126,13 @@ class MenuDescriptorTests(unittest.TestCase):
             item('Test', None).checked)
 
     def test_menu_checked_non_callable(self):
-        """Tests that not providing a value for ``default`` works.
+        """Tests that not passing a callable as checked fails.
         """
         with self.assertRaises(ValueError):
-            item('Test', None, chcked=False)
+            item('Test', None, checked=False)
 
     def test_menu_checked_non_callable(self):
         """Tests that not providing a value for ``default`` works.
         """
         self.assertTrue(
-            item('Test', None, checked=lambda _: True).checked)
-
-
-def separator():
-    """A wrapper around :attr:`pystray.Menu.SEPARATOR`.
-    """
-    return pystray.Menu.SEPARATOR
+            item('Test', None, checked=true).checked)
