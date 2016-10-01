@@ -327,6 +327,13 @@ class MenuItem(object):
     @property
     def checked(self):
         """Whether this item is checked.
+
+        This can be either ``True``, which implies that the item is checkable
+        and checked, ``False``, which implies that the item is checkable but not
+        checked, and ``None`` for uncheckable items.
+
+        Depending on platform, uncheckable items may be rendered differently
+        from unchecked items.
         """
         return self._checked(self)
 
