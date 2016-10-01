@@ -29,6 +29,8 @@ SETUP_PACKAGES = RUNTIME_PACKAGES + [
 
 #: Packages requires for different environments
 EXTRA_PACKAGES = {
+    ':sys_platform == "darwin"': [
+        'pyobjc-framework-Quartz >=3.0'],
     ':sys_platform == "linux"': [
         'python-xlib >=0.17']}
 
