@@ -5,6 +5,8 @@ import pystray
 from pystray import Menu as menu
 from pystray import MenuItem as item
 
+from . import separator
+
 
 class MenuDescriptorTests(unittest.TestCase):
     def test_item_name(self):
@@ -134,9 +136,3 @@ class MenuDescriptorTests(unittest.TestCase):
         """
         self.assertTrue(
             item('Test', None, checked=lambda _: True).checked)
-
-
-def separator():
-    """A wrapper around :attr:`pystray.Menu.SEPARATOR`.
-    """
-    return pystray.Menu.SEPARATOR
