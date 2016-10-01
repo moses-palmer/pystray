@@ -262,16 +262,18 @@ class Icon(_base.Icon):
         else:
             return win32.MENUITEMINFO(
                 cbSize=ctypes.sizeof(win32.MENUITEMINFO),
-                fMask=win32.MIIM_STRING | win32.MIIM_ID | win32.MIIM_STATE
-                | win32.MIIM_SUBMENU,
+                fMask=win32.MIIM_ID | win32.MIIM_STRING | win32.MIIM_STATE
+                | win32.MIIM_FTYPE | win32.MIIM_SUBMENU,
+                wID=len(callbacks),
+                dwTypeData=descriptor.text,
                 fState=0
                 | (win32.MFS_DEFAULT if descriptor.default else 0)
                 | (win32.MFS_CHECKED if descriptor.checked else 0),
-                wID=len(callbacks),
+                fType=0
+                | (win32.MFT_RADIOCHECK if descriptor.radio else 0),
                 hSubMenu=self._create_menu(descriptor.submenu, callbacks)
                 if descriptor.submenu
-                else None,
-                dwTypeData=descriptor.text)
+                else None)
 
     def _message(self, code, flags, **kwargs):
         """Sends a message the the systray icon.
