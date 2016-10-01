@@ -210,6 +210,7 @@ class IconTest(unittest.TestCase):
             self.confirm(
                 'Did a flashing %s icon appear?', colors)
 
+    @for_default_action
     def test_activate(self):
         """Tests that ``on_activate`` is correctly called.
         """
