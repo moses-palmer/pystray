@@ -124,10 +124,10 @@ class MenuDescriptorTests(unittest.TestCase):
             item('Test', None).checked)
 
     def test_menu_checked_non_callable(self):
-        """Tests that not providing a value for ``default`` works.
+        """Tests that not passing a callable as checked fails.
         """
         with self.assertRaises(ValueError):
-            item('Test', None, chcked=False)
+            item('Test', None, checked=False)
 
     def test_menu_checked_non_callable(self):
         """Tests that not providing a value for ``default`` works.
