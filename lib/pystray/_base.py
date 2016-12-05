@@ -57,6 +57,10 @@ class Icon(object):
     #: Whether this particular implementation supports menus.
     HAS_MENU = True
 
+    #: Whether this particular implementation supports displaying mutually
+    #: exclusive menu items using the :attr:`MenuItem.radio` attribute.
+    HAS_MENU_RADIO = True
+
     def __init__(
             self, name, icon=None, title=None, menu=None):
         self._name = name
@@ -294,7 +298,7 @@ class MenuItem(object):
     :class:`Menu` is constructed.
     """
     def __init__(
-            self, text, action, checked=None, default=False,
+            self, text, action, checked=None, radio=False, default=False,
             visible=True):
         self.__name__ = str(text)
         self._text = self._wrap(text or '')
@@ -305,6 +309,7 @@ class MenuItem(object):
             else self._wrap(action)
 
         self._checked = self._assert_callable(checked, lambda _: None)
+        self._radio = self._wrap(radio)
         self._default = self._wrap(default)
         self._visible = self._wrap(visible)
 
@@ -336,6 +341,18 @@ class MenuItem(object):
         from unchecked items.
         """
         return self._checked(self)
+
+    @property
+    def radio(self):
+        """Whether this item is a radio button.
+
+        This is only used for checkable items. It is always set to ``False`` for
+        uncheckable items.
+        """
+        if self.checked is not None:
+            return self._radio(self)
+        else:
+            return False
 
     @property
     def default(self):

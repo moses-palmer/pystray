@@ -79,6 +79,9 @@ class Icon(_base.Icon):
     # We support only the default action
     HAS_MENU = False
 
+    # We support no menu
+    HAS_MENU_RADIO = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
