@@ -148,7 +148,7 @@ class Icon(_base.Icon):
             source = self._icon
         else:
             source = PIL.Image.new(
-                'RGB',
+                'RGBA',
                 size)
             source.paste(self._icon.resize(
                 size,
