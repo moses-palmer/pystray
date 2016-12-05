@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v0.11 - Radio buttons
+---------------------
+*  Added support for radio buttons.
+*  Corrected transparent icons for *OSX*.
+
+
 v0.10 - Changed Xlib backend library
 ------------------------------------
 *  Changed *Xlib* library.
