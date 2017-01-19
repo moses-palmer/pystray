@@ -8,7 +8,7 @@ activated. The icon and title can be changed after the icon has been created,
 and the visibility of the icon can be toggled.
 
 
-.. include:: ../usage.rst
+.. include:: ./usage.rst
 
 
 Reference

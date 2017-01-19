@@ -61,6 +61,7 @@ try:
 
     with open(os.path.join(
             os.path.dirname(__file__),
+            'docs',
             'usage.rst'), 'rb') as f:
         README += '\n\n' + f.read().decode('utf-8')
 except IOError:
