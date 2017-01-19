@@ -47,7 +47,7 @@ class XError(Exception):
 
 @contextlib.contextmanager
 def display_manager(display):
-    """Traps *X* errors and raises an :class:``XError`` at the end if any
+    """Traps *X* errors and raises an :class:`XError` at the end if any
     error occurred.
 
     This handler also ensures that the :class:`Xlib.display.Display` being
