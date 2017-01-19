@@ -50,18 +50,17 @@ Getting input from the *system tray icon*
 In order to receive notifications about user interaction with the icon, a
 popup menu can be added with the ``menu`` constructor argument.
 
-This should be an instance of ``pystray.Menu``, or a tuple that can be passed to
-the ``pystray.Menu`` constructor. Please see the reference for more information
-about the format.
+This must be an instance of ``pystray.Menu``. Please see the reference for more
+information about the format.
 
 It will be displayed when the right-hand button has been pressed on the icon on
-*Windows* and *GTK+*, and when the icon has been clicked on *OSX*. Menus are not
+*Windows*, and when the icon has been clicked on other platforms. Menus are not
 supported on *X*.
 
-Menus also support a default item. On *Windows*, *GTK+* and *X*, this item will
-be activated when the user clicks on the icon using the primary button. On *OSX*
-it will be activated if the menu contains no visible entries; it does not have
-to be visible.
+Menus also support a default item. On *Windows*, and *X*, this item will be
+activated when the user clicks on the icon using the primary button. On other
+platforms it will be activated if the menu contains no visible entries; it does
+not have to be visible.
 
 All properties of menu items, except for the callback, can be dynamically
 calculated by supplying callables instead of values to the menu item
