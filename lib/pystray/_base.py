@@ -302,12 +302,7 @@ class MenuItem(object):
             visible=True):
         self.__name__ = str(text)
         self._text = self._wrap(text or '')
-
-        # Check for None to allow instantiation from Menu class body
-        self._action = action \
-            if action is not None and isinstance(action, Menu) \
-            else self._wrap(action)
-
+        self._action = self._assert_action(action)
         self._checked = self._assert_callable(checked, lambda _: None)
         self._radio = self._wrap(radio)
         self._default = self._wrap(default)
@@ -377,6 +372,34 @@ class MenuItem(object):
         """The submenu used by this menu item, or ``None``.
         """
         return self._action if isinstance(self._action, Menu) else None
+
+    def _assert_action(self, action):
+        """Ensures that a callable can be called with the expected number of
+        arguments.
+
+        :param callable action: The action to modify. If this callable takes
+            less than the expected number of arguments, a wrapper will be
+            returned.
+
+        :raises ValueError: if ``action`` requires more than the expected number
+            of arguments
+
+        :return: a callable
+        """
+        if not hasattr(action, '__code__'):
+            return action
+
+        elif action.__code__.co_argcount == 0:
+            @functools.wraps(action)
+            def wrapper0(*args):
+                return action()
+            return wrapper0
+
+        elif action.__code__.co_argcount == 1:
+            return action
+
+        else:
+            raise ValueError(action)
 
     def _assert_callable(self, value, default):
         """Asserts that a value is callable.

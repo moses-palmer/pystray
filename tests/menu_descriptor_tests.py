@@ -20,7 +20,7 @@ class MenuDescriptorTests(unittest.TestCase):
         """Tests that calling a menu item works as expected.
         """
         data = []
-        item('', lambda _: data.append(True))(None)
+        item('', lambda: data.append(True))(None)
         self.assertEqual(
             [True],
             data)
@@ -104,7 +104,7 @@ class MenuDescriptorTests(unittest.TestCase):
         self.assertEqual(
             'test result',
             menu(
-                item('one', lambda _: 'test result', default=True))(None))
+                item('one', lambda: 'test result', default=True))(None))
 
     def test_menu_visible_submenu(self):
         """Tests that  ``visible`` is correctly set when a submenu is set.

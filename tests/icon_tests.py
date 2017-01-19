@@ -273,7 +273,7 @@ class IconTest(unittest.TestCase):
         """
         q = queue.Queue()
 
-        def on_activate(icon):
+        def on_activate():
             q.put(True)
 
         ico, colors = icon(menu=(
@@ -293,7 +293,7 @@ class IconTest(unittest.TestCase):
         """
         q = queue.Queue()
 
-        def on_activate(icon):
+        def on_activate():
             q.put(True)
 
         ico, colors = icon(menu=(
@@ -315,7 +315,7 @@ class IconTest(unittest.TestCase):
         """
         q = queue.Queue()
 
-        def on_activate(icon):
+        def on_activate():
             q.put(True)
 
         ico, colors = icon(menu=menu(
@@ -336,7 +336,7 @@ class IconTest(unittest.TestCase):
         q = queue.Queue()
         q.ticks = 0
 
-        def on_activate(icon):
+        def on_activate():
             q.put(True)
             q.ticks += 1
 
@@ -365,7 +365,7 @@ class IconTest(unittest.TestCase):
         q = queue.Queue()
         q.ticks = 0
 
-        def on_activate(icon):
+        def on_activate():
             q.put(True)
             q.ticks += 1
 
