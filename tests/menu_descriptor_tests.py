@@ -25,6 +25,15 @@ class MenuDescriptorTests(unittest.TestCase):
             [True],
             data)
 
+    def test_item_call_various_args(self):
+        """Tests that calling a menu item works as expected.
+        """
+        item('', lambda: None)(None)
+        item('', lambda a: a)(None)
+        item('', lambda a, b: (a, b))(None)
+        with self.assertRaises(ValueError):
+            item('', lambda a, b, c: (a, b, ))
+
     def test_menu_construct(self):
         """Tests menu construction.
         """

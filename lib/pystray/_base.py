@@ -310,7 +310,7 @@ class MenuItem(object):
 
     def __call__(self, icon):
         if not isinstance(self._action, Menu):
-            return self._action(icon)
+            return self._action(icon, self)
 
     def __str__(self):
         if isinstance(self._action, Menu):
@@ -396,6 +396,12 @@ class MenuItem(object):
             return wrapper0
 
         elif action.__code__.co_argcount == 1:
+            @functools.wraps(action)
+            def wrapper1(icon, *args):
+                return action(icon)
+            return wrapper1
+
+        elif action.__code__.co_argcount == 2:
             return action
 
         else:
