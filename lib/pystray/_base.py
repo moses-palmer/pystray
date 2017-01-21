@@ -166,11 +166,17 @@ class Icon(object):
         :param callable setup: An optional callback to execute in a separate
             thread once the loop has started. It is passed the icon as its sole
             argument.
+
+            If not specified, a simple setup function setting :attr:`visible` to
+            ``True`` is used. If you specify a custom setup function, you must
+            explicitly set this attribute.
         """
         def setup_handler():
             self.__queue.get()
             if setup:
                 setup(self)
+            else:
+                self.visible = True
 
         self._setup_thread = threading.Thread(target=setup_handler)
         self._setup_thread.start()
