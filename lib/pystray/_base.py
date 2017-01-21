@@ -300,7 +300,7 @@ class MenuItem(object):
     is callable; when called, the activation callback is called.
 
     The :attr:`visible` attribute is provided to make menu creation easier; all
-    menu items with this value set to  `False`` will be discarded when a
+    menu items with this value set to ``False`` will be discarded when a
     :class:`Menu` is constructed.
     """
     def __init__(
