@@ -8,14 +8,15 @@ activated. The icon and title can be changed after the icon has been created,
 and the visibility of the icon can be toggled.
 
 
-.. include:: ../usage.rst
+Table of contents
+-----------------
 
+.. toctree::
+   :maxdepth: 2
 
-Reference
----------
+   usage
 
-.. autoclass:: pystray.Icon
-    :members:
+   reference
 
 
 * :ref:`genindex`
