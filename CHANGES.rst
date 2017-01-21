@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+v0.12 - Simplified API
+----------------------
+*  Do not require use of ``setup`` to show icon.
+*  Pass reference to menu item to action handler. If action handlers do not
+   support this argument, they will be wrapped.
+*  Updated documentation.
+
+
 v0.11 - Radio buttons
 ---------------------
 *  Added support for radio buttons.
