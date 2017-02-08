@@ -331,6 +331,10 @@ class Icon(_base.Icon):
                 window_class=Xlib.X.InputOutput)
             window.set_wm_class('%sSystemTrayIcon' % self.name, self.name)
             window.set_wm_name(self.title)
+            window.set_wm_normal_hints(
+                flags=(Xlib.Xutil.PPosition | Xlib.Xutil.PSize | Xlib.Xutil.PMinSize),
+                min_width=24,
+                min_height=24)
 
             # Enable XEMBED for the window
             window.change_property(self._xembed_info, self._xembed_info, 32, [
