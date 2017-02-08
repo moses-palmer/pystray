@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v0.13 - Corrections for X
+-------------------------
+*  Make sure to set window size hints on *X*. Thanks to *filonenko-mikhail*!
+
+
 v0.12 - Simplified API
 ----------------------
 *  Do not require use of ``setup`` to show icon.
