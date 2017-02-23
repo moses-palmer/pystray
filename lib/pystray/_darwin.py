@@ -181,6 +181,7 @@ class Icon(_base.Icon):
         else:
             # Generate the menu
             nsmenu = AppKit.NSMenu.alloc().initWithTitle_(self.name)
+            nsmenu.setAutoenablesItems_(False)
             for descriptor in descriptors:
                 # Append the callback after creating the menu item to ensure
                 # that the first item gets the tag 0
@@ -231,6 +232,7 @@ class Icon(_base.Icon):
                 menu_item.setState_(
                     AppKit.NSOnState if descriptor.checked
                     else AppKit.NSOffState)
+            menu_item.setEnabled_(descriptor.enabled)
             return menu_item
 
 
