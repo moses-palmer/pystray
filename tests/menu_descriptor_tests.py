@@ -128,6 +128,20 @@ class MenuDescriptorTests(unittest.TestCase):
             item('Test', menu(
                 item('Item', None, visible=False)), visible=True).visible)
 
+    def test_menu_enabled_default(self):
+        """Tests that a menu item is enabled by default.
+        """
+        self.assertTrue(
+            item(
+                'one', lambda: 'test result').enabled)
+
+    def test_menu_enabled_callable(self):
+        """Tests that the enabled state can be set.
+        """
+        self.assertFalse(
+            item(
+                'one', lambda: 'test result', enabled=False).enabled)
+
     def test_menu_checked_none(self):
         """Tests that not providing a value for ``default`` works.
         """
