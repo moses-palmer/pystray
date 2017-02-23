@@ -407,3 +407,20 @@ class IconTest(unittest.TestCase):
             confirm(
                 self,
                 'Was <Item 2> displayed differently from <Item 1>?')
+
+    @for_menu_radio
+    def test_menu_enabled(self):
+        """Tests that menu items can be disabled.
+        """
+        ico, colors = icon(menu=menu(
+            item('Item 1', None, enabled=true),
+            item('Item 2', None, enabled=False)))
+
+        @test(ico)
+        def _():
+            ico.visible = True
+
+            say('Expand the popup menu')
+            confirm(
+                self,
+                'Was <Item 1> enabled and <Item 2> disabled?')

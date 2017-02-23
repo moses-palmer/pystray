@@ -305,7 +305,7 @@ class MenuItem(object):
     """
     def __init__(
             self, text, action, checked=None, radio=False, default=False,
-            visible=True):
+            visible=True, enabled=True):
         self.__name__ = str(text)
         self._text = self._wrap(text or '')
         self._action = self._assert_action(action)
@@ -313,6 +313,7 @@ class MenuItem(object):
         self._radio = self._wrap(radio)
         self._default = self._wrap(default)
         self._visible = self._wrap(visible)
+        self._enabled = self._wrap(enabled)
 
     def __call__(self, icon):
         if not isinstance(self._action, Menu):
@@ -372,6 +373,12 @@ class MenuItem(object):
             return self._visible(self) and self._action.visible
         else:
             return self._visible(self)
+
+    @property
+    def enabled(self):
+        """Whether this menu item is enabled.
+        """
+        return self._enabled(self)
 
     @property
     def submenu(self):

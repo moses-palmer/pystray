@@ -164,6 +164,10 @@ A menu item has several attributes:
 *visible*
     Whether the menu item is visible.
 
+*enabled*
+    Whether the menu item is enabled. Disabled menu items are displayed, but are
+    greyed out and cannot be activated.
+
 *submenu*
     The submenu, if any, that is attached to this menu item.
 

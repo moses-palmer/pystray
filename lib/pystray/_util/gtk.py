@@ -118,6 +118,7 @@ class GtkIcon(_base.Icon):
             if descriptor.default:
                 menu_item.get_children()[0].set_markup(
                     '<b>%s</b>' % GLib.markup_escape_text(descriptor.text))
+            menu_item.set_sensitive(descriptor.enabled)
             return menu_item
 
     def _finalize(self):
