@@ -268,7 +268,8 @@ class Icon(_base.Icon):
                 dwTypeData=descriptor.text,
                 fState=0
                 | (win32.MFS_DEFAULT if descriptor.default else 0)
-                | (win32.MFS_CHECKED if descriptor.checked else 0),
+                | (win32.MFS_CHECKED if descriptor.checked else 0)
+                | (win32.MFS_DISABLED if not descriptor.enabled else 0),
                 fType=0
                 | (win32.MFT_RADIOCHECK if descriptor.radio else 0),
                 hSubMenu=self._create_menu(descriptor.submenu, callbacks)
