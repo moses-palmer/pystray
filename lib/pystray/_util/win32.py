@@ -29,10 +29,8 @@ WM_USER = 0x400
 WM_STOP = WM_USER + 10
 WM_NOTIFY = WM_USER + 11
 
-
 LR_DEFAULTSIZE = 0x00000040
 LR_LOADFROMFILE = 0x00000010
-
 
 MFS_CHECKED = 0x00000008
 MFS_DEFAULT = 0x00001000
@@ -63,6 +61,9 @@ MIIM_STRING = 0x00000040
 MIIM_SUBMENU = 0x00000004
 MIIM_TYPE = 0x00000010
 
+MSGFLT_ALLOW = 1
+MSGFLT_DISALLOW = 2
+MSGFLT_RESET = 0
 
 NIF_MESSAGE = 0x00000001
 NIF_ICON = 0x00000002
@@ -78,7 +79,6 @@ NIM_MODIFY = 0x00000001
 NIM_DELETE = 0x00000002
 NIM_SETFOCUS = 0x00000003
 NIM_SETVERSION = 0x00000004
-
 
 TPM_CENTERALIGN = 0x0004
 TPM_LEFTALIGN = 0x0000
@@ -97,6 +97,8 @@ TPM_VERNEGANIMATION = 0x2000
 TPM_VERPOSANIMATION = 0x1000
 TPM_HORIZONTAL = 0x0000
 TPM_VERTICAL = 0x0040
+
+WS_POPUP = 0x80000000
 
 
 PM_NOREMOVE = 0
@@ -293,7 +295,6 @@ Shell_NotifyIcon = windll.shell32.Shell_NotifyIconW
 Shell_NotifyIcon.argtypes = (
     wintypes.DWORD, LPNOTIFYICONDATA)
 Shell_NotifyIcon.restype = wintypes.BOOL
-Shell_NotifyIcon.errcheck = _err
 
 TranslateMessage = windll.user32.TranslateMessage
 TranslateMessage.argtypes = (
@@ -310,3 +311,31 @@ UnregisterClass.argtypes = (
     wintypes.ATOM, wintypes.HINSTANCE)
 UnregisterClass.restype = wintypes.BOOL
 UnregisterClass.errcheck = _err
+
+RegisterWindowMessage = windll.user32.RegisterWindowMessageW
+RegisterWindowMessage.argtypes = (
+    wintypes.LPCWSTR,)
+RegisterWindowMessage.restype = wintypes.UINT
+RegisterWindowMessage.errcheck = _err
+
+#: The message broadcast to top-level windows on Explorer restart
+WM_TASKBARCREATED = RegisterWindowMessage('TaskbarCreated')
+
+# Ensure that we receive WM_TASKBARCREATED even when running with elevated
+# privileges
+try:
+    ChangeWindowMessageFilterEx = windll.user32.ChangeWindowMessageFilterEx
+
+    ChangeWindowMessageFilterEx.argtypes = (
+        wintypes.HWND, wintypes.UINT, wintypes.DWORD, wintypes.LPVOID)
+    ChangeWindowMessageFilterEx.restype = wintypes.BOOL
+    ChangeWindowMessageFilterEx.errcheck = _err
+
+except KeyError:
+    def ChangeWindowMessageFilterEx(hWnd, message, action, pCHangeFilterStruct):
+        """A dummy implementation of ``ChangeWindowMessageFilterEx`` always
+        returning ``TRUE``.
+
+        This is used on version of *Windows* prior to *Windows Vista*.
+        """
+        return True

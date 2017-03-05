@@ -44,7 +44,8 @@ class Icon(_base.Icon):
         # mainloop
         self._message_handlers = {
             win32.WM_STOP: self._on_stop,
-            win32.WM_NOTIFY: self._on_notify}
+            win32.WM_NOTIFY: self._on_notify,
+            win32.WM_TASKBARCREATED: self._on_taskbarcreated}
 
         self._queue = queue.Queue()
 
@@ -195,6 +196,15 @@ class Icon(_base.Icon):
             if index > 0:
                 descriptors[index - 1](self)
 
+    def _on_taskbarcreated(self, wparam, lparam):
+        """Handles ``WM_TASKBARCREATED``.
+
+        This message is broadcast when the notification area becomes available.
+        Handling this message allows catching explorer restarts.
+        """
+        if self.visible:
+            self._show()
+
     def _create_window(self, atom):
         """Creates the system tray icon window.
 
@@ -202,16 +212,24 @@ class Icon(_base.Icon):
 
         :return: a window
         """
-        return win32.CreateWindowEx(
+        # Broadcast messages (including WM_TASKBARCREATED) can be caught
+        # only by top-level windows, so we cannot create a message-only window
+        hwnd = win32.CreateWindowEx(
             0,
             atom,
             None,
-            0,
+            win32.WS_POPUP,
             0, 0, 0, 0,
-            win32.HWND_MESSAGE,
+            0,
             None,
             win32.GetModuleHandle(None),
             None)
+
+        # On Vista+, we must explicitly opt-in to receive WM_TASKBARCREATED when
+        # running with escalated privileges
+        win32.ChangeWindowMessageFilterEx(
+            hwnd, win32.WM_TASKBARCREATED, win32.MSGFLT_ALLOW, None)
+        return hwnd
 
     def _create_menu(self, descriptors, callbacks):
         """Creates a :class:`ctypes.wintypes.HMENU` from a :class:`pystray.Menu`
