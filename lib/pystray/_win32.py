@@ -199,8 +199,8 @@ class Icon(_base.Icon):
     def _on_taskbarcreated(self, wparam, lparam):
         """Handles ``WM_TASKBARCREATED``.
 
-        This message sent when Notification Area  (usually implemented by explorer)
-        becomes available. Handling this message allows to catch explorer restarts.
+        This message is broadcast when the notification area becomes available.
+        Handling this message allows catching explorer restarts.
         """
         if self.visible:
             self._show()
@@ -213,7 +213,7 @@ class Icon(_base.Icon):
         :return: a window
         """
         # Broadcast messages (including WM_TASKBARCREATED) can be caught
-        # only by top-level windows. So HWND_MESSAGE doesn't fits here.
+        # only by top-level windows, so we cannot create a message-only window
         return win32.CreateWindowEx(
             0,
             atom,

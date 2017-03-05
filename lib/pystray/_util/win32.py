@@ -29,10 +29,8 @@ WM_USER = 0x400
 WM_STOP = WM_USER + 10
 WM_NOTIFY = WM_USER + 11
 
-
 LR_DEFAULTSIZE = 0x00000040
 LR_LOADFROMFILE = 0x00000010
-
 
 MFS_CHECKED = 0x00000008
 MFS_DEFAULT = 0x00001000
@@ -63,6 +61,8 @@ MIIM_STRING = 0x00000040
 MIIM_SUBMENU = 0x00000004
 MIIM_TYPE = 0x00000010
 
+MSGFLT_ADD = 1
+MSGFLT_REMOVE = 2
 
 NIF_MESSAGE = 0x00000001
 NIF_ICON = 0x00000002
@@ -78,7 +78,6 @@ NIM_MODIFY = 0x00000001
 NIM_DELETE = 0x00000002
 NIM_SETFOCUS = 0x00000003
 NIM_SETVERSION = 0x00000004
-
 
 TPM_CENTERALIGN = 0x0004
 TPM_LEFTALIGN = 0x0000
@@ -98,18 +97,13 @@ TPM_VERPOSANIMATION = 0x1000
 TPM_HORIZONTAL = 0x0000
 TPM_VERTICAL = 0x0040
 
+WS_POPUP = 0x80000000
+
 
 PM_NOREMOVE = 0
 COLOR_WINDOW = 5
 HWND_MESSAGE = -3
 IMAGE_ICON = 1
-
-
-MSGFLT_ADD = 1
-MSGFLT_REMOVE = 2
-
-
-WS_POPUP = 0x80000000
 
 
 LPMSG = ctypes.POINTER(wintypes.MSG)
@@ -300,8 +294,6 @@ Shell_NotifyIcon = windll.shell32.Shell_NotifyIconW
 Shell_NotifyIcon.argtypes = (
     wintypes.DWORD, LPNOTIFYICONDATA)
 Shell_NotifyIcon.restype = wintypes.BOOL
-# From MS site: Shell_NotifyIcon is not documented to set last error, so you can't rely on GetLastError() to return useful information.
-#Shell_NotifyIcon.errcheck = _err
 
 TranslateMessage = windll.user32.TranslateMessage
 TranslateMessage.argtypes = (
@@ -325,19 +317,25 @@ RegisterWindowMessage.argtypes = (
 RegisterWindowMessage.restype = wintypes.UINT
 RegisterWindowMessage.errcheck = _err
 
-# This message broadcasted by explorer.exe on restart.
-WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated")
+#: The message broadcast to top-level windows on Explorer restart
+WM_TASKBARCREATED = RegisterWindowMessage('TaskbarCreated')
 
-# This function is available only in Vista and up.
+# Ensure that we receive WM_TASKBARCREATED even when running with elevated
+# privileges
 try:
     ChangeWindowMessageFilter = windll.user32.ChangeWindowMessageFilter
-except KeyError:
-    ChangeWindowMessageFilter = None
-else:
+
     ChangeWindowMessageFilter.argtypes = (
         wintypes.UINT, wintypes.DWORD)
     ChangeWindowMessageFilter.restype = wintypes.BOOL
     ChangeWindowMessageFilter.errcheck = _err
 
-    # This call is required (in Vista+) if running with elevated privileges.
+    # This call is required in Vista+ if running with elevated privileges
     ChangeWindowMessageFilter(WM_TASKBARCREATED, MSGFLT_ADD)
+
+    del ChangeWindowMessageFilter
+
+except KeyError:
+    # We are running a pre-Vista version of Windows; in this case, UAC is not
+    # available and we do not have to change the message filter
+    pass
