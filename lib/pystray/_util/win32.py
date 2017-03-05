@@ -61,8 +61,9 @@ MIIM_STRING = 0x00000040
 MIIM_SUBMENU = 0x00000004
 MIIM_TYPE = 0x00000010
 
-MSGFLT_ADD = 1
-MSGFLT_REMOVE = 2
+MSGFLT_ALLOW = 1
+MSGFLT_DISALLOW = 2
+MSGFLT_RESET = 0
 
 NIF_MESSAGE = 0x00000001
 NIF_ICON = 0x00000002
@@ -323,19 +324,18 @@ WM_TASKBARCREATED = RegisterWindowMessage('TaskbarCreated')
 # Ensure that we receive WM_TASKBARCREATED even when running with elevated
 # privileges
 try:
-    ChangeWindowMessageFilter = windll.user32.ChangeWindowMessageFilter
+    ChangeWindowMessageFilterEx = windll.user32.ChangeWindowMessageFilterEx
 
-    ChangeWindowMessageFilter.argtypes = (
-        wintypes.UINT, wintypes.DWORD)
-    ChangeWindowMessageFilter.restype = wintypes.BOOL
-    ChangeWindowMessageFilter.errcheck = _err
-
-    # This call is required in Vista+ if running with elevated privileges
-    ChangeWindowMessageFilter(WM_TASKBARCREATED, MSGFLT_ADD)
-
-    del ChangeWindowMessageFilter
+    ChangeWindowMessageFilterEx.argtypes = (
+        wintypes.HWND, wintypes.UINT, wintypes.DWORD, wintypes.LPVOID)
+    ChangeWindowMessageFilterEx.restype = wintypes.BOOL
+    ChangeWindowMessageFilterEx.errcheck = _err
 
 except KeyError:
-    # We are running a pre-Vista version of Windows; in this case, UAC is not
-    # available and we do not have to change the message filter
-    pass
+    def ChangeWindowMessageFilterEx(hWnd, message, action, pCHangeFilterStruct):
+        """A dummy implementation of ``ChangeWindowMessageFilterEx`` always
+        returning ``TRUE``.
+
+        This is used on version of *Windows* prior to *Windows Vista*.
+        """
+        return True

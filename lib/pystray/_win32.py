@@ -214,7 +214,7 @@ class Icon(_base.Icon):
         """
         # Broadcast messages (including WM_TASKBARCREATED) can be caught
         # only by top-level windows, so we cannot create a message-only window
-        return win32.CreateWindowEx(
+        hwnd = win32.CreateWindowEx(
             0,
             atom,
             None,
@@ -224,6 +224,12 @@ class Icon(_base.Icon):
             None,
             win32.GetModuleHandle(None),
             None)
+
+        # On Vista+, we must explicitly opt-in to receive WM_TASKBARCREATED when
+        # running with escalated privileges
+        win32.ChangeWindowMessageFilterEx(
+            hwnd, win32.WM_TASKBARCREATED, win32.MSGFLT_ALLOW, None)
+        return hwnd
 
     def _create_menu(self, descriptors, callbacks):
         """Creates a :class:`ctypes.wintypes.HMENU` from a :class:`pystray.Menu`
