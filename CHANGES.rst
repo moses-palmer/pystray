@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v0.14.1 - Restore icon after *explorer.exe* crash
+-------------------------------------------------
+*  Restore the icon when *explorer exe* restarts after a crash. Thanks to
+   *Michael Dubner*!
+
+
 v0.14 - Disabled menu items
 ---------------------------
 *  Added support for disabling menu items.
