@@ -105,6 +105,13 @@ HWND_MESSAGE = -3
 IMAGE_ICON = 1
 
 
+MSGFLT_ADD = 1
+MSGFLT_REMOVE = 2
+
+
+WS_POPUP = 0x80000000
+
+
 LPMSG = ctypes.POINTER(wintypes.MSG)
 
 LPPOINT = ctypes.POINTER(wintypes.POINT)
@@ -293,7 +300,8 @@ Shell_NotifyIcon = windll.shell32.Shell_NotifyIconW
 Shell_NotifyIcon.argtypes = (
     wintypes.DWORD, LPNOTIFYICONDATA)
 Shell_NotifyIcon.restype = wintypes.BOOL
-Shell_NotifyIcon.errcheck = _err
+# From MS site: Shell_NotifyIcon is not documented to set last error, so you can't rely on GetLastError() to return useful information.
+#Shell_NotifyIcon.errcheck = _err
 
 TranslateMessage = windll.user32.TranslateMessage
 TranslateMessage.argtypes = (
@@ -310,3 +318,26 @@ UnregisterClass.argtypes = (
     wintypes.ATOM, wintypes.HINSTANCE)
 UnregisterClass.restype = wintypes.BOOL
 UnregisterClass.errcheck = _err
+
+RegisterWindowMessage = windll.user32.RegisterWindowMessageW
+RegisterWindowMessage.argtypes = (
+    wintypes.LPCWSTR,)
+RegisterWindowMessage.restype = wintypes.UINT
+RegisterWindowMessage.errcheck = _err
+
+# This message broadcasted by explorer.exe on restart.
+WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated")
+
+# This function is available only in Vista and up.
+try:
+    ChangeWindowMessageFilter = windll.user32.ChangeWindowMessageFilter
+except KeyError:
+    ChangeWindowMessageFilter = None
+else:
+    ChangeWindowMessageFilter.argtypes = (
+        wintypes.UINT, wintypes.DWORD)
+    ChangeWindowMessageFilter.restype = wintypes.BOOL
+    ChangeWindowMessageFilter.errcheck = _err
+
+    # This call is required (in Vista+) if running with elevated privileges.
+    ChangeWindowMessageFilter(WM_TASKBARCREATED, MSGFLT_ADD)
