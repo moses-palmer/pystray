@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v0.14.2 - Proper license files
+------------------------------
+*  Added proper license files. Thanks to *Björn Esser*!
+
+
 v0.14.1 - Restore icon after *explorer.exe* crash
 -------------------------------------------------
 *  Restore the icon when *explorer exe* restarts after a crash. Thanks to
