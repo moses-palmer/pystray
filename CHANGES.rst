@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v0.14.3 - Full license coverage
+-------------------------------
+*  Added license preamble to all source files. Thanks to *Björn Esser*!
+
+
 v0.14.2 - Proper license files
 ------------------------------
 *  Added proper license files. Thanks to *Björn Esser*!
