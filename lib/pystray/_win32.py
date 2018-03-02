@@ -320,6 +320,16 @@ class Icon(_base.Icon):
         if self._icon_handle:
             return
 
+        if hasattr(self, 'ico_path'):
+            self._icon_handle = win32.LoadImage(
+                None,
+                self.ico_path,
+                win32.IMAGE_ICON,
+                0,
+                0,
+                win32.LR_DEFAULTSIZE | win32.LR_LOADFROMFILE)
+            return
+
         with serialized_image(self.icon, 'ICO') as icon_path:
             self._icon_handle = win32.LoadImage(
                 None,
