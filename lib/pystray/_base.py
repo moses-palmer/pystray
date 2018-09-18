@@ -26,7 +26,7 @@ from six.moves import queue
 class Icon(object):
     """A representation of a system tray icon.
 
-    The icon is initially hidden. Call :meth:`show` to show it.
+    The icon is initially hidden. Set :attr:`visible` to ``True`` to show it.
 
     :param str name: The name of the icon. This is used by the system to
         identify the icon.
