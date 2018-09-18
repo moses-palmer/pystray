@@ -87,6 +87,7 @@ class Icon(_base.Icon):
             win32.NIM_MODIFY,
             win32.NIF_ICON,
             hIcon=self._icon_handle)
+        self._icon_valid = True
 
     def _update_title(self):
         self._message(

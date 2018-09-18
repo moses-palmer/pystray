@@ -26,7 +26,7 @@ from six.moves import queue
 class Icon(object):
     """A representation of a system tray icon.
 
-    The icon is initially hidden. Call :meth:`show` to show it.
+    The icon is initially hidden. Set :attr:`visible` to ``True`` to show it.
 
     :param str name: The name of the icon. This is used by the system to
         identify the icon.
@@ -68,6 +68,7 @@ class Icon(object):
         self._title = title or ''
         self._menu = menu
         self._visible = False
+        self._icon_valid = False
         self._log = logging.getLogger(__name__)
 
         self._running = False
@@ -100,6 +101,7 @@ class Icon(object):
     @icon.setter
     def icon(self, value):
         self._icon = value
+        self._icon_valid = False
         if value:
             if self.visible:
                 self._update_icon()
@@ -150,6 +152,8 @@ class Icon(object):
             if not self._icon:
                 raise ValueError('cannot show icon without icon data')
 
+            if not self._icon_valid:
+                self._update_icon()
             self._show()
             self._visible = True
 
@@ -255,6 +259,9 @@ class Icon(object):
 
     def _update_icon(self):
         """Updates the image for an already shown icon.
+
+        This method should self :attr:`_icon_valid` to ``True`` if the icon is
+        successfully updated.
 
         This is a platform dependent implementation.
         """

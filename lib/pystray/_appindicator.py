@@ -66,6 +66,7 @@ class Icon(GtkIcon):
         self._update_appindicator_icon()
         if self._appindicator:
             self._appindicator.set_icon(self._appindicator_icon_path)
+            self._icon_valid = True
 
     @mainloop
     def _update_title(self):

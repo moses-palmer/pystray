@@ -80,6 +80,9 @@ platforms allow for the menu to be generated when displayed.
 Creating the menu
 ~~~~~~~~~~~~~~~~~
 
+A menu can be attached to a system tray icon by passing an instance of
+:class:`pystray.Menu` as the ``menu`` keyword argument.
+
 A menu consists of a list of menu items, optionally separated by menu
 separators.
 

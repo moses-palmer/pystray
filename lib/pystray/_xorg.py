@@ -167,6 +167,7 @@ class Icon(_base.Icon):
         # from _icon
         self._icon_data = None
         self._draw()
+        self._icon_valid = True
 
     def _update_title(self):
         """The implementation of :meth:`_update_title`, executed in the
