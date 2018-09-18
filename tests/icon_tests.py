@@ -115,6 +115,21 @@ class IconTest(unittest.TestCase):
                 self,
                 'Did an alternating %s, and %s icon appear?', colors1, colors2)
 
+    def test_set_icon_after_constructor(self):
+        """Tests that updating the icon works.
+        """
+        ico, colors1 = icon(no_image=True)
+        alternative, colors2 = image()
+
+        @test(ico)
+        def _():
+            ico.icon = alternative
+            ico.visible = True
+
+            confirm(
+                self,
+                'Did an icon appear?')
+
     def test_set_icon_to_none(self):
         """Tests that setting the icon to None hides it.
         """

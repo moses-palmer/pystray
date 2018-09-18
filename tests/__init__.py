@@ -62,7 +62,7 @@ def separator():
     return pystray.Menu.SEPARATOR
 
 
-def icon(**kwargs):
+def icon(no_image=False, **kwargs):
     """Generates a systray icon with the specified colours.
 
     A systray icon created by this method will be automatically hidden
@@ -75,7 +75,7 @@ def icon(**kwargs):
     img, colors = image()
     ico = pystray.Icon(
         'test',
-        icon=img,
+        icon=img if not no_image else None,
         **kwargs)
     return ico, colors
 

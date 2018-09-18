@@ -51,6 +51,8 @@ class Icon(GtkIcon):
         with serialized_image(self.icon, 'PNG') as icon_path:
             self._status_icon.set_from_file(icon_path)
 
+        self._icon_valid = True
+
     @mainloop
     def _update_title(self):
         self._status_icon.set_title(self.title)

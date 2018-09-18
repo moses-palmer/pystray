@@ -60,6 +60,7 @@ class Icon(_base.Icon):
 
         if self.visible:
             self._assert_image()
+            self._icon_valid = True
 
     def _update_title(self):
         self._status_item.button().setToolTip_(self.title)
