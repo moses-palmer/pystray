@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v0.14.4 - Allow setting icon after construction
+-----------------------------------------------
+*  Do not require setting ``icon`` twice when not passing the icon to the
+   constructor.
+*  Clarified documentation regarding name of menu argument.
+
+
 v0.14.3 - Full license coverage
 -------------------------------
 *  Added license preamble to all source files. Thanks to *Björn Esser*!
