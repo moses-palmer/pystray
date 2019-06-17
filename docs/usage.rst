@@ -95,7 +95,8 @@ A menu item has several attributes:
 *text* and *action*
     The menu item text and its associated action.
 
-    These are the only required attribute.
+    These are the only required attributes. Please see *submenu* below for
+    alternate interpretations of *action*.
 
 *checked*
     Whether the menu item is checked.
@@ -176,9 +177,23 @@ A menu item has several attributes:
     greyed out and cannot be activated.
 
 *submenu*
-    The submenu, if any, that is attached to this menu item.
+    The submenu, if any, that is attached to this menu item. Either a submenu
+    or an action can be passed as the second argument to the constructor.
 
-    If this is set, the action will not be called.
+    The submenu must be an instance of :class:`Menu`::
+
+        from pystray import Icon as icon, Menu as menu, MenuItem as item
+
+        icon('test', create_image(), menu=menu(
+            item(
+                'With submenu',
+                menu(
+                    item(
+                        'Submenu item 1',
+                        lambda icon, item: 1),
+                    item(
+                        'Submenu item 2',
+                        lambda icon, item: 2))))).run()
 
 Once created, menus and menu items cannot be modified. All attributes except for
 the menu item callbacks can however be set to callables returning the current
