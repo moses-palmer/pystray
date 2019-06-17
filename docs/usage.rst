@@ -95,7 +95,8 @@ A menu item has several attributes:
 *text* and *action*
     The menu item text and its associated action.
 
-    These are the only required attribute.
+    These are the only required attributes. Please see *submenu* below for
+    alternate interpretations of *action*.
 
 *checked*
     Whether the menu item is checked.
@@ -114,6 +115,8 @@ A menu item has several attributes:
     If you want this to actually be togglable, you must pass a callable that
     returns the current state::
 
+        from pystray import Icon as icon, Menu as menu, MenuItem as item
+
         state = False
 
         def on_clicked(icon, item):
@@ -122,8 +125,8 @@ A menu item has several attributes:
 
         # Update the state in `on_clicked` and return the new state in
         # a `checked` callable
-        Icon('test', create_image(), menu=Menu(
-            MenuItem(
+        icon('test', create_image(), menu=menu(
+            item(
                 'Checkable',
                 on_clicked,
                 checked=lambda item: state))).run()
@@ -133,6 +136,8 @@ A menu item has several attributes:
 
     This is used only if ``checked`` is ``True`` or ``False``, and only has a
     visual meaning. The menu has no concept of radio button groups::
+
+        from pystray import Icon as icon, Menu as menu, MenuItem as item
 
         state = 0
 
@@ -149,8 +154,8 @@ A menu item has several attributes:
 
         # Let the menu items be a callable returning a sequence of menu
         # items to allow the menu to grow
-        Icon('test', create_image(), menu=Menu(lambda: (
-            MenuItem(
+        icon('test', create_image(), menu=menu(lambda: (
+            item(
                 'State %d' % i,
                 set_state(i),
                 checked=get_state(i),
@@ -172,9 +177,23 @@ A menu item has several attributes:
     greyed out and cannot be activated.
 
 *submenu*
-    The submenu, if any, that is attached to this menu item.
+    The submenu, if any, that is attached to this menu item. Either a submenu
+    or an action can be passed as the second argument to the constructor.
 
-    If this is set, the action will not be called.
+    The submenu must be an instance of :class:`Menu`::
+
+        from pystray import Icon as icon, Menu as menu, MenuItem as item
+
+        icon('test', create_image(), menu=menu(
+            item(
+                'With submenu',
+                menu(
+                    item(
+                        'Submenu item 1',
+                        lambda icon, item: 1),
+                    item(
+                        'Submenu item 2',
+                        lambda icon, item: 2))))).run()
 
 Once created, menus and menu items cannot be modified. All attributes except for
 the menu item callbacks can however be set to callables returning the current
