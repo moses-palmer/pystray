@@ -114,6 +114,8 @@ A menu item has several attributes:
     If you want this to actually be togglable, you must pass a callable that
     returns the current state::
 
+        from pystray import Icon as icon, Menu as menu, MenuItem as item
+
         state = False
 
         def on_clicked(icon, item):
@@ -122,8 +124,8 @@ A menu item has several attributes:
 
         # Update the state in `on_clicked` and return the new state in
         # a `checked` callable
-        Icon('test', create_image(), menu=Menu(
-            MenuItem(
+        icon('test', create_image(), menu=menu(
+            item(
                 'Checkable',
                 on_clicked,
                 checked=lambda item: state))).run()
@@ -133,6 +135,8 @@ A menu item has several attributes:
 
     This is used only if ``checked`` is ``True`` or ``False``, and only has a
     visual meaning. The menu has no concept of radio button groups::
+
+        from pystray import Icon as icon, Menu as menu, MenuItem as item
 
         state = 0
 
@@ -149,8 +153,8 @@ A menu item has several attributes:
 
         # Let the menu items be a callable returning a sequence of menu
         # items to allow the menu to grow
-        Icon('test', create_image(), menu=Menu(lambda: (
-            MenuItem(
+        icon('test', create_image(), menu=menu(lambda: (
+            item(
                 'State %d' % i,
                 set_state(i),
                 checked=get_state(i),
