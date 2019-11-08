@@ -81,6 +81,7 @@ class Icon(GtkIcon):
         return menu
 
     def _finalize(self):
+        self._remove_appindicator_icon()
         del self._appindicator
 
     def _remove_appindicator_icon(self):
