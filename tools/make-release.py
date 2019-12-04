@@ -158,6 +158,7 @@ def upload_to_pypi():
 
     python(
         os.path.join(ROOT, 'setup.py'),
+        'sdist',
         'bdist_egg',
         'bdist_wheel',
         'upload')
