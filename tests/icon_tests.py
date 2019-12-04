@@ -320,6 +320,28 @@ class IconTest(unittest.TestCase):
             q.get(timeout=TIMEOUT)
 
     @for_menu
+    def test_menu_activate_method(self):
+        """Tests that the menu can be activated and a method can be used.
+        """
+        q = queue.Queue()
+
+        class C:
+            def on_activate(self):
+                q.put(True)
+
+        c = C()
+        ico, colors = icon(menu=(
+            item('Item 1', c.on_activate),
+            item('Item 2', None)))
+
+        @test(ico)
+        def _():
+            ico.visible = True
+
+            say('Click Item 1')
+            q.get(timeout=TIMEOUT)
+
+    @for_menu
     def test_menu_activate_submenu(self):
         """Tests that an item in a submenu can be activated.
         """

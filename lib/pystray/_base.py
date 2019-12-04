@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import inspect
 import itertools
 import logging
 import threading
@@ -409,23 +410,27 @@ class MenuItem(object):
         if not hasattr(action, '__code__'):
             return action
 
-        elif action.__code__.co_argcount == 0:
-            @functools.wraps(action)
-            def wrapper0(*args):
-                return action()
-            return wrapper0
-
-        elif action.__code__.co_argcount == 1:
-            @functools.wraps(action)
-            def wrapper1(icon, *args):
-                return action(icon)
-            return wrapper1
-
-        elif action.__code__.co_argcount == 2:
-            return action
-
         else:
-            raise ValueError(action)
+            argcount = action.__code__.co_argcount - (
+                1 if inspect.ismethod(action) else 0)
+
+            if argcount == 0:
+                @functools.wraps(action)
+                def wrapper0(*args):
+                    return action()
+                return wrapper0
+
+            elif argcount == 1:
+                @functools.wraps(action)
+                def wrapper1(icon, *args):
+                    return action(icon)
+                return wrapper1
+
+            elif argcount == 2:
+                return action
+
+            else:
+                raise ValueError(action)
 
     def _assert_callable(self, value, default):
         """Asserts that a value is callable.
