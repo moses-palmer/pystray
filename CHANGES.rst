@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v0.15.0 - Allow methods as menu callbacks
+-----------------------------------------
+*  Allow passing a method as menu callback.
+*  Ensure that the temporary file is removed when running under *AppIndicator*.
+   Thanks to *superjamie*!
+
+
 v0.14.4 - Allow setting icon after construction
 -----------------------------------------------
 *  Do not require setting ``icon`` twice when not passing the icon to the
