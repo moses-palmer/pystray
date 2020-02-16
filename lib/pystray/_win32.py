@@ -96,7 +96,13 @@ class Icon(_base.Icon):
             szTip=self.title)
 
     def notify(self, title=None, message=None):
+        """Windows only: Show / hide (toast) notification
 
+        :param title: The title <str> of the notification. Will be replaced with the title of the Icon if ``None``.
+
+        :param message: The message <str> of the notification. Set this to ``None`` or ``''`` to hide the notification.
+
+        """
         if message is None:
             self._message(
                 win32.NIM_MODIFY,
