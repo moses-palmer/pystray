@@ -24,6 +24,9 @@ from ._util import serialized_image
 
 
 class Icon(GtkIcon):
+    # Not implemented
+    HAS_NOTIFICATION = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 

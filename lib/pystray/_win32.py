@@ -26,6 +26,9 @@ from . import _base
 
 
 class Icon(_base.Icon):
+    # Not implemented
+    HAS_NOTIFICATION = False
+
     _HWND_TO_ICON = {}
 
     def __init__(self, *args, **kwargs):
