@@ -478,3 +478,33 @@ class IconTest(unittest.TestCase):
             confirm(
                 self,
                 'Was <Item 1> enabled and <Item 2> disabled?')
+
+    if sys.platform == 'win32':
+
+        def test_show_notification(self):
+            """Tests that generation of a notification works.
+            """
+            ico, colors = icon()
+
+            @test(ico)
+            def _():
+                ico.notify(title='Title: Test', message='This is a message!')
+
+                confirm(
+                    self,
+                    'Did a notification appear?')
+
+        def test_hide_notification(self):
+            """Tests that a notification can be removed again.
+            """
+            ico, colors = icon()
+
+            @test(ico)
+            def _():
+                ico.notify(title='Title: Test', message='This is a message!')
+                sleep(5.0)
+                ico.notify()
+
+                confirm(
+                    self,
+                    'Was the notification removed?')
