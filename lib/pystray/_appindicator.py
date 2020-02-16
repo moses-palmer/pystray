@@ -34,6 +34,9 @@ class Icon(GtkIcon):
     # empty menus
     HAS_DEFAULT_ACTION = False
 
+    # Not implemented
+    HAS_NOTIFICATION = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 

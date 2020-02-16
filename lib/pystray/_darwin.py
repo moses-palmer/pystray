@@ -40,6 +40,9 @@ class Icon(_base.Icon):
     # Mutually exclusive menu itema are not displayed distinctly
     HAS_MENU_RADIO = False
 
+    # Not implemented
+    HAS_NOTIFICATION = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 

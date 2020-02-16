@@ -82,6 +82,9 @@ class Icon(_base.Icon):
     # We support no menu
     HAS_MENU_RADIO = False
 
+    # No notification (yet)!
+    HAS_NOTIFICATION = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
