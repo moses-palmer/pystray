@@ -199,3 +199,49 @@ Once created, menus and menu items cannot be modified. All attributes except for
 the menu item callbacks can however be set to callables returning the current
 value. This also applies to the sequence of menu items belonging to a menu: this
 can be a callable returning the current sequence.
+
+
+Selecting a backend
+-------------------
+
+*pystray* aims to provide a unified *API* for all supported platforms. In some
+cases, however, that is not entirely possible.
+
+This library supports a number of backends. On *macOS* and *Windows*, the
+operating system has system tray icons built-in, so the default backends should
+be used, but on *Linux* you may have to make a decision depending on your
+needs.
+
+By setting the environment variable ``PYNPUT_BACKEND`` to one of the strings in
+the next section, the automatic selection is turned off.
+
+
+Supported backends
+~~~~~~~~~~~~~~~~~~
+
+*appindicator*
+    This is one of the backends available on *Linux*, and is the preferred
+    choice. All *pynput* features except for a menu default action are
+    supported, and if the *appindicator* library is installed on the system
+    and the desktop environment supports it, the icon is guaranteed to be
+    displayed.
+
+*darwin*
+    This is the default backend when running on *macOS*. All *pynput* features
+    are available.
+
+*gtk*
+    This is one of the backends available on *Linux*, and is prioritised above
+    the *XOrg* backend. It uses *GTK* as underlying library. All *pynput*
+    features are available, but it may not actually result in a visible icon:
+    when running a *gnome-shell* session, an third party plugin is required to
+    display legacy tray icons.
+
+*win32*
+    This is the default backend when running on *Windows*. All *pynput*
+    features are available.
+
+*xorg*
+    This is one of the backends available on *Linux*. It is used as a fallback
+    when no other backend can be loaded. It does not support any menu
+    functionality except for a default action.
