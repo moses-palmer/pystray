@@ -12,7 +12,7 @@ sys.path.insert(
         os.path.pardir,
         'lib'))
 
-os.environ['__PYSTRAY_GENERATE_DOCUMENTATION'] = 'yes'
+os.environ['PYSTRAY_BACKEND'] = 'dummy'
 
 import pystray as package
 import pystray._info as INFO
