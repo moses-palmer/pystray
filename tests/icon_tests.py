@@ -96,6 +96,17 @@ def for_menu_radio(test):
         return lambda *a: None
 
 
+def for_notification(test):
+    """Prevents a test from being run on implementations not supporting notifications
+
+    :param test: The test.
+    """
+    if pystray.Icon.HAS_NOTIFICATION:
+        return test
+    else:
+        return lambda *a: None
+
+
 class IconTest(unittest.TestCase):
     def test_set_icon(self):
         """Tests that updating the icon works.
@@ -479,32 +490,32 @@ class IconTest(unittest.TestCase):
                 self,
                 'Was <Item 1> enabled and <Item 2> disabled?')
 
-    if sys.platform == 'win32':
+    @for_notification
+    def test_show_notification(self):
+        """Tests that generation of a notification works.
+        """
+        ico, colors = icon()
 
-        def test_show_notification(self):
-            """Tests that generation of a notification works.
-            """
-            ico, colors = icon()
+        @test(ico)
+        def _():
+            ico.notify(title='Title: Test', message='This is a message!')
 
-            @test(ico)
-            def _():
-                ico.notify(title='Title: Test', message='This is a message!')
+            confirm(
+                self,
+                'Did a notification appear?')
 
-                confirm(
-                    self,
-                    'Did a notification appear?')
+    @for_notification
+    def test_hide_notification(self):
+        """Tests that a notification can be removed again.
+        """
+        ico, colors = icon()
 
-        def test_hide_notification(self):
-            """Tests that a notification can be removed again.
-            """
-            ico, colors = icon()
+        @test(ico)
+        def _():
+            ico.notify(title='Title: Test', message='This is a message!')
+            sleep(5.0)
+            ico.remove_notification()
 
-            @test(ico)
-            def _():
-                ico.notify(title='Title: Test', message='This is a message!')
-                sleep(5.0)
-                ico.notify()
-
-                confirm(
-                    self,
-                    'Was the notification removed?')
+            confirm(
+                self,
+                'Was the notification removed?')
