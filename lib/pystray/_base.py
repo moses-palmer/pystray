@@ -62,6 +62,9 @@ class Icon(object):
     #: exclusive menu items using the :attr:`MenuItem.radio` attribute.
     HAS_MENU_RADIO = True
 
+    #: Whether this particular implementation supports displaying a notification
+    HAS_NOTIFICATION = True
+
     def __init__(
             self, name, icon=None, title=None, menu=None):
         self._name = name
@@ -212,6 +215,24 @@ class Icon(object):
         """
         self._menu_handle = self._create_menu_handle()
 
+    def notify(self, message, title=None):
+        """Creates a notification.
+
+        If called, a Toast style notification will be created.
+        You can only create a single notification.
+        This feature is only supported on the Windows platform.
+
+        :param message: The message <str> of the notification.
+        :param title: The title <str> of the notification. Will be replaced with the title of the Icon if ``None``.
+        """
+
+        self._notify(message, title)
+
+    def remove_notification(self):
+        """Remove a notification.
+        """
+        self._remove_notification()
+
     def _mark_ready(self):
         """Marks the icon as ready.
 
@@ -293,6 +314,20 @@ class Icon(object):
 
     def _stop(self):
         """Stops the event loop.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
+    def _notify(self, message, title=None):
+        """Show a notification.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
+    def _remove_notification(self):
+        """Remove a notification.
 
         This is a platform dependent implementation.
         """
