@@ -95,27 +95,27 @@ class Icon(_base.Icon):
             win32.NIF_TIP,
             szTip=self.title)
 
-    def notify(self, title=None, message=None):
-        """Windows only: Show / hide (toast) notification
-
-        :param title: The title <str> of the notification. Will be replaced with the title of the Icon if ``None``.
+    def _notify(self, message, title=None):
+        """Windows only: Show a (toast style) notification.
 
         :param message: The message <str> of the notification. Set this to ``None`` or ``''`` to hide the notification.
-
+        :param title: The title <str> of the notification. Will be replaced with the title of the Icon if ``None``.
         """
-        if message is None:
-            self._message(
-                win32.NIM_MODIFY,
-                win32.NIF_INFO,
-                szInfo=''
-            )
-        else:
-            self._message(
-                win32.NIM_MODIFY,
-                win32.NIF_INFO,
-                szInfo=message,
-                szInfoTitle=title or self.title or ''
-            )
+        self._message(
+            win32.NIM_MODIFY,
+            win32.NIF_INFO,
+            szInfo=message,
+            szInfoTitle=title or self.title or ''
+        )
+
+    def _remove_notification(self):
+        """Windows only: Remove the notification.
+        """
+        self._message(
+            win32.NIM_MODIFY,
+            win32.NIF_INFO,
+            szInfo=''
+        )
 
     def _create_menu_handle(self):
         try:
