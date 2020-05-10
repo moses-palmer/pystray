@@ -94,6 +94,19 @@ class Icon(_base.Icon):
             win32.NIF_TIP,
             szTip=self.title)
 
+    def _notify(self, message, title=None):
+        self._message(
+            win32.NIM_MODIFY,
+            win32.NIF_INFO,
+            szInfo=message,
+            szInfoTitle=title or self.title or '')
+
+    def _remove_notification(self):
+        self._message(
+            win32.NIM_MODIFY,
+            win32.NIF_INFO,
+            szInfo='')
+
     def _create_menu_handle(self):
         try:
             hmenu, callbacks = self._menu_handle
