@@ -26,7 +26,6 @@ gi.require_version('AppIndicator3', '0.1')
 from gi.repository import AppIndicator3 as AppIndicator
 
 from ._util.gtk import GtkIcon, mainloop
-from ._util import serialized_image
 from . import _base
 
 

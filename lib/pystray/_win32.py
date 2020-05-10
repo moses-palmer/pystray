@@ -16,11 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import ctypes
-import os
-import six
-import sys
 import threading
-import tempfile
 
 from ctypes import wintypes
 from six.moves import queue
