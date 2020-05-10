@@ -1,6 +1,6 @@
 # coding=utf-8
 # pystray
-# Copyright (C) 2016-2017 Moses Palmér
+# Copyright (C) 2016-2020 Moses Palmér
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Lesser General Public License as published by the Free
@@ -19,48 +19,33 @@ import os
 import sys
 
 
-if os.environ.get('__PYSTRAY_GENERATE_DOCUMENTATION') == 'yes':
-    from ._base import Icon
-else:
-    Icon = None
+def backend():
+    """Returns the backend module.
+    """
+    import importlib
 
-
-error = None
-try:
-    if sys.platform == 'darwin':
-        if not Icon:
-            from ._darwin import Icon
-
+    backend_name = os.environ.get('PYSTRAY_BACKEND', None)
+    if backend_name:
+        modules = [backend_name]
+    elif sys.platform == 'darwin':
+        modules = ['darwin']
     elif sys.platform == 'win32':
-        if not Icon:
-            from ._win32 import Icon
-
+        modules = ['win32']
     else:
+        modules = ['appindicator', 'gtk', 'xorg']
+
+    errors = []
+    for module in modules:
         try:
-            if not Icon:
-                from ._appindicator import Icon
-        except Exception as e:
-            error = e
-        try:
-            if not Icon:
-                from ._gtk import Icon
-        except Exception as e:
-            error = e
-        try:
-            if not Icon:
-                from ._xorg import Icon
-        except Exception as e:
-            error = e
+            return importlib.import_module(__package__ + '._' + module)
+        except ImportError as e:
+            errors.append(e)
+
+    raise ImportError('this platform is not supported: {}'.format(
+        '; '.join(str(e) for e in errors)))
 
 
-    if not Icon:
-        if error:
-            raise error
-        else:
-            raise ImportError('this platform is not supported')
-
-finally:
-    del error
-
+Icon = backend().Icon
+del backend
 
 from ._base import Menu, MenuItem

@@ -14,6 +14,10 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+"""
+This module contains a dummy implementation.
 
-__author__ = u'Moses Palmér'
-__version__ = (0, 15, 0)
+It cannot be used, but importing it will not raise any exceptions.
+"""
+
+from ._base import Icon
