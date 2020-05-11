@@ -80,6 +80,9 @@ platforms allow for the menu to be generated when displayed.
 Creating the menu
 ~~~~~~~~~~~~~~~~~
 
+*This is not supported on Xorg; please check Icon.HAS_MENU at runtime for
+support on the current platform.*
+
 A menu can be attached to a system tray icon by passing an instance of
 :class:`pystray.Menu` as the ``menu`` keyword argument.
 
@@ -132,6 +135,9 @@ A menu item has several attributes:
                 checked=lambda item: state))).run()
 
 *radio*
+    *This is not supported on macOS; please check Icon.HAS_MENU_RADIO at
+    runtime for support on the current platform.*
+
     Whether this is a radio button.
 
     This is used only if ``checked`` is ``True`` or ``False``, and only has a
@@ -163,6 +169,9 @@ A menu item has several attributes:
             for i in range(max(5, state + 2))))).run()
 
 *default*
+    *This is not supported on Darwin and using AppIndicator; please check
+    Icon.HAS_DEFAULT at runtime for support on the current platform.*
+
     Whether this is the default item.
 
     It is drawn in a distinguished style and will be activated as the default
