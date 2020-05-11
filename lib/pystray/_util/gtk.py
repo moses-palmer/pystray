@@ -26,6 +26,8 @@ from gi.repository import GLib, GObject, Gtk
 
 from pystray import _base
 
+from . import notify_dbus
+
 
 def mainloop(f):
     """Marks a function to be executed in the main loop.
@@ -55,12 +57,14 @@ class GtkIcon(_base.Icon):
         super(GtkIcon, self).__init__(*args, **kwargs)
         self._loop = None
         self._icon_path = None
+        self._notifier = None
 
     def _create_menu_handle(self):
         return self._create_menu(self.menu)
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
+        self._notifier = notify_dbus.Notifier()
         self._mark_ready()
 
         # Make sure that we do not inhibit ctrl+c
@@ -72,6 +76,12 @@ class GtkIcon(_base.Icon):
                 'An error occurred in the main loop', exc_info=True)
         finally:
             self._finalize()
+
+    def _notify(self, message, title=None):
+        self._notifier.notify(title or self.title, message, self._icon_path)
+
+    def _remove_notification(self):
+        self._notifier.hide()
 
     @mainloop
     def _stop(self):
@@ -126,6 +136,7 @@ class GtkIcon(_base.Icon):
 
     def _finalize(self):
         self._remove_fs_icon()
+        self._notifier.hide()
 
     def _remove_fs_icon(self):
         """Removes the temporary file used for the icon.
