@@ -16,13 +16,17 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import os
 import signal
+import tempfile
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
 
 from pystray import _base
+
+from . import notify_dbus
 
 
 def mainloop(f):
@@ -52,12 +56,15 @@ class GtkIcon(_base.Icon):
     def __init__(self, *args, **kwargs):
         super(GtkIcon, self).__init__(*args, **kwargs)
         self._loop = None
+        self._icon_path = None
+        self._notifier = None
 
     def _create_menu_handle(self):
         return self._create_menu(self.menu)
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
+        self._notifier = notify_dbus.Notifier()
         self._mark_ready()
 
         # Make sure that we do not inhibit ctrl+c
@@ -69,6 +76,12 @@ class GtkIcon(_base.Icon):
                 'An error occurred in the main loop', exc_info=True)
         finally:
             self._finalize()
+
+    def _notify(self, message, title=None):
+        self._notifier.notify(title or self.title, message, self._icon_path)
+
+    def _remove_notification(self):
+        self._notifier.hide()
 
     @mainloop
     def _stop(self):
@@ -122,6 +135,29 @@ class GtkIcon(_base.Icon):
             return menu_item
 
     def _finalize(self):
-        """Removes all resources after :meth:`_run`.
+        self._remove_fs_icon()
+        self._notifier.hide()
+
+    def _remove_fs_icon(self):
+        """Removes the temporary file used for the icon.
         """
-        pass
+        try:
+            if self._icon_path:
+                os.unlink(self._icon_path)
+                self._icon_path = None
+        except:
+            pass
+        self._icon_valid = False
+
+    def _update_fs_icon(self):
+        """Updates the icon file.
+
+        This method will update :attr:`_icon_path` and create a new image file.
+
+        If an icon is already set, call :meth:`_remove_fs_icon` first to ensure
+        that the old file is removed.
+        """
+        self._icon_path = tempfile.mktemp()
+        with open(self._icon_path, 'wb') as f:
+            self.icon.save(f, 'PNG')
+        self._icon_valid = True

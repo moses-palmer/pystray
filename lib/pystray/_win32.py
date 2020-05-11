@@ -16,11 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import ctypes
-import os
-import six
-import sys
 import threading
-import tempfile
 
 from ctypes import wintypes
 from six.moves import queue
@@ -30,6 +26,9 @@ from . import _base
 
 
 class Icon(_base.Icon):
+    # Not implemented
+    HAS_NOTIFICATION = False
+
     _HWND_TO_ICON = {}
 
     def __init__(self, *args, **kwargs):
@@ -94,6 +93,19 @@ class Icon(_base.Icon):
             win32.NIM_MODIFY,
             win32.NIF_TIP,
             szTip=self.title)
+
+    def _notify(self, message, title=None):
+        self._message(
+            win32.NIM_MODIFY,
+            win32.NIF_INFO,
+            szInfo=message,
+            szInfoTitle=title or self.title or '')
+
+    def _remove_notification(self):
+        self._message(
+            win32.NIM_MODIFY,
+            win32.NIF_INFO,
+            szInfo='')
 
     def _create_menu_handle(self):
         try:

@@ -15,14 +15,11 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from ._util.gtk import GtkIcon, mainloop
-from ._util import serialized_image
 
 
 class Icon(GtkIcon):
@@ -46,12 +43,9 @@ class Icon(GtkIcon):
 
     @mainloop
     def _update_icon(self):
-        # Write the buffered image to a file and set the status icon image from
-        # the file
-        with serialized_image(self.icon, 'PNG') as icon_path:
-            self._status_icon.set_from_file(icon_path)
-
-        self._icon_valid = True
+        self._remove_fs_icon()
+        self._update_fs_icon()
+        self._status_icon.set_from_file(self._icon_path)
 
     @mainloop
     def _update_title(self):

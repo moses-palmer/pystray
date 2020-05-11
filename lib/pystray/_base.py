@@ -62,6 +62,10 @@ class Icon(object):
     #: exclusive menu items using the :attr:`MenuItem.radio` attribute.
     HAS_MENU_RADIO = True
 
+    #: Whether this particular implementation supports displaying a
+    #: notification.
+    HAS_NOTIFICATION = True
+
     def __init__(
             self, name, icon=None, title=None, menu=None):
         self._name = name
@@ -212,6 +216,28 @@ class Icon(object):
         """
         self._menu_handle = self._create_menu_handle()
 
+    def notify(self, message, title=None):
+        """Displays a notification.
+
+        The notification will generally be visible until
+        :meth:`remove_notification` is called.
+
+        The class field :attr:`HAS_NOTIFICATION` indicates whether this feature
+        is supported on the current platform.
+
+        :param str message: The message of the notification.
+
+        :param str title: The title of the notification. This will be replaced
+            with :attr:`title` if ``None``.
+        """
+
+        self._notify(message, title)
+
+    def remove_notification(self):
+        """Remove a notification.
+        """
+        self._remove_notification()
+
     def _mark_ready(self):
         """Marks the icon as ready.
 
@@ -293,6 +319,20 @@ class Icon(object):
 
     def _stop(self):
         """Stops the event loop.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
+    def _notify(self, message, title=None):
+        """Show a notification.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
+    def _remove_notification(self):
+        """Remove a notification.
 
         This is a platform dependent implementation.
         """
@@ -407,7 +447,10 @@ class MenuItem(object):
 
         :return: a callable
         """
-        if not hasattr(action, '__code__'):
+        if action is None:
+            return lambda *_: None
+
+        elif not hasattr(action, '__code__'):
             return action
 
         else:
