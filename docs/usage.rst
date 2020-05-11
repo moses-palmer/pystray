@@ -210,6 +210,28 @@ value. This also applies to the sequence of menu items belonging to a menu: this
 can be a callable returning the current sequence.
 
 
+Displaying notifications
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+*This is not supported on macOS and Xorg; please check Icon.HAS_NOTIFICATION
+at runtime for support on the current platform.*
+
+To display a system notification, use :meth:`pystray.Icon.notify`::
+
+    from pystray import Icon as icon, Menu as menu, MenuItem as item
+
+    icon('test', create_image(), menu=menu(
+        item(
+            'With submenu',
+            menu(
+                item(
+                    'Show message',
+                    lambda icon, item: icon.notify('Hello World!')),
+                item(
+                    'Submenu item 2',
+                    lambda icon, item: icon.remove_notification()))))).run()
+
+
 Selecting a backend
 -------------------
 
