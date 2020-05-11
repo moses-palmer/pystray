@@ -407,7 +407,10 @@ class MenuItem(object):
 
         :return: a callable
         """
-        if not hasattr(action, '__code__'):
+        if action is None:
+            return lambda *_: None
+
+        elif not hasattr(action, '__code__'):
             return action
 
         else:
