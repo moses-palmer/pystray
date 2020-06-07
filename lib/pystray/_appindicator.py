@@ -34,18 +34,16 @@ class Icon(GtkIcon):
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
-        self._appindicator = None
+        self._appindicator = AppIndicator.Indicator.new(
+            self.name,
+            '',
+            AppIndicator.IndicatorCategory.APPLICATION_STATUS)
 
         if self.icon:
             self._update_icon()
 
     @mainloop
     def _show(self):
-        self._appindicator = AppIndicator.Indicator.new(
-            self.name,
-            '',
-            AppIndicator.IndicatorCategory.APPLICATION_STATUS)
-
         self._appindicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
         self._appindicator.set_icon(self._icon_path)
         self._appindicator.set_menu(
@@ -53,7 +51,7 @@ class Icon(GtkIcon):
 
     @mainloop
     def _hide(self):
-        self._appindicator = None
+        self._appindicator.set_status(AppIndicator.IndicatorStatus.PASSIVE)
 
     @mainloop
     def _update_icon(self):
