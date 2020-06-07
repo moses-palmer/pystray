@@ -31,7 +31,7 @@ class Icon(GtkIcon):
     # empty menus
     HAS_DEFAULT_ACTION = False
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, on_scroll=None, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
         self._appindicator = AppIndicator.Indicator.new(
@@ -39,6 +39,7 @@ class Icon(GtkIcon):
             '',
             AppIndicator.IndicatorCategory.APPLICATION_STATUS)
 
+        if on_scroll: self._appindicator.connect("scroll-event",on_scroll)
         if self.icon:
             self._update_icon()
 
