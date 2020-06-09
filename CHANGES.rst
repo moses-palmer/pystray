@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v0.16.0 - Enable notifications
+------------------------------
+*  Added support for notifications. Thanks to *ralphwetzel* and *Chr0nicT*!
+*  Added support for forcing the backend to use.
+
+
 v0.15.0 - Allow methods as menu callbacks
 -----------------------------------------
 *  Allow passing a method as menu callback.
