@@ -45,6 +45,7 @@ class Notifier(object):
             DESTINATION,
             None)
         self._nid = 0
+        self._icon = None
 
     def notify(self, title, message, icon):
         """Displays a notification message.
@@ -57,7 +58,8 @@ class Notifier(object):
         """
         # Make sure the file exists after having been updated by the Icon
         # instance
-        self._icon = tempfile.mktemp('.png')
+        if self._icon is None:
+            self._icon = tempfile.mktemp('.png')
 
         self._nid = self._notify.call_sync(
             'Notify',
@@ -89,7 +91,8 @@ class Notifier(object):
             GLib.Variant(
                 '(u)',
                 (
-                    self._nid)),
+                    self._nid,
+                )),
             Gio.DBusCallFlags.NONE,
             -1,
             None)
