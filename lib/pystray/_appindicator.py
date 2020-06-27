@@ -66,8 +66,9 @@ class Icon(GtkIcon):
     def _update_title(self):
         self._appindicator.set_title(self.title)
 
+    @mainloop
     def _update_menu(self):
-        super(Icon, self)._update_menu()
+        super(Icon, self)._update_menu_impl()
 
         if self._appindicator:
             self._appindicator.set_menu(self._menu_handle or self._create_default_menu())

@@ -32,7 +32,7 @@ from . import notify_dbus
 def mainloop(f):
     """Marks a function to be executed in the main loop.
 
-    The function will be sceduled to be executed later in the mainloop.
+    The function will be scheduled to be executed later in the mainloop.
 
     :param callable f: The function to execute. Its return value is discarded.
     """
@@ -59,7 +59,7 @@ class GtkIcon(_base.Icon):
         self._icon_path = None
         self._notifier = None
 
-    def _update_menu(self):
+    def _update_menu_impl(self):
         self._menu_handle = self._create_menu(self.menu)
 
     def _run(self):
@@ -77,9 +77,11 @@ class GtkIcon(_base.Icon):
         finally:
             self._finalize()
 
+    @mainloop
     def _notify(self, message, title=None):
         self._notifier.notify(title or self.title, message, self._icon_path)
 
+    @mainloop
     def _remove_notification(self):
         self._notifier.hide()
 
