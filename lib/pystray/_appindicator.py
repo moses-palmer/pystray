@@ -66,13 +66,11 @@ class Icon(GtkIcon):
     def _update_title(self):
         self._appindicator.set_title(self.title)
 
-    def _create_menu_handle(self):
-        menu = super(Icon, self)._create_menu_handle()
+    def _update_menu(self):
+        super(Icon, self)._update_menu()
 
         if self._appindicator:
-            self._appindicator.set_menu(menu or self._create_default_menu())
-
-        return menu
+            self._appindicator.set_menu(self._menu_handle or self._create_default_menu())
 
     def _finalize(self):
         super(Icon, self)._finalize()

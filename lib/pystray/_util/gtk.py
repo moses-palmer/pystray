@@ -59,8 +59,8 @@ class GtkIcon(_base.Icon):
         self._icon_path = None
         self._notifier = None
 
-    def _create_menu_handle(self):
-        return self._create_menu(self.menu)
+    def _update_menu(self):
+        self._menu_handle = self._create_menu(self.menu)
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
