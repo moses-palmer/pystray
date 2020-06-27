@@ -41,15 +41,16 @@ class Icon(GtkIcon):
 
     @mainloop
     def _show(self):
+        name = self.name
         self._appindicator = AppIndicator.Indicator.new(
-            self.name,
+            name,
             '',
             AppIndicator.IndicatorCategory.APPLICATION_STATUS)
 
         self._appindicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
         self._appindicator.set_icon(self._icon_path)
         self._appindicator.set_menu(
-            self._menu_handle or self._create_default_menu())
+            self._menu_handle or self._create_default_menu(self.menu, name))
 
     @mainloop
     def _hide(self):
@@ -68,29 +69,32 @@ class Icon(GtkIcon):
 
     @mainloop
     def _update_menu(self):
-        super(Icon, self)._update_menu_impl()
+        descriptors = self.menu
+        super(Icon, self)._update_menu_impl(descriptors)
 
         if self._appindicator:
-            self._appindicator.set_menu(self._menu_handle or self._create_default_menu())
+            self._appindicator.set_menu(
+                self._menu_handle or
+                self._create_default_menu(descriptors, self.name))
 
     def _finalize(self):
         super(Icon, self)._finalize()
         del self._appindicator
 
-    def _create_default_menu(self):
+    def _create_default_menu(self, descriptors, name):
         """Creates a :class:`Gtk.Menu` from the default menu entry.
 
         :return: a :class:`Gtk.Menu`
         """
         menu = Gtk.Menu.new()
-        if self.menu is not None:
+        if descriptors is not None:
             menu.append(self._create_menu_item(next(
                 menu_item
-                for menu_item in self.menu.items
+                for menu_item in descriptors.items
                 if menu_item.default)))
         else:
             menu.append(self._create_menu_item(
-                _base.MenuItem(self.name, lambda _: None)))
+                _base.MenuItem(name, lambda _: None)))
         menu.show_all()
 
         return menu

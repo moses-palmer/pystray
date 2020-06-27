@@ -212,9 +212,11 @@ class Icon(_base.Icon):
             return AppKit.NSMenuItem.separatorItem()
 
         else:
+            text = descriptor.text
+            checked = descriptor.checked
             menu_item = AppKit.NSMenuItem.alloc() \
                 .initWithTitle_action_keyEquivalent_(
-                    descriptor.text, self._MENU_ITEM_SELECTOR, '')
+                    text, self._MENU_ITEM_SELECTOR, '')
             if descriptor.submenu:
                 menu_item.setSubmenu_(self._create_menu(
                     descriptor.submenu, callbacks))
@@ -226,16 +228,16 @@ class Icon(_base.Icon):
                 menu_item.setAttributedTitle_(
                     Foundation.NSAttributedString.alloc()
                     .initWithString_attributes_(
-                        descriptor.text,
+                        text,
                         Foundation.NSDictionary.alloc()
                         .initWithObjectsAndKeys_(
                             AppKit.NSFont.boldSystemFontOfSize_(
                                 AppKit.NSFont.menuFontOfSize_(0)
                                 .pointSize()),
                             AppKit.NSFontAttributeName)))
-            if descriptor.checked is not None:
+            if checked is not None:
                 menu_item.setState_(
-                    AppKit.NSOnState if descriptor.checked
+                    AppKit.NSOnState if checked
                     else AppKit.NSOffState)
             menu_item.setEnabled_(descriptor.enabled)
             return menu_item

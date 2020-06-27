@@ -59,8 +59,8 @@ class GtkIcon(_base.Icon):
         self._icon_path = None
         self._notifier = None
 
-    def _update_menu_impl(self):
-        self._menu_handle = self._create_menu(self.menu)
+    def _update_menu_impl(self, descriptors):
+        self._menu_handle = self._create_menu(descriptors)
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
@@ -97,6 +97,11 @@ class GtkIcon(_base.Icon):
 
         :return: a :class:`Gtk.Menu` or ``None``
         """
+        if isinstance(descriptors, _base.Menu):
+            # Avoid calling _visible_items twice, for performance and since it
+            # might be changed on another thread in between reads.
+            descriptors = list(descriptors)
+
         if not descriptors:
             return None
 
@@ -120,19 +125,21 @@ class GtkIcon(_base.Icon):
             return Gtk.SeparatorMenuItem()
 
         else:
-            if descriptor.checked is not None:
-                menu_item = Gtk.CheckMenuItem.new_with_label(descriptor.text)
-                menu_item.set_active(descriptor.checked)
+            text = descriptor.text
+            checked = descriptor.checked
+            if checked is not None:
+                menu_item = Gtk.CheckMenuItem.new_with_label(text)
+                menu_item.set_active(checked)
                 menu_item.set_draw_as_radio(descriptor.radio)
             else:
-                menu_item = Gtk.MenuItem.new_with_label(descriptor.text)
+                menu_item = Gtk.MenuItem.new_with_label(text)
             if descriptor.submenu:
                 menu_item.set_submenu(self._create_menu(descriptor.submenu))
             else:
                 menu_item.connect('activate', self._handler(descriptor))
             if descriptor.default:
                 menu_item.get_children()[0].set_markup(
-                    '<b>%s</b>' % GLib.markup_escape_text(descriptor.text))
+                    '<b>%s</b>' % GLib.markup_escape_text(text))
             menu_item.set_sensitive(descriptor.enabled)
             return menu_item
 
