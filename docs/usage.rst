@@ -243,7 +243,7 @@ operating system has system tray icons built-in, so the default backends should
 be used, but on *Linux* you may have to make a decision depending on your
 needs.
 
-By setting the environment variable ``PYNPUT_BACKEND`` to one of the strings in
+By setting the environment variable ``PYSTRAY_BACKEND`` to one of the strings in
 the next section, the automatic selection is turned off.
 
 
