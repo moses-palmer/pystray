@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import atexit
 import os
 import shutil
 import tempfile
@@ -46,6 +47,17 @@ class Notifier(object):
             None)
         self._nid = 0
 
+        icon_path = tempfile.mktemp('.png')
+        self._icon = icon_path
+
+        @atexit.register
+        def cleanup():
+            try:
+                os.unlink(icon_path)
+            except:
+                # Ignore any error
+                pass
+
     def notify(self, title, message, icon):
         """Displays a notification message.
 
@@ -56,9 +68,7 @@ class Notifier(object):
         :param str icon: The icon path.
         """
         # Make sure the file exists after having been updated by the Icon
-        # instance
-        self._icon = tempfile.mktemp('.png')
-
+        # instance by copying the file to a temporary file
         self._nid = self._notify.call_sync(
             'Notify',
             GLib.Variant(
@@ -79,11 +89,6 @@ class Notifier(object):
     def hide(self):
         """Hides the notification displayed by :meth:`notify`.
         """
-        # Make sure to remove the temporary file
-        if self._icon is not None:
-            os.unlink(self._icon)
-            self._icon = None
-
         self._notify.call_sync(
             'CloseNotification',
             GLib.Variant(
