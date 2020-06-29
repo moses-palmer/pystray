@@ -32,7 +32,7 @@ from . import notify_dbus
 def mainloop(f):
     """Marks a function to be executed in the main loop.
 
-    The function will be sceduled to be executed later in the mainloop.
+    The function will be scheduled to be executed later in the mainloop.
 
     :param callable f: The function to execute. Its return value is discarded.
     """
