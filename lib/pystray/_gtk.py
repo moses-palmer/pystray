@@ -47,6 +47,7 @@ class Icon(GtkIcon):
         self._update_fs_icon()
         self._status_icon.set_from_file(self._icon_path)
 
+    @mainloop
     def _update_menu(self):
         self._menu_handle = self._create_menu(self.menu)
 

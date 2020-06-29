@@ -74,9 +74,11 @@ class GtkIcon(_base.Icon):
         finally:
             self._finalize()
 
+    @mainloop
     def _notify(self, message, title=None):
         self._notifier.notify(title or self.title, message, self._icon_path)
 
+    @mainloop
     def _remove_notification(self):
         self._notifier.hide()
 
