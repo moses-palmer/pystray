@@ -243,7 +243,7 @@ operating system has system tray icons built-in, so the default backends should
 be used, but on *Linux* you may have to make a decision depending on your
 needs.
 
-By setting the environment variable ``PYNPUT_BACKEND`` to one of the strings in
+By setting the environment variable ``PYSTRAY_BACKEND`` to one of the strings in
 the next section, the automatic selection is turned off.
 
 
@@ -252,24 +252,24 @@ Supported backends
 
 *appindicator*
     This is one of the backends available on *Linux*, and is the preferred
-    choice. All *pynput* features except for a menu default action are
+    choice. All *pystray* features except for a menu default action are
     supported, and if the *appindicator* library is installed on the system
     and the desktop environment supports it, the icon is guaranteed to be
     displayed.
 
 *darwin*
-    This is the default backend when running on *macOS*. All *pynput* features
+    This is the default backend when running on *macOS*. All *pystray* features
     are available.
 
 *gtk*
     This is one of the backends available on *Linux*, and is prioritised above
-    the *XOrg* backend. It uses *GTK* as underlying library. All *pynput*
+    the *XOrg* backend. It uses *GTK* as underlying library. All *pystray*
     features are available, but it may not actually result in a visible icon:
     when running a *gnome-shell* session, an third party plugin is required to
     display legacy tray icons.
 
 *win32*
-    This is the default backend when running on *Windows*. All *pynput*
+    This is the default backend when running on *Windows*. All *pystray*
     features are available.
 
 *xorg*
