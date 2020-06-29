@@ -89,7 +89,8 @@ class Notifier(object):
             GLib.Variant(
                 '(u)',
                 (
-                    self._nid)),
+                    self._nid,
+                )),
             Gio.DBusCallFlags.NONE,
             -1,
             None)
