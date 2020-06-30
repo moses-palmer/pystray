@@ -214,7 +214,7 @@ class Icon(object):
         For simple use cases where menu changes are triggered by interaction
         with the menu, this method is not necessary.
         """
-        self._menu_handle = self._create_menu_handle()
+        self._update_menu()
 
     def notify(self, message, title=None):
         """Displays a notification.
@@ -301,8 +301,8 @@ class Icon(object):
         """
         raise NotImplementedError()
 
-    def _create_menu_handle(self):
-        """Creates an opaque menu handle from :attr:`menu`.
+    def _update_menu(self):
+        """Updates the native menu state to mimic :attr:`menu`.
 
         This is a platform dependent implementation.
         """

@@ -66,13 +66,13 @@ class Icon(GtkIcon):
     def _update_title(self):
         self._appindicator.set_title(self.title)
 
-    def _create_menu_handle(self):
-        menu = super(Icon, self)._create_menu_handle()
+    @mainloop
+    def _update_menu(self):
+        self._menu_handle = self._create_menu(self.menu) or \
+            self._create_default_menu()
 
         if self._appindicator:
-            self._appindicator.set_menu(menu or self._create_default_menu())
-
-        return menu
+            self._appindicator.set_menu(self._menu_handle)
 
     def _finalize(self):
         super(Icon, self)._finalize()
@@ -84,10 +84,15 @@ class Icon(GtkIcon):
         :return: a :class:`Gtk.Menu`
         """
         menu = Gtk.Menu.new()
-        if self.menu is not None:
+
+        # Copy a reference to the menu items to a local variable to guard
+        # against self.menu being modified from a different thread between
+        # reads
+        menu_items = self.menu.items if self.menu is not None else None
+        if menu_items is not None:
             menu.append(self._create_menu_item(next(
                 menu_item
-                for menu_item in self.menu.items
+                for menu_item in menu_items
                 if menu_item.default)))
         else:
             menu.append(self._create_menu_item(

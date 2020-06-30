@@ -68,14 +68,15 @@ class Icon(_base.Icon):
     def _update_title(self):
         self._status_item.button().setToolTip_(self.title)
 
-    def _create_menu_handle(self):
+    def _update_menu(self):
         callbacks = []
         nsmenu = self._create_menu(self.menu, callbacks)
         if nsmenu:
             self._status_item.setMenu_(nsmenu)
-            return (nsmenu, callbacks)
+            self._menu_handle = (nsmenu, callbacks)
         else:
             self._status_item.setMenu_(None)
+            self._menu_handle = None
 
     def _run(self):
         # Make sure there is an NSApplication instance

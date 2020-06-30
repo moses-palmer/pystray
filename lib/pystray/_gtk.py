@@ -48,6 +48,10 @@ class Icon(GtkIcon):
         self._status_icon.set_from_file(self._icon_path)
 
     @mainloop
+    def _update_menu(self):
+        self._menu_handle = self._create_menu(self.menu)
+
+    @mainloop
     def _update_title(self):
         self._status_icon.set_title(self.title)
 

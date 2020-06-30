@@ -104,7 +104,7 @@ class Icon(_base.Icon):
             win32.NIF_INFO,
             szInfo='')
 
-    def _create_menu_handle(self):
+    def _update_menu(self):
         try:
             hmenu, callbacks = self._menu_handle
             win32.DestroyMenu(hmenu)
@@ -114,7 +114,9 @@ class Icon(_base.Icon):
         callbacks = []
         hmenu = self._create_menu(self.menu, callbacks)
         if hmenu:
-            return (hmenu, callbacks)
+            self._menu_handle = (hmenu, callbacks)
+        else:
+            self._menu_handle = None
 
     def _run(self):
         self._mark_ready()
