@@ -190,7 +190,6 @@ class Icon(object):
         self._setup_thread = threading.Thread(target=setup_handler)
         self._setup_thread.start()
         self._run()
-        self._running = True
 
     def stop(self):
         """Stops the loop handling events for the icon.
