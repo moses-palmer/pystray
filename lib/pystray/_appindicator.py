@@ -84,15 +84,10 @@ class Icon(GtkIcon):
         :return: a :class:`Gtk.Menu`
         """
         menu = Gtk.Menu.new()
-
-        # Copy a reference to the menu items to a local variable to guard
-        # against self.menu being modified from a different thread between
-        # reads
-        menu_items = self.menu.items if self.menu is not None else None
-        if menu_items is not None:
+        if self.menu is not None:
             menu.append(self._create_menu_item(next(
                 menu_item
-                for menu_item in menu_items
+                for menu_item in self.menu.items
                 if menu_item.default)))
         else:
             menu.append(self._create_menu_item(
