@@ -246,6 +246,7 @@ class Icon(object):
         Before the setup method is scheduled to be called, :meth:`update_menu`
         is called.
         """
+        self._running = True
         self.update_menu()
         self.__queue.put(True)
 
