@@ -315,12 +315,12 @@ class Icon(_base.Icon):
         :param int message: The message to send. This should be one of the
             ``NIM_*`` constants.
 
-        :param int flags: The value of ``NOTIFYICONDATA::uFlags``.
+        :param int flags: The value of ``NOTIFYICONDATAW::uFlags``.
 
-        :param kwargs: Data for the :class:`NOTIFYICONDATA` object.
+        :param kwargs: Data for the :class:`NOTIFYICONDATAW` object.
         """
-        win32.Shell_NotifyIcon(code, win32.NOTIFYICONDATA(
-            cbSize=ctypes.sizeof(win32.NOTIFYICONDATA),
+        win32.Shell_NotifyIcon(code, win32.NOTIFYICONDATAW(
+            cbSize=ctypes.sizeof(win32.NOTIFYICONDATAW),
             hWnd=self._hwnd,
             hID=id(self),
             uFlags=flags,
