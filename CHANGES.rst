@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+v0.17.0 - Various bug fixes
+---------------------------
+*  Corrected signalling in *GTK* backend. Thanks to *Simon Lindholm*!
+*  Corrected hinding of notification message in *GTK backend*. Thanks to *Simon
+   Lindholm*!
+*  Corrected notification structure on *Windows*. Thanks to *Felipe Fidelix*!
+
+
 v0.16.0 - Enable notifications
 ------------------------------
 *  Added support for notifications. Thanks to *ralphwetzel* and *Chr0nicT*!
