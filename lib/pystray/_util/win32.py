@@ -134,11 +134,18 @@ class MENUITEMINFO(ctypes.Structure):
 LPMENUITEMINFO = ctypes.POINTER(MENUITEMINFO)
 
 
-class NOTIFYICONDATA(ctypes.Structure):
+class NOTIFYICONDATAW(ctypes.Structure):
     class VERSION_OR_TIMEOUT(ctypes.Union):
         _fields_ = [
             ('uTimeout', wintypes.UINT),
             ('uVersion', wintypes.UINT)]
+
+    class GUID(ctypes.Structure):
+        _fields_ = [
+            ('Data1', wintypes.ULONG),
+            ('Data2', wintypes.WORD),
+            ('Data3', wintypes.WORD),
+            ('Data4', wintypes.BYTE * 8)]
 
     _fields_ = [
         ('cbSize', wintypes.DWORD),
@@ -154,13 +161,13 @@ class NOTIFYICONDATA(ctypes.Structure):
         ('version_or_timeout', VERSION_OR_TIMEOUT),
         ('szInfoTitle', wintypes.WCHAR * 64),
         ('dwInfoFlags', wintypes.DWORD),
-        ('guidItem', wintypes.LPVOID),
+        ('guidItem', GUID),
         ('hBalloonIcon', wintypes.HICON)]
 
     _anonymous_ = [
         'version_or_timeout']
 
-LPNOTIFYICONDATA = ctypes.POINTER(NOTIFYICONDATA)
+LPNOTIFYICONDATAW = ctypes.POINTER(NOTIFYICONDATAW)
 
 
 class TPMPARAMS(ctypes.Structure):
@@ -293,7 +300,7 @@ SetForegroundWindow.restype = wintypes.BOOL
 
 Shell_NotifyIcon = windll.shell32.Shell_NotifyIconW
 Shell_NotifyIcon.argtypes = (
-    wintypes.DWORD, LPNOTIFYICONDATA)
+    wintypes.DWORD, LPNOTIFYICONDATAW)
 Shell_NotifyIcon.restype = wintypes.BOOL
 
 TranslateMessage = windll.user32.TranslateMessage
