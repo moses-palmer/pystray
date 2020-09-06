@@ -35,6 +35,9 @@ class Icon(object):
     :param icon: The icon to use. If this is specified, it must be a
         :class:`PIL.Image.Image` instance.
 
+    :param str freedesktop_icon_name: An available icon_name as specified by
+    the FreeDesktop Icon Theme specification, used with compatible modules.
+
     :param str title: A short title for the icon.
 
     :param menu: A menu to use as popup menu. This can be either an instance of
@@ -67,13 +70,16 @@ class Icon(object):
     HAS_NOTIFICATION = True
 
     def __init__(
-            self, name, icon=None, title=None, menu=None):
+            self, name, icon=None, freedesktop_icon_name=None, 
+            title=None, menu=None):
         self._name = name
         self._icon = icon or None
+        self._freedesktop_icon_name = freedesktop_icon_name or None
         self._title = title or ''
         self._menu = menu
         self._visible = False
         self._icon_valid = False
+        self._uses_freedesktop_icon_name = False
         self._log = logging.getLogger(__name__)
 
         self._running = False
@@ -109,6 +115,27 @@ class Icon(object):
         self._icon_valid = False
         if value:
             if self.visible:
+                self._update_icon()
+        else:
+            if self.visible:
+                self.visible = False
+
+    @property
+    def freedesktop_icon_name(self):
+        """The current FreeDesktop icon_name.
+
+        Setting this to a falsy value will fall back to `icon` or hide the icon
+        if no `icon` is present. Setting this to an icon_name while the icon 
+        is hidden has no effect until the icon is shown.
+        """
+        return self._freedesktop_icon_name
+
+    @freedesktop_icon_name.setter
+    def freedesktop_icon_name(self, value):
+        self._freedesktop_icon_name = value
+        self._icon_valid = False
+        if value:
+            if self.visible and self._uses_freedesktop_icon_name:
                 self._update_icon()
         else:
             if self.visible:
