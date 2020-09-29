@@ -16,10 +16,16 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import gi
-gi.require_version('Gtk', '3.0')
+try:
+    gi.require_version('Gtk', '3.0')
+except ValueError as e:
+    raise ImportError(e)
 from gi.repository import Gtk
 
-gi.require_version('AppIndicator3', '0.1')
+try:
+    gi.require_version('AppIndicator3', '0.1')
+except ValueError as e:
+    raise ImportError(e)
 from gi.repository import AppIndicator3 as AppIndicator
 
 from ._util.gtk import GtkIcon, mainloop
