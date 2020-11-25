@@ -44,6 +44,7 @@ def serialized_image(image, format, extension=None):
 
     finally:
         try:
+            os.close(fd)
             os.unlink(path)
         except:
             raise
