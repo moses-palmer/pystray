@@ -182,10 +182,10 @@ class Icon(_base.Icon):
         is registered and this is a right button click, the popup menu will be
         displayed.
         """
-        if lparam == win32.WM_LBUTTONDOWN:
+        if lparam == win32.WM_LBUTTONUP:
             self()
 
-        elif self._menu_handle and lparam == win32.WM_RBUTTONDOWN:
+        elif self._menu_handle and lparam == win32.WM_RBUTTONUP:
             # TrackPopupMenuEx does not behave unless our systray window is the
             # foreground window
             win32.SetForegroundWindow(self._hwnd)
