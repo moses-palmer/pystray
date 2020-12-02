@@ -225,6 +225,12 @@ DefWindowProc.argtypes = (
     wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
 DefWindowProc.restype = wintypes.DWORD
 
+DestroyIcon = windll.user32.DestroyIcon
+DestroyIcon.argtypes = (
+    wintypes.HICON,)
+DestroyIcon.restype = wintypes.BOOL
+DestroyIcon.errcheck = _err
+
 DestroyMenu = windll.user32.DestroyMenu
 DestroyMenu.argtypes = (
     wintypes.HMENU,)
