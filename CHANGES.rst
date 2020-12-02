@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v0.17.2 - Windows bug fixes
+---------------------------
+*  Actually release loaded icons on *Windows*. Thanks to *Bob1011941*!
+*  Let mouse button release trigger menu and action on *Windows* as expected.
+   Thanks to *Ennea*!
+
+
 v0.17.1 - Corrected release notes
 ---------------------------------
 *  Corrected attribution of *Windows* notification fix.
