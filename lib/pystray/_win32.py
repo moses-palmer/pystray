@@ -61,6 +61,7 @@ class Icon(_base.Icon):
             self._stop()
             if self._thread.ident != threading.current_thread().ident:
                 self._thread.join()
+        self._release_icon()
 
     def _show(self):
         self._assert_icon_handle()
@@ -77,7 +78,7 @@ class Icon(_base.Icon):
             0)
 
     def _update_icon(self):
-        self._icon_handle = None
+        self._release_icon()
         self._assert_icon_handle()
         self._message(
             win32.NIM_MODIFY,
@@ -325,6 +326,15 @@ class Icon(_base.Icon):
             hID=id(self),
             uFlags=flags,
             **kwargs))
+
+    def _release_icon(self):
+        """Releases the icon handle and sets it to ``None``.
+
+        If not icon handle is set, no action is performed.
+        """
+        if self._icon_handle:
+            win32.DestroyIcon(self._icon_handle)
+            self._icon_handle = None
 
     def _assert_icon_handle(self):
         """Asserts that the cached icon handle exists.
