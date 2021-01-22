@@ -22,22 +22,36 @@ import sys
 def backend():
     """Returns the backend module.
     """
-    import importlib
+    def appindicator():
+        from . import _appindicator as backend; return backend
+    def darwin():
+        from . import _darwin as backend; return backend
+    def gtk():
+        from . import _gtk as backend; return backend
+    def win32():
+        from . import _win32 as backend; return backend
+    def xorg():
+        from . import _xorg as backend; return backend
+    backends = {b.__name__: b for b in (
+        appindicator, darwin, gtk, win32, xorg)}
 
     backend_name = os.environ.get('PYSTRAY_BACKEND', None)
     if backend_name:
-        modules = [backend_name]
+        try:
+            candidates = [backends[backend_name]]
+        except KeyError as e:
+            raise ImportError('unknown backend: {}'.format(e))
     elif sys.platform == 'darwin':
-        modules = ['darwin']
+        candidates = [darwin]
     elif sys.platform == 'win32':
-        modules = ['win32']
+        candidates = [win32]
     else:
-        modules = ['appindicator', 'gtk', 'xorg']
+        candidates = [appindicator, gtk, xorg]
 
     errors = []
-    for module in modules:
+    for candidate in candidates:
         try:
-            return importlib.import_module(__package__ + '._' + module)
+            return candidate()
         except ImportError as e:
             errors.append(e)
 
