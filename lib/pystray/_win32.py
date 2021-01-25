@@ -28,6 +28,9 @@ from . import _base
 class Icon(_base.Icon):
     _HWND_TO_ICON = {}
 
+    #: Force large notification icon size on loading the file
+    FORCE_LARGE_NOTIFICATION_ICON = False
+
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
@@ -97,7 +100,8 @@ class Icon(_base.Icon):
             win32.NIM_MODIFY,
             win32.NIF_INFO,
             szInfo=message,
-            szInfoTitle=title or self.title or '')
+            szInfoTitle=title or self.title or '',
+            dwInfoFlags=win32.NIIF_ICON_MASK if Icon.FORCE_LARGE_NOTIFICATION_ICON else win32.NIIF_NONE)
 
     def _remove_notification(self):
         self._message(
@@ -347,8 +351,8 @@ class Icon(_base.Icon):
                 None,
                 icon_path,
                 win32.IMAGE_ICON,
-                0,
-                0,
+                128 if Icon.FORCE_LARGE_NOTIFICATION_ICON else 0,
+                128 if Icon.FORCE_LARGE_NOTIFICATION_ICON else 0,
                 win32.LR_DEFAULTSIZE | win32.LR_LOADFROMFILE)
 
     def _register_class(self):
