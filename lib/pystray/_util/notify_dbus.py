@@ -81,7 +81,7 @@ class Notifier(object):
                     message,
                     [],
                     [],
-                    0)),
+                    -1)),
             Gio.DBusCallFlags.NONE,
             -1,
             None).unpack()[0]
