@@ -35,6 +35,7 @@ class Icon(GtkIcon):
         super(Icon, self).__init__(*args, **kwargs)
 
         self._appindicator = None
+        self._uses_freedesktop_icon_name = True
 
         if self.icon:
             self._update_icon()
@@ -47,7 +48,7 @@ class Icon(GtkIcon):
             AppIndicator.IndicatorCategory.APPLICATION_STATUS)
 
         self._appindicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
-        self._appindicator.set_icon(self._icon_path)
+        self._appindicator.set_icon(self._freedesktop_icon_name or self._icon_path)
         self._appindicator.set_menu(
             self._menu_handle or self._create_default_menu())
 
@@ -60,7 +61,7 @@ class Icon(GtkIcon):
         self._remove_fs_icon()
         self._update_fs_icon()
         if self._appindicator:
-            self._appindicator.set_icon(self._icon_path)
+            self._appindicator.set_icon(self._freedesktop_icon_name or self._icon_path)
 
     @mainloop
     def _update_title(self):
