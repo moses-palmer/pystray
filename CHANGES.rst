@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+v0.17.3 - macOS and AppIndicator bug fixes
+------------------------------------------
+*  Let the default timeout for notifications when using the *AppIndicator*
+   backend be decided by the desktop environment, not infinity. Thanks to
+   *Angelo Naselli*!
+*  Do not attempt to create a menu before the icon has started on *macOS*.
+
+
 v0.17.2 - Windows bug fixes
 ---------------------------
 *  Actually release loaded icons on *Windows*. Thanks to *Bob1011941*!
