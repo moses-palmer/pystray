@@ -66,6 +66,10 @@ class Icon(object):
     #: notification.
     HAS_NOTIFICATION = True
 
+    #: Whether this particular implementation forces displaying a
+    #: large notification icon
+    FORCE_LARGE_NOTIFICATION_ICON = False
+
     def __init__(
             self, name, icon=None, title=None, menu=None):
         self._name = name
