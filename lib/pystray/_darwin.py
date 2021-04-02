@@ -46,6 +46,9 @@ class Icon(_base.Icon):
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
+        #: The icon delegate
+        self._delegate = None
+
         #: The NSImage version of the icon
         self._icon_image = None
 
@@ -171,6 +174,8 @@ class Icon(_base.Icon):
         """Creates a :class:`AppKit.NSMenu` from a :class:`pystray.Menu`
         instance.
 
+        If :meth:`_run` has not yet been called, ``None`` is returned.
+
         :param descriptors: The menu descriptors. If this is falsy, ``None`` is
             returned.
 
@@ -180,7 +185,7 @@ class Icon(_base.Icon):
 
         :return: a menu
         """
-        if not descriptors:
+        if not descriptors or self._delegate is None:
             return None
 
         else:
