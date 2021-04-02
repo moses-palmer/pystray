@@ -82,7 +82,7 @@ class Icon(_base.Icon):
         # Make sure there is an NSApplication instance
         self._app = AppKit.NSApplication.sharedApplication()
 
-        # Make sure we have a delegate to handle the acttion events
+        # Make sure we have a delegate to handle the action events
         self._delegate = IconDelegate.alloc().init()
         self._delegate.icon = self
 
