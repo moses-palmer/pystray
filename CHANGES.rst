@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v0.17.4 - Corrected import on Windows
+-------------------------------------
+*  Corrected imports from _WinDLL_ to ensure argument definitions are private
+   to this library. Thanks to *TomsonBoylett*!
+
+
 v0.17.3 - macOS and AppIndicator bug fixes
 ------------------------------------------
 *  Let the default timeout for notifications when using the *AppIndicator*
