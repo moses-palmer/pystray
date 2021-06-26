@@ -17,7 +17,9 @@
 
 import ctypes
 
-from ctypes import windll, wintypes
+from ctypes import wintypes
+
+windll = ctypes.LibraryLoader(ctypes.WinDLL)
 
 
 WM_CREATE = 0x0001
