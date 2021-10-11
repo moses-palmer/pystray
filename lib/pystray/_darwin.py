@@ -50,7 +50,9 @@ class Icon(_base.Icon):
         self._icon_image = None
 
         #: The NSApplication managing this icon
-        self._app = AppKit.NSApplication.sharedApplication()
+        self._app = self._options['nsapplication'] \
+            if 'nsapplication' in self._options \
+            else AppKit.NSApplication.sharedApplication()
 
         #: The icon delegate
         self._delegate = IconDelegate.alloc().init()

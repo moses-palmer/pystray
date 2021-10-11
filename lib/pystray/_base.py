@@ -50,6 +50,16 @@ class Icon(object):
         invisible menu with a default entry as special action or a full menu
         with no special way to activate the default item, and some platforms do
         not support a menu at all.
+
+    :param kwargs: Any non-standard platform dependent options. These should be
+        prefixed with the platform name thus: ``appindicator_``, ``darwin_``,
+        ``gtk_``, ``win32_`` or ``xorg_``.
+
+        Supported values are:
+
+        ``darwin_nsapplication``
+            An ``NSApplication`` instance used to run the event loop. If this
+            is not specified, the shared application will be used.
     """
     #: Whether this particular implementation has a default action that can be
     #: invoked in a special way, such as clicking on the icon.
