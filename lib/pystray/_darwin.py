@@ -53,6 +53,7 @@ class Icon(_base.Icon):
         self._app = self._options['nsapplication'] \
             if 'nsapplication' in self._options \
             else AppKit.NSApplication.sharedApplication()
+        self._detachable = 'nsapplication' in self._options
 
         #: The icon delegate
         self._delegate = IconDelegate.alloc().init()
@@ -115,6 +116,12 @@ class Icon(_base.Icon):
             if PyObjCTools.MachSignals.getsignal(signal.SIGINT) == sigint:
                 PyObjCTools.MachSignals.signal(signal.SIGINT, previous_sigint)
             self._status_bar.removeStatusItem_(self._status_item)
+
+    def _run_detached(self):
+        if self._detachable:
+            self._mark_ready()
+        else:
+            raise NotImplementedError()
 
     def _stop(self):
         self._app.stop_(self._app)

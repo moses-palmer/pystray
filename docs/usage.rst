@@ -232,6 +232,19 @@ To display a system notification, use :meth:`pystray.Icon.notify`::
                     lambda icon, item: icon.remove_notification()))))).run()
 
 
+Integrating with other frameworks
+---------------------------------
+
+The *pystray* ``run`` method is blocking, and must be called from the main
+thread to maintain platform independence. This is troublesome when attempting
+to use frameworks with an event loop, since they may also require running in
+the main thread.
+
+For this case you can use ``run_detached``. This allows you to setup the icon
+and then pass control to the framework. Please see the documentation for more
+information.
+
+
 Selecting a backend
 -------------------
 
