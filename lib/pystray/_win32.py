@@ -265,7 +265,7 @@ class Icon(_base.Icon):
             hmenu = win32.CreatePopupMenu()
             for i, descriptor in enumerate(descriptors):
                 # Append the callbacks before creating the menu items to ensure
-                # that the first item get the ID 1
+                # that the first item gets the ID 1
                 callbacks.append(self._handler(descriptor))
                 menu_item = self._create_menu_item(descriptor, callbacks)
                 win32.InsertMenuItem(hmenu, i, True, ctypes.byref(menu_item))

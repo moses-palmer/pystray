@@ -42,7 +42,7 @@ will start the runloop.
 
 The ``run()`` method accepts an optional argument: ``setup``, a callable.
 
-The ``setup`` funciton will be run in a separate thread once the *system tray
+The ``setup`` function will be run in a separate thread once the *system tray
 icon* is ready. The icon does not wait for it to complete, so you may put any
 code that would follow the call to ``pystray.Icon.run()`` in it.
 
