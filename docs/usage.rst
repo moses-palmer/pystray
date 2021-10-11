@@ -40,6 +40,10 @@ icon* implementation for *OSX* will fail unless called from the main thread, and
 it also requires the application runloop to be running. ``pystray.Icon.run()``
 will start the runloop.
 
+If you only target *Windows*, calling ``run()`` from a thread other than the
+main thread is safe, provided that you also create the ``Icon`` instance in the
+same thread.
+
 The ``run()`` method accepts an optional argument: ``setup``, a callable.
 
 The ``setup`` function will be run in a separate thread once the *system tray
