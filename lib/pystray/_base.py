@@ -176,9 +176,9 @@ class Icon(object):
             thread once the loop has started. It is passed the icon as its sole
             argument.
 
-            If not specified, a simple setup function setting :attr:`visible` to
-            ``True`` is used. If you specify a custom setup function, you must
-            explicitly set this attribute.
+            If not specified, a simple setup function setting :attr:`visible`
+            to ``True`` is used. If you specify a custom setup function, you
+            must explicitly set this attribute.
         """
         def setup_handler():
             self.__queue.get()
@@ -247,8 +247,10 @@ class Icon(object):
         is called.
         """
         self._running = True
-        self.update_menu()
-        self.__queue.put(True)
+        try:
+            self.update_menu()
+        finally:
+            self.__queue.put(True)
 
     def _handler(self, callback):
         """Generates a callback handler.
@@ -384,8 +386,8 @@ class MenuItem(object):
         """Whether this item is checked.
 
         This can be either ``True``, which implies that the item is checkable
-        and checked, ``False``, which implies that the item is checkable but not
-        checked, and ``None`` for uncheckable items.
+        and checked, ``False``, which implies that the item is checkable but
+        not checked, and ``None`` for uncheckable items.
 
         Depending on platform, uncheckable items may be rendered differently
         from unchecked items.
@@ -396,8 +398,8 @@ class MenuItem(object):
     def radio(self):
         """Whether this item is a radio button.
 
-        This is only used for checkable items. It is always set to ``False`` for
-        uncheckable items.
+        This is only used for checkable items. It is always set to ``False``
+        for uncheckable items.
         """
         if self.checked is not None:
             return self._radio(self)
@@ -442,8 +444,8 @@ class MenuItem(object):
             less than the expected number of arguments, a wrapper will be
             returned.
 
-        :raises ValueError: if ``action`` requires more than the expected number
-            of arguments
+        :raises ValueError: if ``action`` requires more than the expected
+            number of arguments
 
         :return: a callable
         """

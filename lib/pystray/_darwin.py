@@ -202,8 +202,8 @@ class Icon(_base.Icon):
             return nsmenu
 
     def _create_menu_item(self, descriptor, callbacks):
-        """Creates a :class:`AppKit.NSMenuItem` from a :class:`pystray.MenuItem`
-        instance.
+        """Creates a :class:`AppKit.NSMenuItem` from a
+        :class:`pystray.MenuItem` instance.
 
         :param descriptor: The menu item descriptor.
 
