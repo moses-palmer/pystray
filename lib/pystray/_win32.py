@@ -238,22 +238,22 @@ class Icon(_base.Icon):
             win32.GetModuleHandle(None),
             None)
 
-        # On Vista+, we must explicitly opt-in to receive WM_TASKBARCREATED when
-        # running with escalated privileges
+        # On Vista+, we must explicitly opt-in to receive WM_TASKBARCREATED
+        # when running with escalated privileges
         win32.ChangeWindowMessageFilterEx(
             hwnd, win32.WM_TASKBARCREATED, win32.MSGFLT_ALLOW, None)
         return hwnd
 
     def _create_menu(self, descriptors, callbacks):
-        """Creates a :class:`ctypes.wintypes.HMENU` from a :class:`pystray.Menu`
-        instance.
+        """Creates a :class:`ctypes.wintypes.HMENU` from a
+        :class:`pystray.Menu` instance.
 
         :param descriptors: The menu descriptors. If this is falsy, ``None`` is
             returned.
 
         :param callbacks: A list to which a callback is appended for every menu
-            item created. The menu item IDs correspond to the items in this list
-            plus one.
+            item created. The menu item IDs correspond to the items in this
+            list plus one.
 
         :return: a menu
         """
@@ -279,8 +279,8 @@ class Icon(_base.Icon):
         :param descriptor: The menu item descriptor.
 
         :param callbacks: A list to which a callback is appended for every menu
-            item created. The menu item IDs correspond to the items in this list
-            plus one.
+            item created. The menu item IDs correspond to the items in this
+            list plus one.
 
         :return: a :class:`pystray._util.win32.MENUITEMINFO`
         """
