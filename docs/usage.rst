@@ -41,8 +41,7 @@ it also requires the application runloop to be running. ``pystray.Icon.run()``
 will start the runloop.
 
 If you only target *Windows*, calling ``run()`` from a thread other than the
-main thread is safe, provided that you also create the ``Icon`` instance in the
-same thread.
+main thread is safe.
 
 The ``run()`` method accepts an optional argument: ``setup``, a callable.
 
