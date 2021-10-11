@@ -46,11 +46,22 @@ class Icon(_base.Icon):
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
-        #: The icon delegate
-        self._delegate = None
-
         #: The NSImage version of the icon
         self._icon_image = None
+
+        #: The NSApplication managing this icon
+        self._app = AppKit.NSApplication.sharedApplication()
+
+        #: The icon delegate
+        self._delegate = IconDelegate.alloc().init()
+        self._delegate.icon = self
+
+        self._status_bar = AppKit.NSStatusBar.systemStatusBar()
+        self._status_item = self._status_bar.statusItemWithLength_(
+            AppKit.NSVariableStatusItemLength)
+
+        self._status_item.button().setTarget_(self._delegate)
+        self._status_item.button().setAction_(self._ACTION_SELECTOR)
 
     def _show(self):
         self._assert_image()
@@ -82,20 +93,6 @@ class Icon(_base.Icon):
             self._menu_handle = None
 
     def _run(self):
-        # Make sure there is an NSApplication instance
-        self._app = AppKit.NSApplication.sharedApplication()
-
-        # Make sure we have a delegate to handle the action events
-        self._delegate = IconDelegate.alloc().init()
-        self._delegate.icon = self
-
-        self._status_bar = AppKit.NSStatusBar.systemStatusBar()
-        self._status_item = self._status_bar.statusItemWithLength_(
-            AppKit.NSVariableStatusItemLength)
-
-        self._status_item.button().setTarget_(self._delegate)
-        self._status_item.button().setAction_(self._ACTION_SELECTOR)
-
         # Notify the setup callback
         self._mark_ready()
 
@@ -185,7 +182,7 @@ class Icon(_base.Icon):
 
         :return: a menu
         """
-        if not descriptors or self._delegate is None:
+        if not descriptors:
             return None
 
         else:
