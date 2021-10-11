@@ -67,7 +67,7 @@ class Icon(object):
     HAS_NOTIFICATION = True
 
     def __init__(
-            self, name, icon=None, title=None, menu=None):
+            self, name, icon=None, title=None, menu=None, **kwargs):
         self._name = name
         self._icon = icon or None
         self._title = title or ''
@@ -78,6 +78,12 @@ class Icon(object):
 
         self._running = False
         self.__queue = queue.Queue()
+
+        prefix = self.__class__.__module__.rsplit('.', 1)[-1][1:] + '_'
+        self._options = {
+            key[len(prefix):]: value
+            for key, value in kwargs.items()
+            if key.startswith(prefix)}
 
     def __del__(self):
         if self.visible:
