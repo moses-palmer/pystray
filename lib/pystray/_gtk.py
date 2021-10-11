@@ -27,8 +27,10 @@ class Icon(GtkIcon):
         super(Icon, self).__init__(*args, **kwargs)
 
         self._status_icon = Gtk.StatusIcon.new()
-        self._status_icon.connect('activate', self._on_status_icon_activate)
-        self._status_icon.connect('popup-menu', self._on_status_icon_popup_menu)
+        self._status_icon.connect(
+            'activate', self._on_status_icon_activate)
+        self._status_icon.connect(
+            'popup-menu', self._on_status_icon_popup_menu)
 
         if self.icon:
             self._update_icon()

@@ -64,8 +64,13 @@ class GtkIcon(_base.Icon):
         self._notifier = notify_dbus.Notifier()
         self._mark_ready()
 
-        # Make sure that we do not inhibit ctrl+c
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
+        # Make sure that we do not inhibit ctrl+c; this is only possible from
+        # the main thread
+        try:
+            signal.signal(signal.SIGINT, signal.SIG_DFL)
+        except ValueError:
+            pass
+
         try:
             self._loop.run()
         except:

@@ -142,8 +142,8 @@ class Icon(_base.Icon):
         try:
             self._assert_docked()
         except AssertionError:
-            # There is no systray selection owner, so we cannot dock; ignore and
-            # dock later
+            # There is no systray selection owner, so we cannot dock; ignore
+            # and dock later
             self._log.error(
                 'Failed to dock icon', exc_info=True)
 
@@ -305,7 +305,8 @@ class Icon(_base.Icon):
 
         # Create the atoms and a mapping from atom to actual implementation
         atoms = [
-            self._display.intern_atom('_PYSTRAY_%s' % original.__name__.upper())
+            self._display.intern_atom(
+                '_PYSTRAY_%s' % original.__name__.upper())
             for original in args]
         handlers = {
             atom: wrapper(original)
@@ -333,10 +334,12 @@ class Icon(_base.Icon):
                 -1, -1, 1, 1, 0, screen.root_depth,
                 event_mask=Xlib.X.ExposureMask | Xlib.X.StructureNotifyMask,
                 window_class=Xlib.X.InputOutput)
+            flags = (
+                Xlib.Xutil.PPosition | Xlib.Xutil.PSize | Xlib.Xutil.PMinSize)
             window.set_wm_class('%sSystemTrayIcon' % self.name, self.name)
             window.set_wm_name(self.title)
             window.set_wm_normal_hints(
-                flags=(Xlib.Xutil.PPosition | Xlib.Xutil.PSize | Xlib.Xutil.PMinSize),
+                flags=flags,
                 min_width=24,
                 min_height=24)
 
