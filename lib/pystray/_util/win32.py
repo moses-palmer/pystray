@@ -347,7 +347,8 @@ try:
     ChangeWindowMessageFilterEx.errcheck = _err
 
 except KeyError:
-    def ChangeWindowMessageFilterEx(hWnd, message, action, pCHangeFilterStruct):
+    def ChangeWindowMessageFilterEx(
+            hWnd, message, action, pCHangeFilterStruct):
         """A dummy implementation of ``ChangeWindowMessageFilterEx`` always
         returning ``TRUE``.
 
