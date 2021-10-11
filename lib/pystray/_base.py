@@ -247,8 +247,10 @@ class Icon(object):
         is called.
         """
         self._running = True
-        self.update_menu()
-        self.__queue.put(True)
+        try:
+            self.update_menu()
+        finally:
+            self.__queue.put(True)
 
     def _handler(self, callback):
         """Generates a callback handler.
