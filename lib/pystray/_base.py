@@ -60,6 +60,8 @@ class Icon(object):
         ``darwin_nsapplication``
             An ``NSApplication`` instance used to run the event loop. If this
             is not specified, the shared application will be used.
+
+            This must be specified when calling :meth:`run_detached`.
     """
     #: Whether this particular implementation has a default action that can be
     #: invoked in a special way, such as clicking on the icon.
@@ -196,16 +198,37 @@ class Icon(object):
             to ``True`` is used. If you specify a custom setup function, you
             must explicitly set this attribute.
         """
-        def setup_handler():
-            self.__queue.get()
-            if setup:
-                setup(self)
-            else:
-                self.visible = True
-
-        self._setup_thread = threading.Thread(target=setup_handler)
-        self._setup_thread.start()
+        self._start_setup(setup)
         self._run()
+
+    def run_detached(self, setup=None):
+        """Prepares for running the loop handling events detached.
+
+        This allows integrating *pystray* with other libraries requiring a
+        mainloop. Call this method before entering the mainloop of the other
+        library.
+
+        Depending on the backend used, calling this method may require special
+        preparations:
+
+        macOS
+            You must pass the argument ``darwin_nsapplication`` to the
+            constructor. This is to ensure that you actually have a reference
+            to the application instance used to drive the icon.
+
+        :param callable setup: An optional callback to execute in a separate
+            thread once the loop has started. It is passed the icon as its sole
+            argument.
+
+            If not specified, a simple setup function setting :attr:`visible`
+            to ``True`` is used. If you specify a custom setup function, you
+            must explicitly set this attribute.
+
+        :raises NotImplementedError: if this is not implemented for the
+            preparations taken
+        """
+        self._start_setup(setup)
+        self._run_detached()
 
     def stop(self):
         """Stops the loop handling events for the icon.
@@ -334,6 +357,31 @@ class Icon(object):
         This is a platform dependent implementation.
         """
         raise NotImplementedError()
+
+    def _start_setup(self, setup):
+        """Starts the setup thread.
+
+        :param callable setup: The thread handler.
+        """
+        def setup_handler():
+            self.__queue.get()
+            if setup:
+                setup(self)
+            else:
+                self.visible = True
+
+        self._setup_thread = threading.Thread(target=setup_handler)
+        self._setup_thread.start()
+
+    def _run_detached(self):
+        """Runs detached.
+
+        This method must call :meth:`_mark_ready` once ready.
+
+        This is a platform dependent implementation.
+        """
+        # By default, we assume that we can simply delegate to a thread
+        threading.Thread(target=lambda: self.run(setup)).start()
 
     def _stop(self):
         """Stops the event loop.
