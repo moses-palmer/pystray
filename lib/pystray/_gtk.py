@@ -47,7 +47,10 @@ class Icon(GtkIcon):
     def _update_icon(self):
         self._remove_fs_icon()
         self._update_fs_icon()
-        self._status_icon.set_from_file(self._icon_path)
+        if self._freedesktop_icon_name:
+            self._status_icon.set_from_icon_name(self.freedesktop_icon_name)
+        else:
+            self._status_icon.set_from_file(self._icon_path)
 
     @mainloop
     def _update_menu(self):
