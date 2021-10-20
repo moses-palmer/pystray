@@ -31,6 +31,7 @@ class Icon(_base.Icon):
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
+        self._atom = self._register_class()
         self._icon_handle = None
         self._hwnd = None
         self._menu_hwnd = None
@@ -44,17 +45,6 @@ class Icon(_base.Icon):
             win32.WM_TASKBARCREATED: self._on_taskbarcreated}
 
         self._queue = queue.Queue()
-
-        # Create the message loop
-        msg = wintypes.MSG()
-        lpmsg = ctypes.byref(msg)
-        win32.PeekMessage(
-            lpmsg, None, win32.WM_USER, win32.WM_USER, win32.PM_NOREMOVE)
-
-        self._atom = self._register_class()
-        self._hwnd = self._create_window(self._atom)
-        self._menu_hwnd = self._create_window(self._atom)
-        self._HWND_TO_ICON[self._hwnd] = self
 
     def __del__(self):
         if self._running:
@@ -120,6 +110,16 @@ class Icon(_base.Icon):
             self._menu_handle = None
 
     def _run(self):
+        # Create the message loop
+        msg = wintypes.MSG()
+        lpmsg = ctypes.byref(msg)
+        win32.PeekMessage(
+            lpmsg, None, win32.WM_USER, win32.WM_USER, win32.PM_NOREMOVE)
+
+        self._hwnd = self._create_window(self._atom)
+        self._menu_hwnd = self._create_window(self._atom)
+        self._HWND_TO_ICON[self._hwnd] = self
+
         self._mark_ready()
 
         # Run the event loop

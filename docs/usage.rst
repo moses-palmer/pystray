@@ -41,8 +41,7 @@ it also requires the application runloop to be running. ``pystray.Icon.run()``
 will start the runloop.
 
 If you only target *Windows*, calling ``run()`` from a thread other than the
-main thread is safe, provided that you also create the ``Icon`` instance in the
-same thread.
+main thread is safe.
 
 The ``run()`` method accepts an optional argument: ``setup``, a callable.
 
@@ -234,6 +233,19 @@ To display a system notification, use :meth:`pystray.Icon.notify`::
                 item(
                     'Submenu item 2',
                     lambda icon, item: icon.remove_notification()))))).run()
+
+
+Integrating with other frameworks
+---------------------------------
+
+The *pystray* ``run`` method is blocking, and must be called from the main
+thread to maintain platform independence. This is troublesome when attempting
+to use frameworks with an event loop, since they may also require running in
+the main thread.
+
+For this case you can use ``run_detached``. This allows you to setup the icon
+and then pass control to the framework. Please see the documentation for more
+information.
 
 
 Selecting a backend
