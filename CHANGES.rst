@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+v0.18.0 - Easier integration with other libraries
+-------------------------------------------------
+*  Added a detached run mode to enable integration with libraries with a run
+   loop. Thanks to *PySimpleGUI* and *glight2000* for their testing efforts!
+*  Do not crash when running the icon in a non-main thread when using a *GTK+*
+   backend.
+*  Updated documentation.
+
+
 v0.17.4 - Corrected import on Windows
 -------------------------------------
 *  Corrected imports from _WinDLL_ to ensure argument definitions are private
