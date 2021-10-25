@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import atexit
 import functools
 import os
 import signal
@@ -61,15 +62,7 @@ class GtkIcon(_base.Icon):
 
     def _run(self):
         self._loop = GLib.MainLoop.new(None, False)
-        self._notifier = notify_dbus.Notifier()
-        self._mark_ready()
-
-        # Make sure that we do not inhibit ctrl+c; this is only possible from
-        # the main thread
-        try:
-            signal.signal(signal.SIGINT, signal.SIG_DFL)
-        except ValueError:
-            pass
+        self._initialize()
 
         try:
             self._loop.run()
@@ -78,6 +71,23 @@ class GtkIcon(_base.Icon):
                 'An error occurred in the main loop', exc_info=True)
         finally:
             self._finalize()
+
+    def _run_detached(self):
+        self._initialize()
+        atexit.register(lambda: self._finalize())
+
+    def _initialize(self):
+        """Performs shared initialisation steps.
+        """
+        # Make sure that we do not inhibit ctrl+c; this is only possible from
+        # the main thread
+        try:
+            signal.signal(signal.SIGINT, signal.SIG_DFL)
+        except ValueError:
+            pass
+
+        self._notifier = notify_dbus.Notifier()
+        self._mark_ready()
 
     @mainloop
     def _notify(self, message, title=None):
@@ -89,7 +99,8 @@ class GtkIcon(_base.Icon):
 
     @mainloop
     def _stop(self):
-        self._loop.quit()
+        if self._loop is not None:
+            self._loop.quit()
 
     def _create_menu(self, descriptors):
         """Creates a :class:`Gtk.Menu` from a :class:`pystray.Menu` instance.
