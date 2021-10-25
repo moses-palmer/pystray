@@ -358,6 +358,15 @@ class Icon(object):
         """
         raise NotImplementedError()
 
+    def _run_detached(self):
+        """Runs detached.
+
+        This method must call :meth:`_mark_ready` once ready.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
     def _start_setup(self, setup):
         """Starts the setup thread.
 
@@ -372,16 +381,6 @@ class Icon(object):
 
         self._setup_thread = threading.Thread(target=setup_handler)
         self._setup_thread.start()
-
-    def _run_detached(self):
-        """Runs detached.
-
-        This method must call :meth:`_mark_ready` once ready.
-
-        This is a platform dependent implementation.
-        """
-        # By default, we assume that we can simply delegate to a thread
-        threading.Thread(target=lambda: self.run(setup)).start()
 
     def _stop(self):
         """Stops the event loop.
