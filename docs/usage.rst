@@ -271,7 +271,8 @@ Supported backends
     choice. All *pystray* features except for a menu default action are
     supported, and if the *appindicator* library is installed on the system
     and the desktop environment supports it, the icon is guaranteed to be
-    displayed.
+    displayed. Alternatively, the *atayana-appindicator* library will be used
+    on distributions that do not support *appindicator* anymore, e.g., Debian 11 or greater.
 
 *darwin*
     This is the default backend when running on *macOS*. All *pystray* features
