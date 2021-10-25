@@ -60,8 +60,6 @@ class Icon(object):
         ``darwin_nsapplication``
             An ``NSApplication`` instance used to run the event loop. If this
             is not specified, the shared application will be used.
-
-            This must be specified when calling :meth:`run_detached`.
     """
     #: Whether this particular implementation has a default action that can be
     #: invoked in a special way, such as clicking on the icon.
@@ -358,6 +356,15 @@ class Icon(object):
         """
         raise NotImplementedError()
 
+    def _run_detached(self):
+        """Runs detached.
+
+        This method must call :meth:`_mark_ready` once ready.
+
+        This is a platform dependent implementation.
+        """
+        raise NotImplementedError()
+
     def _start_setup(self, setup):
         """Starts the setup thread.
 
@@ -372,16 +379,6 @@ class Icon(object):
 
         self._setup_thread = threading.Thread(target=setup_handler)
         self._setup_thread.start()
-
-    def _run_detached(self):
-        """Runs detached.
-
-        This method must call :meth:`_mark_ready` once ready.
-
-        This is a platform dependent implementation.
-        """
-        # By default, we assume that we can simply delegate to a thread
-        threading.Thread(target=lambda: self.run(setup)).start()
 
     def _stop(self):
         """Stops the event loop.

@@ -53,7 +53,6 @@ class Icon(_base.Icon):
         self._app = self._options['nsapplication'] \
             if 'nsapplication' in self._options \
             else AppKit.NSApplication.sharedApplication()
-        self._detachable = 'nsapplication' in self._options
 
         #: The icon delegate
         self._delegate = IconDelegate.alloc().init()
@@ -118,10 +117,7 @@ class Icon(_base.Icon):
             self._status_bar.removeStatusItem_(self._status_item)
 
     def _run_detached(self):
-        if self._detachable:
-            self._mark_ready()
-        else:
-            raise NotImplementedError()
+        self._mark_ready()
 
     def _stop(self):
         self._app.stop_(self._app)

@@ -126,6 +126,9 @@ class Icon(_base.Icon):
         self._thread = threading.current_thread()
         self._mainloop()
 
+    def _run_detached(self):
+        threading.Thread(target=lambda: self._run()).start()
+
     def _stop(self):
         win32.PostMessage(self._hwnd, win32.WM_STOP, 0, 0)
 
