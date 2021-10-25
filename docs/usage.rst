@@ -273,6 +273,9 @@ Supported backends
     and the desktop environment supports it, the icon is guaranteed to be
     displayed.
 
+    If the *appindicator* library is not available on the system, a fallback on
+    *ayatana-appindicator* is attempted.
+
 *darwin*
     This is the default backend when running on *macOS*. All *pystray* features
     are available.
