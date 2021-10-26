@@ -60,8 +60,6 @@ class Icon(object):
         ``darwin_nsapplication``
             An ``NSApplication`` instance used to run the event loop. If this
             is not specified, the shared application will be used.
-
-            This must be specified when calling :meth:`run_detached`.
     """
     #: Whether this particular implementation has a default action that can be
     #: invoked in a special way, such as clicking on the icon.
