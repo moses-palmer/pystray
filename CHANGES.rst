@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v0.19.0 - Ayatana AppIndicator support
+--------------------------------------
+*  Added support for *Ayatana AppIndicator* under *Linux*. Thanks to *Paulo
+   Martinez*!
+*  Corrected support for ``run_detached`` under *Linux* and *Windows*.
+
+
 v0.18.0 - Easier integration with other libraries
 -------------------------------------------------
 *  Added a detached run mode to enable integration with libraries with a run
