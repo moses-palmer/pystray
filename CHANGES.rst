@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v0.19.1 (2021-12-06) - Simplify packaging
+-----------------------------------------
+*  Simplify loading of backends to make packaging into a standalone package
+   easier.
+*  Added release dates to release notes.
+
+
 v0.19.0 (2021-12-05) - Ayatana AppIndicator support
 ---------------------------------------------------
 *  Added support for *Ayatana AppIndicator* under *Linux*. Thanks to *Paulo
