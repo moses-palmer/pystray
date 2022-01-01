@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v0.19.2 (2022-01-01) - Allow tuple as menu argument
+---------------------------------------------------
+*  Corrected menu implementation to allow tuples as arguments as indicated by
+   the documentation.
+
+
 v0.19.1 (2021-12-06) - Simplify packaging
 -----------------------------------------
 *  Simplify loading of backends to make packaging into a standalone package
