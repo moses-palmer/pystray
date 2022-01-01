@@ -81,7 +81,7 @@ class Icon(object):
         self._name = name
         self._icon = icon or None
         self._title = title or ''
-        self._menu = menu
+        self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
         self._visible = False
         self._icon_valid = False
         self._log = logging.getLogger(__name__)
