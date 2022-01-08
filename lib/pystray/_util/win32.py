@@ -76,6 +76,12 @@ NIF_GUID = 0x00000020
 NIF_REALTIME = 0x00000040
 NIF_SHOWTIP = 0x00000080
 
+NIIF_NONE = 0x00000000
+NIIF_ICON_MASK = 0x0000000F
+
+SM_CXICON = 11
+SM_CYICON = 12
+
 NIM_ADD = 0x00000000
 NIM_MODIFY = 0x00000001
 NIM_DELETE = 0x00000002
@@ -272,6 +278,18 @@ InsertMenuItem.argtypes = (
     wintypes.HMENU, wintypes.UINT, wintypes.BOOL, LPMENUITEMINFO)
 InsertMenuItem.restype = wintypes.BOOL
 InsertMenuItem.errcheck = _err
+
+FindWindow = windll.user32.FindWindowW
+FindWindow.argtypes = (
+    wintypes.LPCWSTR, wintypes.LPCWSTR)
+
+GetDpiForWindow = windll.user32.GetDpiForWindow
+GetDpiForWindow.argtypes = (
+    wintypes.HWND, )
+
+GetSystemMetricsForDpi = windll.user32.GetSystemMetricsForDpi
+GetSystemMetricsForDpi.argtypes = (
+    wintypes.INT, wintypes.UINT)
 
 LoadImage = windll.user32.LoadImageW
 LoadImage.argtypes = (
