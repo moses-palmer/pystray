@@ -5,15 +5,10 @@ In order to create a *system tray icon*, the class ``pystray.Icon`` is used::
 
     import pystray
 
-    icon = pystray.Icon('test name')
-
-
-In order for the icon to be displayed, you must provide an icon. This icon must
-be specified as a ``PIL.Image.Image``::
-
     from PIL import Image, ImageDraw
 
-    def create_image():
+
+    def create_image(width, height, color1, color2):
         # Generate an image and draw a pattern
         image = Image.new('RGB', (width, height), color1)
         dc = ImageDraw.Draw(image)
@@ -26,11 +21,14 @@ be specified as a ``PIL.Image.Image``::
 
         return image
 
-    icon.icon = create_image()
+
+    # In order for the icon to be displayed, you must provide an icon
+    icon = pystray.Icon(
+        'test name',
+        icon=create_image(64, 64, 'black', 'white'))
 
 
-To finally show you icon, run the following code::
-
+    # To finally show you icon, call run
     icon.run()
 
 
