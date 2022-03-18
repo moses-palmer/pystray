@@ -79,6 +79,13 @@ class MenuDescriptorTests(unittest.TestCase):
             item('Test entry %d' % (i + 1), None)
             for i in range(4)))))
 
+    def test_menu_construct_from_none(self):
+        """Tests menu construction.
+        """
+        self.assertEqual(
+            '',
+            '\n' + str(menu(None)))
+
     def test_menu_construct_with_submenu(self):
         """Tests menu construction.
         """
