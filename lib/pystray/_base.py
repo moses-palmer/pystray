@@ -38,8 +38,8 @@ class Icon(object):
     :param str title: A short title for the icon.
 
     :param menu: A menu to use as popup menu. This can be either an instance of
-        :class:`Menu` or a tuple, which will be interpreted as arguments to the
-        :class:`Menu` constructor.
+        :class:`Menu` or an iterable, which will be interpreted as arguments to
+        the :class:`Menu` constructor, or ``None``, which disables the menu.
 
         The behaviour of the menu depends on the platform. Only one action is
         guaranteed to be invokable: the first menu item whose
@@ -81,7 +81,9 @@ class Icon(object):
         self._name = name
         self._icon = icon or None
         self._title = title or ''
-        self._menu = menu if isinstance(menu, Menu) else Menu(*menu)
+        self._menu = menu if isinstance(menu, Menu) \
+            else Menu(*menu) if menu is not None \
+            else None
         self._visible = False
         self._icon_valid = False
         self._log = logging.getLogger(__name__)
@@ -210,9 +212,10 @@ class Icon(object):
         preparations:
 
         macOS
-            You must pass the argument ``darwin_nsapplication`` to the
-            constructor. This is to ensure that you actually have a reference
-            to the application instance used to drive the icon.
+            Pass an instance of ``NSApplication`` retrieved from the library
+            with which you are integrating as the argument
+            ``darwin_nsapplication``. This will allow this library to integrate
+            with the main loop.
 
         :param callable setup: An optional callback to execute in a separate
             thread once the loop has started. It is passed the icon as its sole
