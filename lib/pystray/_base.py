@@ -210,9 +210,10 @@ class Icon(object):
         preparations:
 
         macOS
-            You must pass the argument ``darwin_nsapplication`` to the
-            constructor. This is to ensure that you actually have a reference
-            to the application instance used to drive the icon.
+            Pass an instance of ``NSApplication`` retrieved from the library
+            with which you are integrating as the argument
+            ``darwin_nsapplication``. This will allow this library to integrate
+            with the main loop.
 
         :param callable setup: An optional callback to execute in a separate
             thread once the loop has started. It is passed the icon as its sole
