@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+v0.19.3 (2022-03-18) - Various fixes
+------------------------------------
+*  Do not crash when passed a ``None`` menu.
+*  Only let ``pystray.Icon.stop`` block for 5 seconds when waiting for the
+   ``setup`` function to complete.
+*  Made usage example single, runnable script.
+
+
 v0.19.2 (2022-01-01) - Allow tuple as menu argument
 ---------------------------------------------------
 *  Corrected menu implementation to allow tuples as arguments as indicated by
