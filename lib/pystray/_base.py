@@ -76,6 +76,10 @@ class Icon(object):
     #: notification.
     HAS_NOTIFICATION = True
 
+    #: The timeout, in secods, before giving up on waiting for the setup thread
+    #: when stopping the icon.
+    SETUP_THREAD_TIMEOUT = 5.0
+
     def __init__(
             self, name, icon=None, title=None, menu=None, **kwargs):
         self._name = name
@@ -194,6 +198,12 @@ class Icon(object):
             thread once the loop has started. It is passed the icon as its sole
             argument.
 
+            Please note that this function is started in a thread, and when the
+            icon is stopped, an attempt to join this thread is made, so
+            stopping the icon may be blocking for up to
+            ``SETUP_THREAD_TIMEOUT`` seconds if the function is not
+            well-behaved.
+
             If not specified, a simple setup function setting :attr:`visible`
             to ``True`` is used. If you specify a custom setup function, you
             must explicitly set this attribute.
@@ -236,7 +246,12 @@ class Icon(object):
         """
         self._stop()
         if self._setup_thread.ident != threading.current_thread().ident:
-            self._setup_thread.join()
+            self._setup_thread.join(timeout=self.SETUP_THREAD_TIMEOUT)
+            if self._setup_thread.is_alive():
+                self._log.warning(
+                    'The function passed as setup to the icon did not finish '
+                    'within {} seconds after icon was stopped'.format(
+                        self.SETUP_THREAD_TIMEOUT))
         self._running = False
 
     def update_menu(self):
