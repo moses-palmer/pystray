@@ -22,6 +22,8 @@ import sys
 def backend():
     """Returns the backend module.
     """
+    def dummy():
+        from . import _dummy as backend; return backend
     def appindicator():
         from . import _appindicator as backend; return backend
     def darwin():
@@ -33,7 +35,7 @@ def backend():
     def xorg():
         from . import _xorg as backend; return backend
     backends = {b.__name__: b for b in (
-        appindicator, darwin, gtk, win32, xorg)}
+        dummy, appindicator, darwin, gtk, win32, xorg)}
 
     backend_name = os.environ.get('PYSTRAY_BACKEND', None)
     if backend_name:
