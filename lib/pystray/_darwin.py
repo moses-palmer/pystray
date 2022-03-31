@@ -17,6 +17,7 @@
 
 import io
 import signal
+import subprocess
 
 import AppKit
 import Foundation
@@ -39,9 +40,6 @@ class Icon(_base.Icon):
 
     # Mutually exclusive menu itema are not displayed distinctly
     HAS_MENU_RADIO = False
-
-    # Not implemented
-    HAS_NOTIFICATION = False
 
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
@@ -118,6 +116,17 @@ class Icon(_base.Icon):
 
     def _run_detached(self):
         self._mark_ready()
+
+    def _notify(self, message, title=None):
+        subprocess.check_call([
+            'osascript',
+            '-e',
+            'display notification "{}" with title "{}"'.format(
+                message.replace('\\', '\\\\').replace('"', '\\"'),
+                title.replace('\\', '\\\\').replace('"', '\\"'))])
+
+    def _remove_notification(self):
+        pass
 
     def _stop(self):
         self._app.stop_(self._app)
