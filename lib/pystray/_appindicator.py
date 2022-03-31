@@ -54,6 +54,7 @@ class Icon(GtkIcon):
         self._appindicator.set_icon(self._icon_path)
         self._appindicator.set_menu(
             self._menu_handle or self._create_default_menu())
+        self._appindicator.set_title(self.title)
 
     @mainloop
     def _hide(self):
