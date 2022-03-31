@@ -30,6 +30,11 @@ from pystray import _base
 from . import notify_dbus
 
 
+# Make sure Gtk works
+if not Gtk.init_check()[0]:
+   raise ImportError('Gtk could not be initialised')
+
+
 def mainloop(f):
     """Marks a function to be executed in the main loop.
 
