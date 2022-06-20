@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+v0.19.4 (2022-06-20) - Notifications for macOS
+----------------------------------------------
+*  Enable notifications for *macOS*. Thanks to *danrossi*!
+*  Added FAQ.
+*  Correctly set title for *appindicator* when icon is created. Thanks to
+   *SpookedByRoaches*!
+*  Verify that *Gtk* actually works before trying to use it. Thanks to *Peter
+   Hjalmarsson*!
+*  Corrected regression for the *dummy* backend. Thanks to *Simon Robinson*!
+*  Corrected regression with ``run_detached`` for *Xorg*.
+
+
 v0.19.3 (2022-03-18) - Various fixes
 ------------------------------------
 *  Do not crash when passed a ``None`` menu.
