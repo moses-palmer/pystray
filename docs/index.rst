@@ -16,6 +16,8 @@ Table of contents
 
    usage
 
+   faq
+
    reference
 
 
