@@ -35,21 +35,20 @@ class Icon(GtkIcon):
     # empty menus
     HAS_DEFAULT_ACTION = False
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, on_scroll=None, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
-        self._appindicator = None
-
-        if self.icon:
-            self._update_icon()
-
-    @mainloop
-    def _show(self):
         self._appindicator = AppIndicator.Indicator.new(
             self.name,
             '',
             AppIndicator.IndicatorCategory.APPLICATION_STATUS)
 
+        if on_scroll: self._appindicator.connect("scroll-event",on_scroll)
+        if self.icon:
+            self._update_icon()
+
+    @mainloop
+    def _show(self):
         self._appindicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
         self._appindicator.set_icon(self._icon_path)
         self._appindicator.set_menu(
@@ -58,7 +57,7 @@ class Icon(GtkIcon):
 
     @mainloop
     def _hide(self):
-        self._appindicator = None
+        self._appindicator.set_status(AppIndicator.IndicatorStatus.PASSIVE)
 
     @mainloop
     def _update_icon(self):
