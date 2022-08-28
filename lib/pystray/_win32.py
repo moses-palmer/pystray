@@ -37,6 +37,8 @@ class Icon(_base.Icon):
         self._menu_hwnd = None
         self._hmenu = None
 
+        self._default_double_click = self._options.get('default_double_click', False)
+
         # This is a mapping from win32 event codes to handlers used by the
         # mainloop
         self._message_handlers = {
@@ -187,8 +189,11 @@ class Icon(_base.Icon):
         displayed.
         """
         if lparam == win32.WM_LBUTTONUP:
-            self()
-
+            if not self._default_double_click:
+                self()
+        elif lparam == win32.WM_LBUTTONDBLCLK:
+            if self._default_double_click:
+                self()
         elif self._menu_handle and lparam == win32.WM_RBUTTONUP:
             # TrackPopupMenuEx does not behave unless our systray window is the
             # foreground window
