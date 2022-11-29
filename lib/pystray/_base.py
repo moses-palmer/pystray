@@ -243,16 +243,20 @@ class Icon(object):
 
     def stop(self):
         """Stops the loop handling events for the icon.
+
+        If the icon is not running, calling this method has no effect.
         """
-        self._stop()
-        if self._setup_thread.ident != threading.current_thread().ident:
-            self._setup_thread.join(timeout=self.SETUP_THREAD_TIMEOUT)
-            if self._setup_thread.is_alive():
-                self._log.warning(
-                    'The function passed as setup to the icon did not finish '
-                    'within {} seconds after icon was stopped'.format(
-                        self.SETUP_THREAD_TIMEOUT))
-        self._running = False
+        if self._running:
+            self._stop()
+            if self._setup_thread.ident != threading.current_thread().ident:
+                self._setup_thread.join(timeout=self.SETUP_THREAD_TIMEOUT)
+                if self._setup_thread.is_alive():
+                    self._log.warning(
+                        'The function passed as setup to the icon did not '
+                        'finish within {} seconds after icon was '
+                        'stopped'.format(
+                            self.SETUP_THREAD_TIMEOUT))
+            self._running = False
 
     def update_menu(self):
         """Updates the menu.
