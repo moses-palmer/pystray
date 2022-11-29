@@ -40,6 +40,7 @@ class Icon(_base.Icon):
         # This is a mapping from win32 event codes to handlers used by the
         # mainloop
         self._message_handlers = {
+            win32.WM_DISPLAYCHANGE: self._on_display_change,
             win32.WM_STOP: self._on_stop,
             win32.WM_NOTIFY: self._on_notify,
             win32.WM_TASKBARCREATED: self._on_taskbarcreated}
@@ -170,6 +171,16 @@ class Icon(_base.Icon):
                 hmenu, callbacks = self._menu_handle
                 win32.DestroyMenu(hmenu)
             self._unregister_class(self._atom)
+
+    def _on_display_change(self, wparam, lparam):
+        """Handles ``WM_DISPLAYCHANGE``.
+
+        This method updates the icon to prevent blurring when changing
+        resolutions.
+        """
+        if self.visible:
+            self._hide()
+            self._show()
 
     def _on_stop(self, wparam, lparam):
         """Handles ``WM_STOP``.
