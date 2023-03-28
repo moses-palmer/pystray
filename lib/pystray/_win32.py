@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import atexit
 import ctypes
 import threading
 
@@ -31,6 +32,8 @@ class Icon(_base.Icon):
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
 
+        atexit.register(self.__del__)
+        
         self._atom = self._register_class()
         self._icon_handle = None
         self._hwnd = None
