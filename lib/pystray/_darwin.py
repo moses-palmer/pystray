@@ -171,7 +171,7 @@ class Icon(_base.Icon):
                 size)
             source.paste(self._icon.resize(
                 size,
-                PIL.Image.ANTIALIAS))
+                PIL.Image.LANCZOS))
 
         # Convert the PIL image to an NSImage
         b = io.BytesIO()
