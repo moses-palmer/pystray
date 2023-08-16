@@ -383,7 +383,7 @@ class Icon(_base.Icon):
             (width, height))
         self._icon_data.paste(self._icon.resize(
             (width, height),
-            PIL.Image.ANTIALIAS))
+            PIL.Image.LANCZOS))
         self._icon_data.tostring = self._icon_data.tobytes
 
     def _assert_docked(self):
