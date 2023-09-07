@@ -322,7 +322,7 @@ class Icon(_base.Icon):
                 else None)
 
     def _message(self, code, flags, **kwargs):
-        """Sends a message the the systray icon.
+        """Sends a message to the systray icon.
 
         This method adds ``cbSize``, ``hWnd``, ``hId`` and ``uFlags`` to the
         message data.
