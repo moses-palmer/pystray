@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+v0.19.5 (2023-09-17) - Various fixes
+------------------------------------
+*  Change image flags to *Pillow* to those actually supported by newer versions
+   of that library.
+*  Correct visibility for *appindicator* backend. Thanks to *Stephan Helma*!
+*  Do not stop the icon unless it is running.
+*  Correct issue where the icon would become blurry on screen resolution
+   changes on *Windows*.
+
+
 v0.19.4 (2022-06-20) - Notifications for macOS
 ----------------------------------------------
 *  Enable notifications for *macOS*. Thanks to *danrossi*!
