@@ -245,6 +245,22 @@ For this case you can use ``run_detached``. This allows you to setup the icon
 and then pass control to the framework. Please see the documentation for more
 information.
 
+Using Subprocesses for Integration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Because ``run`` is blocking (and must be run from the main thread), integration is often easier if you use pystray in a seperate process. This is made straight-forward by the standard library `multiprocessing <https://docs.python.org/3/library/multiprocessing.html>`_ module (it has mostly the same API as the `threading` module).
+
+Often times, GUI frameworks like QT or GTK have shared, global-state (the same is true with the Windows & Mac OSX GUI frameworks). pystray often interacts with these frameworks either directly or indirectly. This can cause issues that affecting your main GUI code.
+
+For example, if the main application is closed, third-party code may de-initializes the GTK (or QT) context.
+When pystray tries to use the GTK/QT context, it may cause an error. In my tests it actually segfaults.
+
+Consider using the `"spawn" <https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods>`_ start-method to further seperate state. On Linux & BSD, ``start="fork"`` is the default. This may cause state to be implicitly shared. Alternatively, initialize the GUI frameworks *after* calling ``fork`` avoiding the implicit state-sharing.
+
+Further advice: If you expect the icon to be long-lived (like Discord), consider having the main application be the sub-process and the icon be the parent.
+
+In this case, the sub-process holding the main window could exit while the parent process (holding the tray) would still live.
+
+You can do it the other way around if you expect the window to outlive the icon.
 
 Selecting a backend
 -------------------
