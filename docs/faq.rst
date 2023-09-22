@@ -47,3 +47,16 @@ platforms, it is possible to just launch the icon mainloop in a thread::
 
     # Run the toolkit mainlon in the main thread
     some_toolkit.mainloop()
+
+
+Icon does not display in GNOME desktop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Newer versions of GNOME desktop do not support legacy tray icons by default_.
+You will need to install the "AppIndicator and KStatusNotifierItem Support"
+extension_ in order to use the system tray icon with these versions of the
+GNOME desktop.
+
+.. _default: https://bugzilla.gnome.org/show_bug.cgi?id=785956
+
+.. _extension: https://extensions.gnome.org/extension/615/appindicator-support/
