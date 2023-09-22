@@ -662,7 +662,7 @@ class Menu(object):
         def cleaned(items):
             was_separator = False
             for i in items:
-                if not i.visible:
+                if not i or not i.visible:
                     continue
 
                 if i is self.SEPARATOR:

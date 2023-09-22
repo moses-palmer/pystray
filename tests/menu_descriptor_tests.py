@@ -83,8 +83,7 @@ class MenuDescriptorTests(unittest.TestCase):
         """Tests menu construction.
         """
         self.assertEqual(
-            '',
-            '\n' + str(menu(None)))
+            '', str(menu(None)))
 
     def test_menu_construct_with_submenu(self):
         """Tests menu construction.
