@@ -190,7 +190,8 @@ A menu item has several attributes:
     The submenu, if any, that is attached to this menu item. Either a submenu
     or an action can be passed as the second argument to the constructor.
 
-    The submenu must be an instance of :class:`Menu`::
+    The submenu must be an instance of :class:`Menu`:: or a tuple of menu
+    entries.
 
         from pystray import Icon as icon, Menu as menu, MenuItem as item
 

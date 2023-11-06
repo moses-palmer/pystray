@@ -159,7 +159,9 @@ class Icon(object):
 
     @menu.setter
     def menu(self, value):
-        self._menu = value
+        self._menu = value if isinstance(value, Menu) \
+            else Menu(*value) if value is not None \
+            else None
         self.update_menu()
 
     @property
