@@ -20,6 +20,7 @@ import functools
 import six
 import sys
 import threading
+import time
 import types
 
 import PIL
@@ -239,12 +240,15 @@ class Icon(_base.Icon):
 
         # Try to locate a new systray selection owner
         self._systray_manager = None
-        try:
-            self._assert_docked()
-        except AssertionError:
-            # There is no new selection owner; we must retry later
-            self._log.error(
-                'Failed to dock icon', exc_info=True)
+        while 1:
+            try:
+                self._assert_docked()
+                break
+            except AssertionError:
+                # There is no new selection owner; we must retry later
+                self._log.error(
+                    'Failed to dock icon', exc_info=True)
+                time.sleep(1)
 
     def _on_expose(self, event):
         """Handles ``Xlib.X.ConfigureNotify`` and ``Xlib.X.Expose``.
