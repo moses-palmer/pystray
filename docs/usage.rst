@@ -214,8 +214,8 @@ can be a callable returning the current sequence.
 Displaying notifications
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-*This is not supported on macOS and Xorg; please check Icon.HAS_NOTIFICATION
-at runtime for support on the current platform.*
+*This is not supported on Xorg; please check Icon.HAS_NOTIFICATION at runtime
+for support on the current platform.*
 
 To display a system notification, use :meth:`pystray.Icon.notify`::
 
