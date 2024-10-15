@@ -179,6 +179,8 @@ class Icon(_base.Icon):
         data = Foundation.NSData(b.getvalue())
 
         self._icon_image = AppKit.NSImage.alloc().initWithData_(data)
+        self._icon_image.setSize_(size)
+        self._icon_image.setTemplate_(AppKit.YES)
         self._status_item.button().setImage_(self._icon_image)
 
     def _create_menu(self, descriptors, callbacks):
