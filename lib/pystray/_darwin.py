@@ -62,6 +62,7 @@ class Icon(_base.Icon):
 
         self._status_item.button().setTarget_(self._delegate)
         self._status_item.button().setAction_(self._ACTION_SELECTOR)
+        self._force_fullcolor = kwargs.get('darwin_force_fullcolor', False)
 
     def _show(self):
         self._assert_image()
@@ -179,6 +180,9 @@ class Icon(_base.Icon):
         data = Foundation.NSData(b.getvalue())
 
         self._icon_image = AppKit.NSImage.alloc().initWithData_(data)
+        # Template images match the taskbar appearance (dynamically light or dark). Uses the alpha channel only.
+        if not self._force_fullcolor:
+            self._icon_image.setTemplate_(True)
         self._status_item.button().setImage_(self._icon_image)
 
     def _create_menu(self, descriptors, callbacks):
