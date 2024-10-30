@@ -160,18 +160,20 @@ class Icon(_base.Icon):
         """Asserts that the cached icon image exists.
         """
         thickness = self._status_bar.thickness()
-        size = (int(thickness), int(thickness))
-        if self._icon_image and self._icon_image.size() == size:
+        logical_size = (int(thickness), int(thickness))
+        retnia_size = thickness * 3
+        pixel_size = (int(retnia_size), int(retnia_size))
+        if self._icon_image and self._icon_image.size() == logical_size:
             return
 
-        if self._icon.size == size:
+        if self._icon.size == pixel_size:
             source = self._icon
         else:
             source = PIL.Image.new(
                 'RGBA',
-                size)
+                pixel_size)
             source.paste(self._icon.resize(
-                size,
+                pixel_size,
                 PIL.Image.LANCZOS))
 
         # Convert the PIL image to an NSImage
@@ -180,6 +182,7 @@ class Icon(_base.Icon):
         data = Foundation.NSData(b.getvalue())
 
         self._icon_image = AppKit.NSImage.alloc().initWithData_(data)
+        self._icon_image.setSize_(logical_size)
         # Template images match the taskbar appearance (dynamically light or dark). Uses the alpha channel only.
         if not self._force_fullcolor:
             self._icon_image.setTemplate_(True)
