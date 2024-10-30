@@ -60,6 +60,11 @@ class Icon(object):
         ``darwin_nsapplication``
             An ``NSApplication`` instance used to run the event loop. If this
             is not specified, the shared application will be used.
+
+        ``darwin_force_fullcolor``
+            If ``True``, the icon will be forced to use the full color image,
+            instead of automatically switching the icon color based on the
+            system appearance (dark or light mode).
     """
     #: Whether this particular implementation has a default action that can be
     #: invoked in a special way, such as clicking on the icon.
