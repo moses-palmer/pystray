@@ -47,6 +47,8 @@ def backend():
         candidates = [darwin]
     elif sys.platform == 'win32':
         candidates = [win32]
+    elif sys.platform.startswith("openbsd"):
+        candidates = [gtk, xorg]
     else:
         candidates = [appindicator, gtk, xorg]
 
