@@ -190,7 +190,8 @@ A menu item has several attributes:
     The submenu, if any, that is attached to this menu item. Either a submenu
     or an action can be passed as the second argument to the constructor.
 
-    The submenu must be an instance of :class:`Menu`::
+    The submenu must be an instance of :class:`Menu`:: or a tuple of menu
+    entries.
 
         from pystray import Icon as icon, Menu as menu, MenuItem as item
 
@@ -214,8 +215,8 @@ can be a callable returning the current sequence.
 Displaying notifications
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-*This is not supported on macOS and Xorg; please check Icon.HAS_NOTIFICATION
-at runtime for support on the current platform.*
+*This is not supported on Xorg; please check Icon.HAS_NOTIFICATION at runtime
+for support on the current platform.*
 
 To display a system notification, use :meth:`pystray.Icon.notify`::
 

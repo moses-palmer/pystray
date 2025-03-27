@@ -17,6 +17,12 @@ compilers and *pkg-config*, must be installed:
 - ``libcairo-dev``
 - ``libgirepository1.0-dev``
 
+For *fedora* and similar distributions, please add the following packages to
+enable *AppIndicator* support:
+
+- ``libayatana-appindicator-gtk3``
+- ``libayatana-appindicator-gtk3-devel``
+
 
 I am trying to integrate with a framework, but ``run_detached`` does not work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

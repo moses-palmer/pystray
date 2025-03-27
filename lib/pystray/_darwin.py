@@ -106,9 +106,8 @@ class Icon(_base.Icon):
 
         try:
             self._app.run()
-        except:
-            self._log.error(
-                'An error occurred in the main loop', exc_info=True)
+        except BaseException():
+            self._queue.put(sys.exc_info())
         finally:
             if PyObjCTools.MachSignals.getsignal(signal.SIGINT) == sigint:
                 PyObjCTools.MachSignals.signal(signal.SIGINT, previous_sigint)
@@ -179,6 +178,8 @@ class Icon(_base.Icon):
         data = Foundation.NSData(b.getvalue())
 
         self._icon_image = AppKit.NSImage.alloc().initWithData_(data)
+        self._icon_image.setSize_(size)
+        self._icon_image.setTemplate_(AppKit.YES)
         self._status_item.button().setImage_(self._icon_image)
 
     def _create_menu(self, descriptors, callbacks):

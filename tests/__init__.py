@@ -20,7 +20,6 @@ from __future__ import print_function
 import itertools
 
 from PIL import Image, ImageDraw
-from six.moves import input
 
 import pystray
 

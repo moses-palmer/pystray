@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import queue
 import sys
 import unittest
 
 import pystray
 
-from six.moves import queue
-from six import reraise
 from time import sleep
 
 from pystray import Menu as menu, MenuItem as item
@@ -56,7 +56,8 @@ def test(icon):
         icon.run(setup=setup)
         result = q.get()
         if result is not True:
-            reraise(*result)
+            _, value, tb = result
+            raise value.with_traceback(tb)
 
     return inner
 
@@ -97,7 +98,8 @@ def for_menu_radio(test):
 
 
 def for_notification(test):
-    """Prevents a test from being run on implementations not supporting notifications
+    """Prevents a test from being run on implementations not supporting
+    notifications
 
     :param test: The test.
     """
@@ -107,7 +109,20 @@ def for_notification(test):
         return lambda *a: None
 
 
+def interactive_test(test):
+    """Marks a test as interactive, which prevents it from being run when
+    environment variable "TEST_SKIP_INTERACTIVE" is set to "1".
+
+    :param test: The test.
+    """
+    if os.getenv('TEST_SKIP_INTERACTIVE') != '1':
+        return test
+    else:
+        return lambda *a: None
+
+
 class IconTest(unittest.TestCase):
+    @interactive_test
     def test_set_icon(self):
         """Tests that updating the icon works.
         """
@@ -126,6 +141,7 @@ class IconTest(unittest.TestCase):
                 self,
                 'Did an alternating %s, and %s icon appear?', colors1, colors2)
 
+    @interactive_test
     def test_set_icon_after_constructor(self):
         """Tests that updating the icon works.
         """
@@ -141,6 +157,7 @@ class IconTest(unittest.TestCase):
                 self,
                 'Did an icon appear?')
 
+    @interactive_test
     def test_set_icon_to_none(self):
         """Tests that setting the icon to None hides it.
         """
@@ -157,6 +174,7 @@ class IconTest(unittest.TestCase):
                 self,
                 'Did the %s icon disappear?', colors)
 
+    @interactive_test
     def test_title(self):
         """Tests that initialising with a title works.
         """
@@ -171,6 +189,7 @@ class IconTest(unittest.TestCase):
                 self,
                 'Did an %s icon with the title "%s" appear?', colors, title)
 
+    @interactive_test
     def test_title_set_hidden(self):
         """Tests that setting the title of a hidden icon works.
         """
@@ -186,6 +205,7 @@ class IconTest(unittest.TestCase):
                 self,
                 'Did a %s icon with the title "%s" appear?', colors, title)
 
+    @interactive_test
     def test_title_set_visible(self):
         """Tests that setting the title of a visible icon works.
         """
@@ -212,6 +232,7 @@ class IconTest(unittest.TestCase):
             ico.visible = True
             self.assertTrue(ico.visible)
 
+    @interactive_test
     def test_visible_set(self):
         """Tests that showing a simple icon works.
         """
@@ -238,6 +259,7 @@ class IconTest(unittest.TestCase):
             finally:
                 ico.visible = False
 
+    @interactive_test
     def test_show_hide(self):
         """Tests that showing and hiding the icon works.
         """
@@ -256,6 +278,7 @@ class IconTest(unittest.TestCase):
                 'Did a flashing %s icon appear?', colors)
 
     @for_default_action
+    @interactive_test
     def test_activate(self):
         """Tests that ``on_activate`` is correctly called.
         """
@@ -274,6 +297,7 @@ class IconTest(unittest.TestCase):
             say('Click the icon')
             q.get(timeout=TIMEOUT)
 
+    @interactive_test
     def test_activate_with_default(self):
         """Tests that the default menu item is activated when activating icon.
         """
@@ -294,6 +318,7 @@ class IconTest(unittest.TestCase):
             q.get(timeout=TIMEOUT)
 
     @for_menu
+    @interactive_test
     def test_menu_construct(self):
         """Tests that the menu is constructed.
         """
@@ -311,6 +336,7 @@ class IconTest(unittest.TestCase):
                 'Was it\n%s?' % str(ico.menu))
 
     @for_menu
+    @interactive_test
     def test_menu_activate(self):
         """Tests that the menu can be activated.
         """
@@ -331,6 +357,7 @@ class IconTest(unittest.TestCase):
             q.get(timeout=TIMEOUT)
 
     @for_menu
+    @interactive_test
     def test_menu_activate_method(self):
         """Tests that the menu can be activated and a method can be used.
         """
@@ -353,6 +380,7 @@ class IconTest(unittest.TestCase):
             q.get(timeout=TIMEOUT)
 
     @for_menu
+    @interactive_test
     def test_menu_activate_submenu(self):
         """Tests that an item in a submenu can be activated.
         """
@@ -375,6 +403,7 @@ class IconTest(unittest.TestCase):
             q.get(timeout=TIMEOUT)
 
     @for_default_action
+    @interactive_test
     def test_menu_invisble(self):
         """Tests that a menu consisting of only empty items does not show.
         """
@@ -395,6 +424,7 @@ class IconTest(unittest.TestCase):
             q.get(timeout=TIMEOUT)
 
     @for_menu
+    @interactive_test
     def test_menu_dynamic(self):
         """Tests that a dynamic menu works.
         """
@@ -424,6 +454,7 @@ class IconTest(unittest.TestCase):
 
     @for_default_action
     @for_menu
+    @interactive_test
     def test_menu_dynamic_show_hide(self):
         """Tests that a dynamic menu that is hidden works as expected.
         """
@@ -457,6 +488,7 @@ class IconTest(unittest.TestCase):
                 'Was it\n%s?' % str(ico.menu))
 
     @for_menu_radio
+    @interactive_test
     def test_menu_radio(self):
         """Tests that mutually exclusive items are displayed separately.
         """
@@ -474,6 +506,7 @@ class IconTest(unittest.TestCase):
                 'Was <Item 2> displayed differently from <Item 1>?')
 
     @for_menu_radio
+    @interactive_test
     def test_menu_enabled(self):
         """Tests that menu items can be disabled.
         """
@@ -491,6 +524,7 @@ class IconTest(unittest.TestCase):
                 'Was <Item 1> enabled and <Item 2> disabled?')
 
     @for_notification
+    @interactive_test
     def test_show_notification(self):
         """Tests that generation of a notification works.
         """
@@ -505,6 +539,7 @@ class IconTest(unittest.TestCase):
                 'Did a notification appear?')
 
     @for_notification
+    @interactive_test
     def test_hide_notification(self):
         """Tests that a notification can be removed again.
         """

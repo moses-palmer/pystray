@@ -71,9 +71,8 @@ class GtkIcon(_base.Icon):
 
         try:
             self._loop.run()
-        except:
-            self._log.error(
-                'An error occurred in the main loop', exc_info=True)
+        except BaseException:
+            self._queue.put(sys.exc_info())
         finally:
             self._finalize()
 

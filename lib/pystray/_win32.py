@@ -16,10 +16,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import ctypes
+import queue
 import threading
 
 from ctypes import wintypes
-from six.moves import queue
 
 from ._util import serialized_image, win32
 from . import _base
@@ -153,9 +153,8 @@ class Icon(_base.Icon):
                     win32.TranslateMessage(lpmsg)
                     win32.DispatchMessage(lpmsg)
 
-        except:
-            self._log.error(
-                'An error occurred in the main loop', exc_info=True)
+        except BaseException:
+            self._queue.put(sys.exc_info())
 
         finally:
             try:
@@ -322,7 +321,7 @@ class Icon(_base.Icon):
                 else None)
 
     def _message(self, code, flags, **kwargs):
-        """Sends a message the the systray icon.
+        """Sends a message to the systray icon.
 
         This method adds ``cbSize``, ``hWnd``, ``hId`` and ``uFlags`` to the
         message data.
