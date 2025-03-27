@@ -98,7 +98,8 @@ def for_menu_radio(test):
 
 
 def for_notification(test):
-    """Prevents a test from being run on implementations not supporting notifications
+    """Prevents a test from being run on implementations not supporting
+    notifications
 
     :param test: The test.
     """
