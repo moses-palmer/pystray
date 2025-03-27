@@ -212,9 +212,8 @@ class Icon(_base.Icon):
 
                 self._message_handlers.get(event.type, lambda e: None)(event)
 
-        except:
-            self._log.error(
-                'An error occurred in the main loop', exc_info=True)
+        except BaseException:
+            self._queue.put(sys.exc_info())
 
     def _on_button_press(self, event):
         """Handles ``Xlib.X.ButtonPress``.

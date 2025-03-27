@@ -153,9 +153,8 @@ class Icon(_base.Icon):
                     win32.TranslateMessage(lpmsg)
                     win32.DispatchMessage(lpmsg)
 
-        except:
-            self._log.error(
-                'An error occurred in the main loop', exc_info=True)
+        except BaseException:
+            self._queue.put(sys.exc_info())
 
         finally:
             try:
