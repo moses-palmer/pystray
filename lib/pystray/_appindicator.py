@@ -1,6 +1,6 @@
 # coding=utf-8
 # pystray
-# Copyright (C) 2016-2022 Moses Palmér
+# Copyright (C) 2016-2025 Moses Palmér
 # Copyright (C) 2022 Stephan Helma
 #
 # This program is free software: you can redistribute it and/or modify it under
