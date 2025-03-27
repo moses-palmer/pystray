@@ -19,9 +19,8 @@ import functools
 import inspect
 import itertools
 import logging
+import queue
 import threading
-
-from six.moves import queue
 
 
 class Icon(object):

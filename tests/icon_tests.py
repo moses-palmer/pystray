@@ -16,13 +16,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import queue
 import sys
 import unittest
 
 import pystray
 
-from six.moves import queue
-from six import reraise
 from time import sleep
 
 from pystray import Menu as menu, MenuItem as item
@@ -57,7 +56,8 @@ def test(icon):
         icon.run(setup=setup)
         result = q.get()
         if result is not True:
-            reraise(*result)
+            _, value, tb = result
+            raise value.with_traceback(tb)
 
     return inner
 

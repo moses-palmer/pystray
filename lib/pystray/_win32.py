@@ -16,10 +16,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import ctypes
+import queue
 import threading
 
 from ctypes import wintypes
-from six.moves import queue
 
 from ._util import serialized_image, win32
 from . import _base

@@ -17,7 +17,7 @@
 
 import contextlib
 import functools
-import six
+import queue
 import sys
 import threading
 import types
@@ -26,8 +26,6 @@ import PIL
 import Xlib.display
 import Xlib.threaded
 import Xlib.XK
-
-from six.moves import queue
 
 from . import _base
 
@@ -289,7 +287,8 @@ class Icon(_base.Icon):
                     # for completion and reraise any exceptions
                     result = self._queue.get()
                     if result is not True:
-                        six.reraise(*result)
+                        _, value, tb = result
+                        raise value.with_traceback(tb)
 
             return types.MethodType(inner, self)
 
