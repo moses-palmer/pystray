@@ -347,7 +347,7 @@ try:
     ChangeWindowMessageFilterEx.restype = wintypes.BOOL
     ChangeWindowMessageFilterEx.errcheck = _err
 
-except KeyError:
+except (KeyError, AttributeError):
     def ChangeWindowMessageFilterEx(
             hWnd, message, action, pCHangeFilterStruct):
         """A dummy implementation of ``ChangeWindowMessageFilterEx`` always
