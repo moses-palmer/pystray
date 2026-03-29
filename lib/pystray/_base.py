@@ -31,8 +31,8 @@ class Icon(object):
     :param str name: The name of the icon. This is used by the system to
         identify the icon.
 
-    :param icon: The icon to use. If this is specified, it must be a
-        :class:`PIL.Image.Image` instance.
+    :param icon: The icon to use. If this is specified, it must be either a
+        :class:`PIL.Image.Image` instance or a string path to an icon file.
 
     :param str title: A short title for the icon.
 
