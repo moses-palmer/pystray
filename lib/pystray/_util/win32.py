@@ -109,6 +109,11 @@ COLOR_WINDOW = 5
 HWND_MESSAGE = -3
 IMAGE_ICON = 1
 
+SM_CXSMICON = 49
+SM_CYSMICON = 50
+
+IDI_APPLICATION = 32512
+
 
 LPMSG = ctypes.POINTER(wintypes.MSG)
 
@@ -257,6 +262,11 @@ GetCursorPos.argtypes = (
 GetCursorPos.restype = wintypes.BOOL
 GetCursorPos.errcheck = _err
 
+GetSystemMetrics = windll.user32.GetSystemMetrics
+GetSystemMetrics.argtypes = (
+    wintypes.INT,)
+GetSystemMetrics.restype = wintypes.INT
+
 GetMessage = windll.user32.GetMessageW
 GetMessage.argtypes = (
     LPMSG, wintypes.HWND, wintypes.UINT, wintypes.UINT)
@@ -273,6 +283,12 @@ InsertMenuItem.argtypes = (
     wintypes.HMENU, wintypes.UINT, wintypes.BOOL, LPMENUITEMINFO)
 InsertMenuItem.restype = wintypes.BOOL
 InsertMenuItem.errcheck = _err
+
+LoadIcon = windll.user32.LoadIconW
+LoadIcon.argtypes = (
+    wintypes.HINSTANCE, wintypes.LPCWSTR)
+LoadIcon.restype = wintypes.HICON
+LoadIcon.errcheck = _err
 
 LoadImage = windll.user32.LoadImageW
 LoadImage.argtypes = (
@@ -311,6 +327,14 @@ Shell_NotifyIcon = windll.shell32.Shell_NotifyIconW
 Shell_NotifyIcon.argtypes = (
     wintypes.DWORD, LPNOTIFYICONDATAW)
 Shell_NotifyIcon.restype = wintypes.BOOL
+
+
+ExtractIconEx = windll.shell32.ExtractIconExW
+ExtractIconEx.argtypes = (
+    wintypes.LPCWSTR, wintypes.INT,
+    ctypes.POINTER(wintypes.HICON), ctypes.POINTER(wintypes.HICON),
+    wintypes.UINT)
+ExtractIconEx.restype = wintypes.UINT
 
 TranslateMessage = windll.user32.TranslateMessage
 TranslateMessage.argtypes = (

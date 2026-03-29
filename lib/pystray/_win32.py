@@ -16,6 +16,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import ctypes
+import os
+import sys
 import queue
 import threading
 
@@ -355,14 +357,39 @@ class Icon(_base.Icon):
         if self._icon_handle:
             return
 
-        with serialized_image(self.icon, 'ICO') as icon_path:
-            self._icon_handle = win32.LoadImage(
+        if isinstance(self.icon, str) and os.path.isfile(self.icon):
+            if self.icon.endswith('.exe'):
+                h_icon_small = wintypes.HICON()
+                if win32.ExtractIconEx(self.icon, 0, None, ctypes.byref(h_icon_small), 1):
+                    self._icon_handle = h_icon_small
+            else:
+                ico_x = win32.GetSystemMetrics(win32.SM_CXSMICON)
+                ico_y = win32.GetSystemMetrics(win32.SM_CYSMICON)
+                try:
+                    self._icon_handle = win32.LoadImage(
+                        None,
+                        self.icon,
+                        win32.IMAGE_ICON,
+                        ico_x,
+                        ico_y,
+                        win32.LR_LOADFROMFILE)
+                except Exception:
+                    self._icon_handle = None
+        elif self.icon is not None and not isinstance(self.icon, str):
+            with serialized_image(self.icon, 'ICO') as icon_path:
+                self._icon_handle = win32.LoadImage(
+                    None,
+                    icon_path,
+                    win32.IMAGE_ICON,
+                    0,
+                    0,
+                    win32.LR_DEFAULTSIZE | win32.LR_LOADFROMFILE)
+
+        # show default emtpy icon, like infi.systray
+        if not self._icon_handle:
+            self._icon_handle = win32.LoadIcon(
                 None,
-                icon_path,
-                win32.IMAGE_ICON,
-                0,
-                0,
-                win32.LR_DEFAULTSIZE | win32.LR_LOADFROMFILE)
+                ctypes.cast(win32.IDI_APPLICATION, wintypes.LPCWSTR))
 
     def _register_class(self):
         """Registers the systray window class.

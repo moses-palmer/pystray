@@ -3,6 +3,7 @@
 *.pyc
 *.sublime-*
 
+.idea
 build/*
 dist/*
 
