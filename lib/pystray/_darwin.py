@@ -117,6 +117,8 @@ class Icon(_base.Icon):
         self._mark_ready()
 
     def _notify(self, message, title=None):
+        if title is None:
+            title = ""
         subprocess.check_call([
             'osascript',
             '-e',
