@@ -21,7 +21,7 @@ import threading
 
 from ctypes import wintypes
 
-from ._util import serialized_image, win32
+from ._util import win32
 from . import _base
 
 
@@ -355,14 +355,69 @@ class Icon(_base.Icon):
         if self._icon_handle:
             return
 
-        with serialized_image(self.icon, 'ICO') as icon_path:
-            self._icon_handle = win32.LoadImage(
-                None,
-                icon_path,
-                win32.IMAGE_ICON,
-                0,
-                0,
-                win32.LR_DEFAULTSIZE | win32.LR_LOADFROMFILE)
+        self._icon_handle = self._create_icon_handle(self.icon)
+
+    def _create_icon_handle(self, image):
+        """Creates an icon handle from a :class:`PIL.Image.Image`.
+
+        Unlike loading the icon through ``LoadImage``, this builds the
+        ``HICON`` directly from an in-memory bitmap, so no temporary file is
+        written to disk.
+
+        :param PIL.Image.Image image: The image to convert.
+
+        :return: a :class:`ctypes.wintypes.HICON`
+        """
+        # CreateIconIndirect composites 32-bit alpha icons assuming
+        # premultiplied color channels; 'RGBa' makes Pillow do that
+        # premultiplication for us
+        image = image.convert('RGBA').convert('RGBa')
+        width, height = image.size
+        pixels = image.tobytes('raw', 'BGRa')
+
+        bmi = win32.BITMAPINFO()
+        bmi.bmiHeader.biSize = ctypes.sizeof(win32.BITMAPINFOHEADER)
+        bmi.bmiHeader.biWidth = width
+        # A negative height selects a top-down DIB, so the row order matches
+        # what PIL yields and no manual flipping is needed
+        bmi.bmiHeader.biHeight = -height
+        bmi.bmiHeader.biPlanes = 1
+        bmi.bmiHeader.biBitCount = 32
+        bmi.bmiHeader.biCompression = win32.BI_RGB
+
+        bits = wintypes.LPVOID()
+        hbm_color = win32.CreateDIBSection(
+            None, ctypes.byref(bmi), win32.DIB_RGB_COLORS,
+            ctypes.byref(bits), None, 0)
+        try:
+            ctypes.memmove(bits, pixels, len(pixels))
+
+            # The color bitmap already carries a full alpha channel, so the
+            # AND mask only needs to be all zero, but CreateBitmap does not
+            # zero-initialize its pixels unless we pass an explicit,
+            # word-aligned buffer
+            mask_stride = ((width + 15) // 16) * 2
+            mask_bits = bytes(mask_stride * height)
+            hbm_mask = win32.CreateBitmap(width, height, 1, 1, mask_bits)
+            try:
+                icon_info = win32.ICONINFO(
+                    fIcon=True,
+                    xHotspot=0,
+                    yHotspot=0,
+                    hbmMask=hbm_mask,
+                    hbmColor=hbm_color)
+                hicon = win32.CreateIconIndirect(ctypes.byref(icon_info))
+
+            finally:
+                # Only the two bitmaps created above are released here; a
+                # successfully created hicon must still be returned even if
+                # deleting one of them fails
+                _delete_object_quietly(hbm_mask)
+
+        finally:
+            _delete_object_quietly(hbm_color)
+
+        return hicon
 
     def _register_class(self):
         """Registers the systray window class.
@@ -389,6 +444,21 @@ class Icon(_base.Icon):
         :param atom: The class atom returned by :meth:`_register_class`.
         """
         win32.UnregisterClass(atom, win32.GetModuleHandle(None))
+
+
+def _delete_object_quietly(handle):
+    """Deletes a GDI object, ignoring failures.
+
+    This is used to release the temporary bitmaps used to build an icon
+    handle: a failure to release one of them must not prevent an already
+    created icon handle from being returned to the caller.
+
+    :param handle: The object to delete.
+    """
+    try:
+        win32.DeleteObject(handle)
+    except OSError:
+        pass
 
 
 @win32.WNDPROC
