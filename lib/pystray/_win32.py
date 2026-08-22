@@ -368,9 +368,12 @@ class Icon(_base.Icon):
 
         :return: a :class:`ctypes.wintypes.HICON`
         """
-        image = image.convert('RGBA')
+        # CreateIconIndirect composites 32-bit alpha icons assuming
+        # premultiplied color channels; 'RGBa' makes Pillow do that
+        # premultiplication for us
+        image = image.convert('RGBA').convert('RGBa')
         width, height = image.size
-        pixels = image.tobytes('raw', 'BGRA')
+        pixels = image.tobytes('raw', 'BGRa')
 
         bmi = win32.BITMAPINFO()
         bmi.bmiHeader.biSize = ctypes.sizeof(win32.BITMAPINFOHEADER)
@@ -389,9 +392,13 @@ class Icon(_base.Icon):
         try:
             ctypes.memmove(bits, pixels, len(pixels))
 
-            # The color bitmap already carries a full alpha channel, so an
-            # empty 1bpp mask is all CreateIconIndirect needs
-            hbm_mask = win32.CreateBitmap(width, height, 1, 1, None)
+            # The color bitmap already carries a full alpha channel, so the
+            # AND mask only needs to be all zero, but CreateBitmap does not
+            # zero-initialize its pixels unless we pass an explicit,
+            # word-aligned buffer
+            mask_stride = ((width + 15) // 16) * 2
+            mask_bits = bytes(mask_stride * height)
+            hbm_mask = win32.CreateBitmap(width, height, 1, 1, mask_bits)
             try:
                 icon_info = win32.ICONINFO(
                     fIcon=True,
@@ -399,13 +406,18 @@ class Icon(_base.Icon):
                     yHotspot=0,
                     hbmMask=hbm_mask,
                     hbmColor=hbm_color)
-                return win32.CreateIconIndirect(ctypes.byref(icon_info))
+                hicon = win32.CreateIconIndirect(ctypes.byref(icon_info))
 
             finally:
-                win32.DeleteObject(hbm_mask)
+                # Only the two bitmaps created above are released here; a
+                # successfully created hicon must still be returned even if
+                # deleting one of them fails
+                _delete_object_quietly(hbm_mask)
 
         finally:
-            win32.DeleteObject(hbm_color)
+            _delete_object_quietly(hbm_color)
+
+        return hicon
 
     def _register_class(self):
         """Registers the systray window class.
@@ -432,6 +444,21 @@ class Icon(_base.Icon):
         :param atom: The class atom returned by :meth:`_register_class`.
         """
         win32.UnregisterClass(atom, win32.GetModuleHandle(None))
+
+
+def _delete_object_quietly(handle):
+    """Deletes a GDI object, ignoring failures.
+
+    This is used to release the temporary bitmaps used to build an icon
+    handle: a failure to release one of them must not prevent an already
+    created icon handle from being returned to the caller.
+
+    :param handle: The object to delete.
+    """
+    try:
+        win32.DeleteObject(handle)
+    except OSError:
+        pass
 
 
 @win32.WNDPROC
