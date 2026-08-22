@@ -21,7 +21,7 @@ import threading
 
 from ctypes import wintypes
 
-from ._util import serialized_image, win32
+from ._util import win32
 from . import _base
 
 
@@ -355,14 +355,57 @@ class Icon(_base.Icon):
         if self._icon_handle:
             return
 
-        with serialized_image(self.icon, 'ICO') as icon_path:
-            self._icon_handle = win32.LoadImage(
-                None,
-                icon_path,
-                win32.IMAGE_ICON,
-                0,
-                0,
-                win32.LR_DEFAULTSIZE | win32.LR_LOADFROMFILE)
+        self._icon_handle = self._create_icon_handle(self.icon)
+
+    def _create_icon_handle(self, image):
+        """Creates an icon handle from a :class:`PIL.Image.Image`.
+
+        Unlike loading the icon through ``LoadImage``, this builds the
+        ``HICON`` directly from an in-memory bitmap, so no temporary file is
+        written to disk.
+
+        :param PIL.Image.Image image: The image to convert.
+
+        :return: a :class:`ctypes.wintypes.HICON`
+        """
+        image = image.convert('RGBA')
+        width, height = image.size
+        pixels = image.tobytes('raw', 'BGRA')
+
+        bmi = win32.BITMAPINFO()
+        bmi.bmiHeader.biSize = ctypes.sizeof(win32.BITMAPINFOHEADER)
+        bmi.bmiHeader.biWidth = width
+        # A negative height selects a top-down DIB, so the row order matches
+        # what PIL yields and no manual flipping is needed
+        bmi.bmiHeader.biHeight = -height
+        bmi.bmiHeader.biPlanes = 1
+        bmi.bmiHeader.biBitCount = 32
+        bmi.bmiHeader.biCompression = win32.BI_RGB
+
+        bits = wintypes.LPVOID()
+        hbm_color = win32.CreateDIBSection(
+            None, ctypes.byref(bmi), win32.DIB_RGB_COLORS,
+            ctypes.byref(bits), None, 0)
+        try:
+            ctypes.memmove(bits, pixels, len(pixels))
+
+            # The color bitmap already carries a full alpha channel, so an
+            # empty 1bpp mask is all CreateIconIndirect needs
+            hbm_mask = win32.CreateBitmap(width, height, 1, 1, None)
+            try:
+                icon_info = win32.ICONINFO(
+                    fIcon=True,
+                    xHotspot=0,
+                    yHotspot=0,
+                    hbmMask=hbm_mask,
+                    hbmColor=hbm_color)
+                return win32.CreateIconIndirect(ctypes.byref(icon_info))
+
+            finally:
+                win32.DeleteObject(hbm_mask)
+
+        finally:
+            win32.DeleteObject(hbm_color)
 
     def _register_class(self):
         """Registers the systray window class.

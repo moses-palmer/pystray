@@ -109,6 +109,9 @@ COLOR_WINDOW = 5
 HWND_MESSAGE = -3
 IMAGE_ICON = 1
 
+BI_RGB = 0
+DIB_RGB_COLORS = 0
+
 
 LPMSG = ctypes.POINTER(wintypes.MSG)
 
@@ -117,6 +120,48 @@ LPPOINT = ctypes.POINTER(wintypes.POINT)
 WNDPROC = ctypes.WINFUNCTYPE(
     ctypes.HRESULT,
     wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
+
+
+class RGBQUAD(ctypes.Structure):
+    _fields_ = [
+        ('rgbBlue', wintypes.BYTE),
+        ('rgbGreen', wintypes.BYTE),
+        ('rgbRed', wintypes.BYTE),
+        ('rgbReserved', wintypes.BYTE)]
+
+
+class BITMAPINFOHEADER(ctypes.Structure):
+    _fields_ = [
+        ('biSize', wintypes.DWORD),
+        ('biWidth', wintypes.LONG),
+        ('biHeight', wintypes.LONG),
+        ('biPlanes', wintypes.WORD),
+        ('biBitCount', wintypes.WORD),
+        ('biCompression', wintypes.DWORD),
+        ('biSizeImage', wintypes.DWORD),
+        ('biXPelsPerMeter', wintypes.LONG),
+        ('biYPelsPerMeter', wintypes.LONG),
+        ('biClrUsed', wintypes.DWORD),
+        ('biClrImportant', wintypes.DWORD)]
+
+
+class BITMAPINFO(ctypes.Structure):
+    _fields_ = [
+        ('bmiHeader', BITMAPINFOHEADER),
+        ('bmiColors', RGBQUAD * 1)]
+
+LPBITMAPINFO = ctypes.POINTER(BITMAPINFO)
+
+
+class ICONINFO(ctypes.Structure):
+    _fields_ = [
+        ('fIcon', wintypes.BOOL),
+        ('xHotspot', wintypes.DWORD),
+        ('yHotspot', wintypes.DWORD),
+        ('hbmMask', wintypes.HBITMAP),
+        ('hbmColor', wintypes.HBITMAP)]
+
+LPICONINFO = ctypes.POINTER(ICONINFO)
 
 
 class MENUITEMINFO(ctypes.Structure):
@@ -209,6 +254,26 @@ def _err(result, func, arguments):
 LPWNDCLASSEX = ctypes.POINTER(WNDCLASSEX)
 
 
+CreateBitmap = windll.gdi32.CreateBitmap
+CreateBitmap.argtypes = (
+    wintypes.INT, wintypes.INT, wintypes.UINT, wintypes.UINT,
+    wintypes.LPVOID)
+CreateBitmap.restype = wintypes.HBITMAP
+CreateBitmap.errcheck = _err
+
+CreateDIBSection = windll.gdi32.CreateDIBSection
+CreateDIBSection.argtypes = (
+    wintypes.HDC, LPBITMAPINFO, wintypes.UINT,
+    ctypes.POINTER(wintypes.LPVOID), wintypes.HANDLE, wintypes.DWORD)
+CreateDIBSection.restype = wintypes.HBITMAP
+CreateDIBSection.errcheck = _err
+
+CreateIconIndirect = windll.user32.CreateIconIndirect
+CreateIconIndirect.argtypes = (
+    LPICONINFO,)
+CreateIconIndirect.restype = wintypes.HICON
+CreateIconIndirect.errcheck = _err
+
 CreatePopupMenu = windll.user32.CreatePopupMenu
 CreatePopupMenu.argtypes = ()
 CreatePopupMenu.restype = wintypes.HMENU
@@ -227,6 +292,12 @@ DefWindowProc = windll.user32.DefWindowProcW
 DefWindowProc.argtypes = (
     wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
 DefWindowProc.restype = wintypes.DWORD
+
+DeleteObject = windll.gdi32.DeleteObject
+DeleteObject.argtypes = (
+    wintypes.HGDIOBJ,)
+DeleteObject.restype = wintypes.BOOL
+DeleteObject.errcheck = _err
 
 DestroyIcon = windll.user32.DestroyIcon
 DestroyIcon.argtypes = (
