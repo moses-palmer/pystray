@@ -47,6 +47,11 @@ The ``setup`` function will be run in a separate thread once the *system tray
 icon* is ready. The icon does not wait for it to complete, so you may put any
 code that would follow the call to ``pystray.Icon.run()`` in it.
 
+On *macOS*, updates to the icon, title, menu and visibility from ``setup`` or
+other worker threads are performed on the main thread. These calls wait for
+the update to complete, so the main runloop must remain available to process
+events. Worker updates that have not started when the icon stops are discarded.
+
 The call to ``pystray.Icon.run()`` will not complete until ``stop()`` is called.
 
 

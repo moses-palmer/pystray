@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Unreleased
+----------
+*  Run macOS icon, title, menu and visibility updates, and event-loop shutdown,
+   on the main thread, including when called from setup or worker threads.
+
+
 v0.19.5 (2023-09-17) - Various fixes
 ------------------------------------
 *  Change image flags to *Pillow* to those actually supported by newer versions

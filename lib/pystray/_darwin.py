@@ -15,9 +15,12 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import functools
 import io
 import signal
 import subprocess
+import sys
+import threading
 
 import AppKit
 import Foundation
@@ -26,6 +29,58 @@ import PIL
 import  PyObjCTools.MachSignals
 
 from . import _base
+
+
+class _MainThreadCall(Foundation.NSObject):
+    """Executes a Python call without letting exceptions cross into Cocoa.
+    """
+    def initWithPayload_(self, payload):
+        self = objc.super(_MainThreadCall, self).init()
+        if self is not None:
+            self.payload = payload
+            self.result = None
+            self.exc_info = None
+            self.completed = threading.Event()
+        return self
+
+    def invoke_(self, unused):
+        function, args, kwargs = self.payload
+        try:
+            if not args[0]._stopped.is_set():
+                self.result = function(*args, **kwargs)
+        except BaseException:
+            self.exc_info = sys.exc_info()
+        finally:
+            self.completed.set()
+
+
+def _on_main_thread(function):
+    """Runs an AppKit operation synchronously on the Cocoa main thread.
+    """
+    @functools.wraps(function)
+    def inner(self, *args, **kwargs):
+        if Foundation.NSThread.isMainThread():
+            return function(self, *args, **kwargs)
+        if self._stopped.is_set():
+            return
+
+        # The setup thread may not have an autorelease pool of its own.
+        with objc.autorelease_pool():
+            call = _MainThreadCall.alloc().initWithPayload_(
+                (function, (self,) + args, kwargs))
+            call.performSelectorOnMainThread_withObject_waitUntilDone_(
+                'invoke:', None, False)
+            # Do not strand the setup thread if stop() is called on the main
+            # thread while it is waiting for an AppKit operation.
+            while not call.completed.wait(0.1):
+                if self._stopped.is_set():
+                    return
+            if call.exc_info is not None:
+                _, exception, traceback = call.exc_info
+                call.exc_info = None
+                raise exception.with_traceback(traceback)
+            return call.result
+    return inner
 
 
 class Icon(_base.Icon):
@@ -43,6 +98,9 @@ class Icon(_base.Icon):
 
     def __init__(self, *args, **kwargs):
         super(Icon, self).__init__(*args, **kwargs)
+
+        #: Set when the main loop can no longer service worker requests.
+        self._stopped = threading.Event()
 
         #: The NSImage version of the icon
         self._icon_image = None
@@ -63,15 +121,18 @@ class Icon(_base.Icon):
         self._status_item.button().setTarget_(self._delegate)
         self._status_item.button().setAction_(self._ACTION_SELECTOR)
 
+    @_on_main_thread
     def _show(self):
         self._assert_image()
         self._update_title()
 
         self._status_item.button().setHidden_(False)
 
+    @_on_main_thread
     def _hide(self):
         self._status_item.button().setHidden_(True)
 
+    @_on_main_thread
     def _update_icon(self):
         self._icon_image = None
 
@@ -79,9 +140,11 @@ class Icon(_base.Icon):
             self._assert_image()
             self._icon_valid = True
 
+    @_on_main_thread
     def _update_title(self):
         self._status_item.button().setToolTip_(self.title)
 
+    @_on_main_thread
     def _update_menu(self):
         callbacks = []
         nsmenu = self._create_menu(self.menu, callbacks)
@@ -93,6 +156,7 @@ class Icon(_base.Icon):
             self._menu_handle = None
 
     def _run(self):
+        self._stopped.clear()
         # Notify the setup callback
         self._mark_ready()
 
@@ -109,11 +173,13 @@ class Icon(_base.Icon):
         except BaseException():
             self._queue.put(sys.exc_info())
         finally:
+            self._stopped.set()
             if PyObjCTools.MachSignals.getsignal(signal.SIGINT) == sigint:
                 PyObjCTools.MachSignals.signal(signal.SIGINT, previous_sigint)
             self._status_bar.removeStatusItem_(self._status_item)
 
     def _run_detached(self):
+        self._stopped.clear()
         self._mark_ready()
 
     def _notify(self, message, title=None):
@@ -127,6 +193,7 @@ class Icon(_base.Icon):
     def _remove_notification(self):
         pass
 
+    @_on_main_thread
     def _stop(self):
         self._app.stop_(self._app)
 
@@ -153,6 +220,7 @@ class Icon(_base.Icon):
             0,
             0)
         self._app.postEvent_atStart_(event, False)
+        self._stopped.set()
 
     def _assert_image(self):
         """Asserts that the cached icon image exists.
